@@ -18,7 +18,6 @@ Group={{exporter_startup_config.exporter_group|default('prometheus')}}
 {% for key in exporter_startup_config.startup.env|default({}) %}
 Environment="{{key}}={{exporter_startup_config.startup.env[key]}}"
 {% endfor %}
-ExecStart={{exporter_startup_config.startup.execstart}}
 {% if exporter_startup_config.startup.execstop|default(False) %}
 ExecStop={{exporter_startup_config.startup.execstop}}
 {% endif %}

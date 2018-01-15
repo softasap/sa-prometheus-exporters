@@ -5,6 +5,37 @@
   vars:
     - root_dir: ..
 
+    - box_prometheus_exporters:
+
+        - {
+            name: blackbox
+          }
+        - {
+            name: elasticsearch
+          }
+        - {
+            name: postgres
+          }
+        - {
+            name: cadvisor
+          }
+        - {
+            name: mongodb
+          }
+        - {
+            name: redis
+          }
+        - {
+            name: sql
+          }
+        - {
+            name: memcached
+          }
+        - {
+            name: mysqld
+          }
+
+
 
   pre_tasks:
     - debug: msg="Pre tasks section"
@@ -25,7 +56,8 @@
   roles:
      - {
          role: "sa-prometheus-exporters",
-         tags: ["create"]
+         tags: ["create"],
+         prometheus_exporters: "{{box_prometheus_exporters}}"
        }
 
   tasks:
