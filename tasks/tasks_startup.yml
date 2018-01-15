@@ -23,4 +23,4 @@
     when: docker_test is not defined
     become: yes
     tags:
-      - vault
+      - prometheus

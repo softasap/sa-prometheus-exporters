@@ -32,4 +32,6 @@
     tags:
       - prometheus
 
-  
+  - debug: var="exporter_config"
+
+  - include_tasks: "tasks_startup.yml exporter_startup_config={{exporter_config}}"

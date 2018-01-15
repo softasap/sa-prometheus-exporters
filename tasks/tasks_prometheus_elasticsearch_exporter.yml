@@ -32,3 +32,5 @@
     become: yes
     tags:
       - prometheus
+
+  - include_tasks: "tasks_startup.yml exporter_startup_config={{exporter_config}}"  
