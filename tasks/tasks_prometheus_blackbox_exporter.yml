@@ -3,17 +3,10 @@
 # https://github.com/prometheus/blackbox_exporter/releases/download/v0.11.0/blackbox_exporter-0.11.0.linux-amd64.tar.gz
 
   - set_fact:
-      blackbox_exporter_sub_dir: "{{exporter_dir | default('blackbox_exporter')}}"
-      blackbox_exporter_user: "{{exporter_user | default(prometheus_user)}}"
-      blackbox_exporter_group: "{{exporter_group | default(prometheus_group)}}"
+      blackbox_exporter_sub_dir: "{{exporter_config.exporter_dir | default('blackbox_exporter')}}"
+      blackbox_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
+      blackbox_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
 
-  - name: Prometheus | Create dirs
-    file: path="{{item}}"  state=directory  owner="root"  group="{{ blackbox_exporter_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
-    with_items:
-      - "{{prometheus_exporters_dir}}"
-    tags:
-      - prometheus
 
   - name: Prometheus BlackBox Exporter | Download distribution
     get_url:
@@ -39,3 +32,5 @@
     become: yes
     tags:
       - prometheus
+
+  

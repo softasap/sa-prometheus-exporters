@@ -4,18 +4,10 @@
 # https://github.com/oliver006/redis_exporter/releases/download/v0.14/redis_exporter-v0.14.linux-amd64.tar.gz
 
   - set_fact:
-      redis_exporter_sub_dir: "{{exporter_dir | default('redis_exporter')}}"
-      redis_exporter_user: "{{exporter_user | default(prometheus_user)}}"
-      redis_exporter_group: "{{exporter_group | default(prometheus_group)}}"
+      redis_exporter_sub_dir: "{{exporter_config.exporter_dir | default('redis_exporter')}}"
+      redis_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
+      redis_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
 
-  - name: Prometheus | Create dirs
-    file: path="{{item}}"  state=directory  owner="root"  group="{{ redis_exporter_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
-    with_items:
-      - "{{prometheus_exporters_dir}}"
-      - "{{prometheus_exporters_dir}}/{{redis_exporter_sub_dir}}"
-    tags:
-      - prometheus
 
   - name: Prometheus redis Exporter | Download distribution
     get_url:
@@ -35,3 +27,5 @@
     become_user: "{{ redis_exporter_user }}"
     tags:
       - prometheus
+
+  

@@ -5,8 +5,18 @@
 
   - include_tasks: tasks_prometheus_users.yml
 
+  - name: Prometheus | Create dirs
+    file: path="{{item}}" state=directory  owner="root"  group="{{ prometheus_group }}"   mode="u=rwx,g=rwx,o="
+    become: yes
+    with_items:
+      - "{{prometheus_exporters_dir}}"
+      - "{{prometheus_exporters_config_dir}}"
+    tags:
+      - prometheus
+
+
   - include_tasks: tasks_go.yml
     when: option_install_go
 
-  - include_tasks: "tasks_prometheus_{{item.name}}_exporter.yml"
+  - include_tasks: "tasks_prometheus_{{item.name}}_exporter.yml exporter_config={{item}}"
     with_items: "{{prometheus_exporters}}"

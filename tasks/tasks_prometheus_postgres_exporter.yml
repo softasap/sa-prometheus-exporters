@@ -4,17 +4,9 @@
 # https://github.com/wrouesnel/postgres_exporter/releases/download/v0.4.1/postgres_exporter_v0.4.1_linux-amd64.tar.gz
 
   - set_fact:
-      postgres_exporter_sub_dir: "{{exporter_dir | default('postgres_exporter')}}"
-      postgres_exporter_user: "{{exporter_user | default(prometheus_user)}}"
-      postgres_exporter_group: "{{exporter_group | default(prometheus_group)}}"
-
-  - name: Prometheus | Create dirs
-    file: path="{{item}}"  state=directory  owner="root"  group="{{ postgres_exporter_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
-    with_items:
-      - "{{prometheus_exporters_dir}}"
-    tags:
-      - prometheus
+      postgres_exporter_sub_dir: "{{exporter_config.exporter_dir | default('postgres_exporter')}}"
+      postgres_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
+      postgres_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
 
   - name: Prometheus postgres Exporter | Download distribution
     get_url:
@@ -40,3 +32,5 @@
     become: yes
     tags:
       - prometheus
+
+  

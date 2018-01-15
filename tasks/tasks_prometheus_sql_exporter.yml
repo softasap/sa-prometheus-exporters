@@ -4,17 +4,10 @@
 # https://github.com/justwatchcom/sql_exporter/releases/download/v0.2.0/sql_exporter-0.2.0.linux-amd64.tar.gz
 
   - set_fact:
-      sql_exporter_sub_dir: "{{exporter_dir | default('sql_exporter')}}"
-      sql_exporter_user: "{{exporter_user | default(prometheus_user)}}"
-      sql_exporter_group: "{{exporter_group | default(prometheus_group)}}"
+      sql_exporter_sub_dir: "{{exporter_config.exporter_dir | default('sql_exporter')}}"
+      sql_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
+      sql_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
 
-  - name: Prometheus | Create dirs
-    file: path="{{item}}"  state=directory  owner="root"  group="{{ sql_exporter_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
-    with_items:
-      - "{{prometheus_exporters_dir}}"
-    tags:
-      - prometheus
 
   - name: Prometheus sql Exporter | Download distribution
     get_url:
@@ -40,3 +33,5 @@
     become: yes
     tags:
       - prometheus
+
+  

@@ -3,7 +3,7 @@
 
 role_dir: "{{role_path}}"
 
-option_install_go: true
+option_install_go: false
 go_version: 1.6
 
 prometheus_exporters:
@@ -45,6 +45,7 @@ prometheus_group:  prometheus
 prometheus_base_dir: /opt/prometheus
 prometheus_exporters_dir: "{{prometheus_base_dir}}/exporters"
 prometheus_data_dir: "{{prometheus_base_dir}}/data"
+prometheus_exporters_config_dir: /etc/prometheus/exporters
 
 prometheus_node_exporter_version:   0.15.2
 prometheus_blackbox_exporter_version:   "0.11.0"

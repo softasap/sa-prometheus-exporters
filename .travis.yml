@@ -7,29 +7,29 @@ env:
 #    init: /sbin/init
 #    run_opts: ""
 #    playbook: test.yml
-  - distribution: ubuntu
-    version: 16.04
-    init: /sbin/init
-    run_opts: ""
-    playbook: test.yml
-#  - distribution: fedora
-#    version: 25
-#    init: /usr/sbin/init
-#    run_opts: ""
-#    playbook: test.yml
-#  - distribution: centos
-#    version: 7
-#    init: /usr/lib/systemd/systemd
-#    run_opts: "--privileged"
-#    playbook: test.yml
-#  - distribution: alpine
-#    version: 3.4
-#    init: /sbin/init
-#    playbook: test.yml
-#  - distribution: alpine
-#    version: 3.5
-#    init: /sbin/init
-#    playbook: test.yml
+   - distribution: ubuntu
+     version: 16.04
+     init: /sbin/init
+     run_opts: ""
+     playbook: test.yml
+   - distribution: fedora
+     version: 25
+     init: /usr/sbin/init
+     run_opts: ""
+     playbook: test.yml
+   - distribution: centos
+     version: 7
+     init: /usr/lib/systemd/systemd
+     run_opts: "--privileged"
+     playbook: test.yml
+   - distribution: alpine
+     version: 3.4
+     init: /sbin/init
+     playbook: test.yml
+   - distribution: alpine
+     version: 3.5
+     init: /sbin/init
+     playbook: test.yml
 
 
 # whitelist

@@ -7,7 +7,9 @@
       - prometheus
 
   - name: Prometheus | Create Prometheus exporter user
-    user: name="{{prometheus_user}}" group="{{prometheus_group}}"  comment="Prometheus user" shell="/bin/bash" createhome="false"
+    user: name="{{prometheus_user}}" group="{{prometheus_group}}"  comment="Prometheus user" shell="/bin/nologin" createhome="false"
     become: yes
     tags:
       - prometheus
+
+    
