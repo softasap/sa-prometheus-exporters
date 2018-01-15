@@ -3,7 +3,7 @@ FROM fedora:25
 
 # Install Ansible
 RUN dnf -y update
-RUN dnf install -y python2 python2-dnf libselinux-python
+RUN dnf install -y python2 python2-dnf libselinux-python sudo
 RUN dnf -y install ansible
 RUN mkdir -p /etc/ansible
 
