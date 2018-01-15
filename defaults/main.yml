@@ -6,6 +6,38 @@ role_dir: "{{role_path}}"
 option_install_go: true
 go_version: 1.6
 
+prometheus_exporters:
+  - {
+      name: node
+    }
+  - {
+      name: blackbox
+    }
+  - {
+      name: elasticsearch
+    }
+  - {
+      name: postgres
+    }
+  - {
+      name: cadvisor
+    }
+  - {
+      name: mongodb
+    }
+  - {
+      name: redis
+    }
+  - {
+      name: sql
+    }
+  - {
+      name: memcached
+    }
+  - {
+      name: mysqld
+    }
+
 
 prometheus_user:   prometheus
 prometheus_group:  prometheus
