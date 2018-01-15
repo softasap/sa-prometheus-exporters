@@ -8,6 +8,13 @@
       cadvisor_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
       cadvisor_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
 
+  - name: Prometheus | Create dirs
+    file: path="{{item}}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="
+    become: yes
+    with_items:
+      - "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}"
+    tags:
+      - prometheus
 
   - name: Prometheus cadvisor Exporter | Download distribution
     get_url:
@@ -19,4 +26,4 @@
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml exporter_startup_config={{exporter_config}}"  
+  - include_tasks: "tasks_startup.yml exporter_startup_config={{exporter_config}}"
