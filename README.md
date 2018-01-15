@@ -5,6 +5,20 @@ sa-prometheus-exporters
 
 Re-usable list of exporters usually used with Prometheus
 
+Bundled exporters:
+
+| Exporter | Description | Port | Example | Github |
+| --- | --- | --- | --- | --- |
+| node | Server params | 9100 | http://192.168.2.66:9100/metrics | [prometheus/node_exporter](https://github.com/prometheus/node_exporter/) |
+| mysqld | Prometheus MySQL exporter | 9104 | http://192.168.2.66:9104/metrics | [prometheus/mysqld_exporter](https://github.com/prometheus/mysqld_exporter/) |
+| elasticsearch | Elastic search | 9108 | http://192.168.2.66:9108/metrics | [justwatchcom/elasticsearch_exporter](https://github.com/justwatchcom/elasticsearch_exporter/) | 
+| blackbox | External services | 9115 | http://192.168.2.66:9115/metrics | [prometheus/blackbox_exporter](https://github.com/prometheus/blackbox_exporter/) | 
+| redis | Redis exporter | 9121 | http://192.168.2.66:9121/metrics | [oliver006/redis_exporter](https://github.com/oliver006/redis_exporter/) | 
+| memcached | memcached health | 9150 | http://192.168.2.66:9150/metrics | [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter/) | 
+| postgres | postgres exporter | 9187 | http://192.168.2.66:9187/metrics | [wrouesnel/postgres_exporter](https://github.com/wrouesnel/postgres_exporter/) | 
+| cadvisor | Google's cadvisor exporter | 9199 (configurable) | http://192.168.2.66:9199/metrics | [google/cadvisor](https://github.com/google/cadvisor/) | 
+| mongodb | Percona's mongodb exporter | 9216 | http://192.168.2.66:9216/metrics | [percona/mongodb_exporter](https://github.com/percona/mongodb_exporter/) | 
+| sql | custom sql exporter | 9237 | http://192.168.2.66:9237/metrics | [justwatchcom/sql_exporter](https://github.com/justwatchcom/sql_exporter) | 
 
 Example of usage:
 
@@ -69,4 +83,4 @@ Join gitter discussion channel at [Gitter](https://gitter.im/softasap)
 
 Discover other roles at  http://www.softasap.com/roles/registry_generated.html
 
-visit our blog at http://www.softasap.com/blog/archive.html 
+visit our blog at http://www.softasap.com/blog/archive.html
