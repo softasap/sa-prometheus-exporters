@@ -1,4 +1,4 @@
-  ---
+---
 
 # https://github.com/google/cadvisor/releases
 # https://github.com/google/cadvisor/releases/download/v0.27.4/cadvisor
@@ -20,7 +20,8 @@
   - name: Prometheus cadvisor Exporter | Download distribution
     get_url:
       url: "https://github.com/google/cadvisor/releases/download/v{{prometheus_cadvisor_exporter_version}}/cadvisor"
-      dest: "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}/cadvisor"
+      dest: "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}/cadvisor-exporter"
+      mode: "u=rwx,g=rx,o=rx"
     become: yes
     become_user: "{{ cadvisor_exporter_user }}"
     tags:
