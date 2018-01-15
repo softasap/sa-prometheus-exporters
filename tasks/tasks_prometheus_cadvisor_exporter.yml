@@ -1,0 +1,27 @@
+  ---
+
+# https://github.com/google/cadvisor/releases
+# https://github.com/google/cadvisor/releases/download/v0.27.4/cadvisor
+
+  - set_fact:
+      cadvisor_exporter_sub_dir: "{{exporter_dir | default('cadvisor_exporter')}}"
+      cadvisor_exporter_user: "{{exporter_user | default(prometheus_user)}}"
+      cadvisor_exporter_group: "{{exporter_group | default(prometheus_group)}}"
+
+  - name: Prometheus | Create dirs
+    file: path="{{item}}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="
+    become: yes
+    with_items:
+      - "{{prometheus_exporters_dir}}"
+      - "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}"
+    tags:
+      - prometheus
+
+  - name: Prometheus cadvisor Exporter | Download distribution
+    get_url:
+      url: "https://github.com/google/cadvisor/releases/download/v{{prometheus_cadvisor_exporter_version}}/cadvisor"
+      dest: "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}/cadvisor"
+    become: yes
+    become_user: "{{ cadvisor_exporter_user }}"
+    tags:
+      - prometheus

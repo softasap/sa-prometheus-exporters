@@ -1,0 +1,7 @@
+---
+# tasks file for sa-prometheus-exporters
+
+  - include: use/__detect_init_system.yml
+
+  - include: tasks_go.yml
+    when: option_install_go
