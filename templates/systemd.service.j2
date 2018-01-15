@@ -1,0 +1,40 @@
+# CI/CD managed
+# Do NOT modify this file by hand!
+
+[Unit]
+Description={{exporter_startup_config.name}} exporter service
+After=network.target
+Requires=network.target
+
+[Service]
+EnvironmentFile={{prometheus_exporters_config_dir}}/{{exporter_startup_config.name}}_exporter
+
+ExecStart={{prometheus_exporters_dir}}/{{exporter_startup_config.name}}_exporter/{{exporter_startup_config.name}}_exporter $OPTIONS
+User={{exporter_startup_config.exporter_user|default('prometheus')}}
+Group={{exporter_startup_config.exporter_group|default('prometheus')}}
+
+{% if exporter_startup_config.startup|default({}) %}
+
+{% for key in exporter_startup_config.startup.env|default({}) %}
+Environment="{{key}}={{exporter_startup_config.startup.env[key]}}"
+{% endfor %}
+{% if exporter_startup_config.startup.execstop|default(False) %}
+ExecStop={{exporter_startup_config.startup.execstop}}
+{% endif %}
+
+{% if exporter_startup_config.startup.pidfile|default(False) %}
+PIDFile={{exporter_startup_config.startup.pidfile}}
+{% endif %}
+
+{% for line in exporter_startup_config.startup.extralines|default([]) %}
+{{ line|default('') }}
+{% endfor %}
+
+{% endif %}
+
+Restart=always
+RestartSec=5
+TimeoutSec=5
+
+[Install]
+WantedBy=multi-user.target

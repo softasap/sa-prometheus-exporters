@@ -1,0 +1,65 @@
+---
+- hosts: www
+  gather_facts: False
+
+  vars:
+    - root_dir: ..
+
+    - box_prometheus_exporters:
+
+        - {
+            name: blackbox
+          }
+        - {
+            name: elasticsearch
+          }
+        - {
+            name: postgres
+          }
+        - {
+            name: cadvisor
+          }
+        - {
+            name: mongodb
+          }
+        - {
+            name: redis
+          }
+        - {
+            name: sql
+          }
+        - {
+            name: memcached
+          }
+        - {
+            name: mysqld
+          }
+
+
+
+  pre_tasks:
+    - debug: msg="Pre tasks section"
+
+    - name: ANSIBLE PYTHON | install python 2
+      raw: test -e /usr/bin/python || (apt -qqy update && apt install -qy python-minimal)
+      become: yes
+
+    - name:  UNPRIVILEGED USERS | Get acl dependency (ansible unprivileged user operations magic)
+      apt: pkg="acl"
+      become: yes
+
+    - name: gather facts
+      setup:
+      tags: always
+
+
+  roles:
+     - {
+         role: "sa-prometheus-exporters",
+         tags: ["create"],
+         prometheus_exporters: "{{box_prometheus_exporters}}"
+       }
+
+  tasks:
+
+    - debug: msg="Tasks section"
