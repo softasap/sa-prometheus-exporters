@@ -1,8 +1,7 @@
-  ---
+---
 
 # https://github.com/Lusitaniae/phpfpm_exporter
 # https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v0.2.0/phpfpm_exporter-0.2.0.linux-amd64.tar.gz
-
   - set_fact:
       phpfpm_exporter_sub_dir: "{{exporter_config.exporter_dir | default('phpfpm_exporter')}}"
       phpfpm_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
@@ -10,7 +9,7 @@
 
   - name: Prometheus phpfpm Exporter | Download distribution
     get_url:
-      url: "https://github.com/Lusitaniae/phpfpm_exporter/releases/download/releases/download/v{{prometheus_phpfpm_exporter_version}}/phpfpm_exporter-{{prometheus_phpfpm_exporter_version}}.linux-amd64.tar.gz"
+      url: "https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v{{prometheus_phpfpm_exporter_version}}/phpfpm_exporter-{{prometheus_phpfpm_exporter_version}}.linux-amd64.tar.gz"
       dest: "{{prometheus_exporters_dir}}/phpfpm_exporter-{{prometheus_phpfpm_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ phpfpm_exporter_user }}"
