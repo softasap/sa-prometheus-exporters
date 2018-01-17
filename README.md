@@ -137,6 +137,11 @@ user=prometheus_exporter
 password=XXXXXX
 ```
 
+For presentation, consider grafana dashboards , like
+
+https://github.com/percona/grafana-dashboards
+
+
 
 postgres exporter configuration
 --------------------------------
@@ -179,6 +184,13 @@ DATA_SOURCE_NAME="login:password@(hostname:port)/"
 ```
 
 Assuming, you provided above exporter is ready to operate.
+
+For presentation, consider grafana dashboards , like
+
+https://grafana.com/dashboards/3300
+
+https://grafana.com/dashboards/3742
+
 
 Usage with ansible galaxy workflow
 ----------------------------------
