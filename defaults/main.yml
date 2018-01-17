@@ -37,6 +37,9 @@ prometheus_exporters:
   - {
       name: mysqld
     }
+  - {
+      name: phpfpm
+    }
 
 
 prometheus_user:   prometheus
@@ -57,3 +60,4 @@ prometheus_redis_exporter_version:   "0.14"
 prometheus_sql_exporter_version: "0.2.0"
 prometheus_memcached_exporter_version:   "0.3.0"
 prometheus_mysqld_exporter_version:   "0.10.0"
+prometheus_phpfpm_exporter_version: "0.2.0"

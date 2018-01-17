@@ -8,6 +8,9 @@
     - box_prometheus_exporters:
 
         - {
+            name: phpfpm
+          }
+        - {
             name: blackbox
           }
         - {

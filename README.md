@@ -19,6 +19,8 @@ Bundled exporters:
 | cadvisor | Google's cadvisor exporter | 9199 (configurable) | http://192.168.2.66:9199/metrics | [google/cadvisor](https://github.com/google/cadvisor/) |
 | mongodb | Percona's mongodb exporter | 9216 | http://192.168.2.66:9216/metrics | [percona/mongodb_exporter](https://github.com/percona/mongodb_exporter/) |
 | sql | custom sql exporter | 9237 | http://192.168.2.66:9237/metrics | [justwatchcom/sql_exporter](https://github.com/justwatchcom/sql_exporter) |
+| phpfpm | php fpm exporter via sock | 9253 | http://192.168.2.66:9253/metrics | [Lusitaniae/phpfpm_exporter](https://github.com/Lusitaniae/phpfpm_exporter) |
+
 
 Example of usage:
 
@@ -91,7 +93,8 @@ box_prometheus_exporters:
       name: memcached
     }
   - {
-      name: mysqld
+      name: mysqld,
+      parameters: "-config.my-cnf=/etc/prometheus/.mycnf -collect.binlog_size=true -collect.info_schema.processlist=true"
     }
 
 roles:
@@ -104,6 +107,91 @@ roles:
 
 ```
 
+mysqld exporter configuration
+-----------------------------
+
+Best served with grafana dashboards from percona https://github.com/percona/grafana-dashboards
+
+For those you need to add parameter
+`-collect.binlog_size=true -collect.info_schema.processlist=true`
+
+additionally create exporter mysql user
+
+```sql
+CREATE USER 'prometheus_exporter'@'localhost' IDENTIFIED BY 'XXX' WITH MAX_USER_CONNECTIONS 3;
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'prometheus_exporter'@'localhost';
+```
+
+then either ensure environment variable in startup script (see configuration example in advanced)
+```shell
+export DATA_SOURCE_NAME='prometheus_exporter:XXX@(localhost:3306)/'
+```
+
+or
+
+create  ~/.my.cnf
+
+-config.my-cnf=/etc/prometheus/.mycnf -collect.binlog_size=true -collect.info_schema.processlist=true
+
+```ini
+[client]
+user=prometheus_exporter
+password=XXXXXX
+```
+
+For presentation, consider grafana dashboards , like
+
+https://github.com/percona/grafana-dashboards
+
+
+
+postgres exporter configuration
+--------------------------------
+
+Recommended approach - is to use dedicated user for stats collecting
+
+create exporter `postgres_exporter` user
+
+```sql
+CREATE USER postgres_exporter PASSWORD 'XXXX';
+ALTER USER postgres_exporter SET SEARCH_PATH TO postgres_exporter,pg_catalog;
+```
+
+As you are running as non postgres user, you would need to create views
+to read statistics information
+
+```sql
+
+-- If deploying as non-superuser (for example in AWS RDS)
+-- GRANT postgres_exporter TO :MASTER_USER;
+CREATE SCHEMA postgres_exporter AUTHORIZATION postgres_exporter;
+
+CREATE VIEW postgres_exporter.pg_stat_activity
+AS
+  SELECT * from pg_catalog.pg_stat_activity;
+
+GRANT SELECT ON postgres_exporter.pg_stat_activity TO postgres_exporter;
+
+CREATE VIEW postgres_exporter.pg_stat_replication AS
+  SELECT * from pg_catalog.pg_stat_replication;
+
+GRANT SELECT ON postgres_exporter.pg_stat_replication TO postgres_exporter;
+```
+
+in `/etc/prometheus/exporters/postgres_exporter`
+
+```
+OPTIONS="some parameters"
+DATA_SOURCE_NAME="login:password@(hostname:port)/"
+```
+
+Assuming, you provided above exporter is ready to operate.
+
+For presentation, consider grafana dashboards , like
+
+https://grafana.com/dashboards/3300
+
+https://grafana.com/dashboards/3742
 
 
 Usage with ansible galaxy workflow
