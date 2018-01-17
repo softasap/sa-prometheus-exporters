@@ -138,6 +138,48 @@ password=XXXXXX
 ```
 
 
+postgres exporter configuration
+--------------------------------
+
+Recommended approach - is to use dedicated user for stats collecting
+
+create exporter `postgres_exporter` user
+
+```sql
+CREATE USER postgres_exporter PASSWORD 'XXXX';
+ALTER USER postgres_exporter SET SEARCH_PATH TO postgres_exporter,pg_catalog;
+```
+
+As you are running as non postgres user, you would need to create views
+to read statistics information
+
+```sql
+
+-- If deploying as non-superuser (for example in AWS RDS)
+-- GRANT postgres_exporter TO :MASTER_USER;
+CREATE SCHEMA postgres_exporter AUTHORIZATION postgres_exporter;
+
+CREATE VIEW postgres_exporter.pg_stat_activity
+AS
+  SELECT * from pg_catalog.pg_stat_activity;
+
+GRANT SELECT ON postgres_exporter.pg_stat_activity TO postgres_exporter;
+
+CREATE VIEW postgres_exporter.pg_stat_replication AS
+  SELECT * from pg_catalog.pg_stat_replication;
+
+GRANT SELECT ON postgres_exporter.pg_stat_replication TO postgres_exporter;
+```
+
+in `/etc/prometheus/exporters/postgres_exporter`
+
+```
+OPTIONS="some parameters"
+DATA_SOURCE_NAME="login:password@(hostname:port)/"
+```
+
+Assuming, you provided above exporter is ready to operate.
+
 Usage with ansible galaxy workflow
 ----------------------------------
 
