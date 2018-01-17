@@ -91,7 +91,8 @@ box_prometheus_exporters:
       name: memcached
     }
   - {
-      name: mysqld
+      name: mysqld,
+      parameters: "-config.my-cnf=/etc/prometheus/.mycnf -collect.binlog_size=true -collect.info_schema.processlist=true"
     }
 
 roles:
@@ -104,6 +105,37 @@ roles:
 
 ```
 
+mysqld exporter configuration
+-----------------------------
+
+Best served with grafana dashboards from percona https://github.com/percona/grafana-dashboards
+
+For those you need to add parameter
+`-collect.binlog_size=true -collect.info_schema.processlist=true`
+
+additionally create exporter mysql user
+
+```sql
+CREATE USER 'prometheus_exporter'@'localhost' IDENTIFIED BY 'XXX' WITH MAX_USER_CONNECTIONS 3;
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'prometheus_exporter'@'localhost';
+```
+
+then either ensure environment variable in startup script (see configuration example in advanced)
+```shell
+export DATA_SOURCE_NAME='prometheus_exporter:XXX@(localhost:3306)/'
+```
+
+or
+
+create  ~/.my.cnf
+
+-config.my-cnf=/etc/prometheus/.mycnf -collect.binlog_size=true -collect.info_schema.processlist=true
+
+```ini
+[client]
+user=prometheus_exporter
+password=XXXXXX
+```
 
 
 Usage with ansible galaxy workflow
