@@ -37,6 +37,10 @@
         - {
             name: mysqld
           }
+        - {
+            name: ecs,
+            parameters: "--aws.region='us-east-1'"
+          }
 
 
 

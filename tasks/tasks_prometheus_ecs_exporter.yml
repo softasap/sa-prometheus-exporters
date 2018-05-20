@@ -1,0 +1,28 @@
+---
+
+# https://github.com/ProjectLighthouse/ecs-exporter/releases/tag/v1.1.1
+
+  - set_fact:
+      ecs_exporter_sub_dir: "{{exporter_config.exporter_dir | default('ecs_exporter')}}"
+      ecs_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
+      ecs_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
+
+  - name: Prometheus | Create dirs
+    file: path="{{item}}"  state=directory  owner="root"  group="{{ ecs_exporter_group }}"   mode="u=rwx,g=rwx,o="
+    become: yes
+    with_items:
+      - "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}"
+    tags:
+      - prometheus
+
+  - name: Prometheus ecs Exporter | Download distribution
+    get_url:
+      url: "https://github.com/ProjectLighthouse/ecs-exporter/releases/download/v{{prometheus_ecs_exporter_version | default('1.1.1')}}/ecs-exporter"
+      dest: "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}/ecs-exporter"
+      mode: "u=rwx,g=rx,o=rx"
+    become: yes
+    become_user: "{{ ecs_exporter_user }}"
+    tags:
+      - prometheus
+
+  - include_tasks: "tasks_startup.yml exporter_startup_config={{exporter_config}}"

@@ -2,35 +2,62 @@
 sudo: required
 
 env:
-#  - distribution: ubuntu
-#    version: 14.04
+#  - distribution='ubuntu'
+#    version='14.04'
+#    init='/sbin/init'
+#    run_opts=''
+#    playbook='test.yml'
+  - distribution='ubuntu'
+    version='16.04'
+    init='/sbin/init'
+    run_opts='--security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro'
+    playbook='test.yml'
+  - distribution='ubuntu'
+    version='18.04'
+    init='/sbin/init'
+    run_opts='--security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro'
+    playbook='test.yml'
+  - distribution='fedora'
+    version='25'
+    init='/usr/sbin/init'
+    run_opts='--security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro'
+    playbook='test.yml'
+  - distribution='fedora'
+    version='26'
+    init='/usr/sbin/init'
+    run_opts='--security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro'
+    playbook='test.yml'
+  - distribution='fedora'
+    version='27'
+    init='/usr/sbin/init'
+    run_opts='--security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro'
+    playbook='test.yml'
+  - distribution='fedora'
+    version='28'
+    init='/usr/sbin/init'
+    run_opts='--security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro'
+    playbook='test.yml'
+  - distribution='centos'
+    version='7'
+    init='/usr/lib/systemd/systemd'
+    run_opts='--privileged'
+    playbook='test.yml'
+#  - distribution: alpine
+#    version: 3.4
 #    init: /sbin/init
-#    run_opts: ""
 #    playbook: test.yml
-   - distribution: ubuntu
-     version: 16.04
-     init: /sbin/init
-     run_opts: ""
-     playbook: test.yml
-   - distribution: fedora
-     version: 25
-     init: /usr/sbin/init
-     run_opts: ""
-     playbook: test.yml
-   - distribution: centos
-     version: 7
-     init: /usr/lib/systemd/systemd
-     run_opts: "--privileged"
-     playbook: test.yml
-   # - distribution: alpine
-   #   version: 3.4
-   #   init: /sbin/init
-   #   playbook: test.yml
-   # - distribution: alpine
-   #   version: 3.5
-   #   init: /sbin/init
-   #   playbook: test.yml
-
+#  - distribution: alpine
+#    version: 3.5
+#    init: /sbin/init
+#    playbook: test.yml
+#  - distribution: alpine
+#    version: 3.6
+#    init: /sbin/init
+#    playbook: test.yml
+#  - distribution: alpine
+#    version: 3.7
+#    init: /sbin/init
+#    playbook: test.yml
 
 # whitelist
 branches:
@@ -46,12 +73,14 @@ before_install:
   - 'sudo docker pull ${distribution}:${version}'
   # Customize container
   - 'sudo docker build --rm=true --file=tests/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible tests'
+  - 'sudo docker run --rm --privileged -v /:/host ${distribution}-${version}:ansible setup || true'
+  - 'sudo mkdir -p /tmp/cgroup/systemd && sudo mount -t cgroup systemd /tmp/cgroup/systemd -o ro,noexec,nosuid,nodev,none,name=systemd'
 
 script:
   - container_id=$(mktemp)
     # Run container in detached state
-  - 'sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
-
+  - 'echo sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} -t ${distribution}-${version}:ansible "${init}"'
+  - 'sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} -t ${distribution}-${version}:ansible "${init}" > "${container_id}"'
   # Ansible syntax check.
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} --syntax-check'
 
