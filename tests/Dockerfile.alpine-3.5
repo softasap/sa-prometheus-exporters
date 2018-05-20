@@ -1,7 +1,9 @@
 FROM alpine:3.5
 
+ENV container docker
+
 RUN echo "===> (temporary) Installing sudo ..."  && \
-    apk --update add sudo bash                   && \
+    apk --update add sudo                        && \
     \
     \
     echo "===> Adding Python runtime..."  && \
@@ -24,3 +26,4 @@ RUN mkdir -p /etc/ansible
 # Install Ansible inventory file
 RUN echo "[local]" > /etc/ansible/hosts
 RUN echo "localhost ansible_connection=local" >> /etc/ansible/hosts
+

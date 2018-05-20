@@ -40,7 +40,9 @@ prometheus_exporters:
   - {
       name: phpfpm
     }
-
+  - {
+      name: ecs
+    }
 
 prometheus_user:   prometheus
 prometheus_group:  prometheus
@@ -61,3 +63,4 @@ prometheus_sql_exporter_version: "0.2.0"
 prometheus_memcached_exporter_version:   "0.3.0"
 prometheus_mysqld_exporter_version:   "0.10.0"
 prometheus_phpfpm_exporter_version: "0.2.0"
+prometheus_ecs_exporter_version: "1.1.1"

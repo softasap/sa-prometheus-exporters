@@ -1,5 +1,8 @@
 
 FROM centos:7
+
+ENV container docker
+
 RUN rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm
 
 # Install Ansible
