@@ -9,10 +9,12 @@
       cadvisor_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
 
   - name: Prometheus | Create dirs
-    file: path="{{item}}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="
+    file: path="{{current}}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
     with_items:
       - "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}"
+    loop_control:
+        loop_var: current
     tags:
       - prometheus
 
