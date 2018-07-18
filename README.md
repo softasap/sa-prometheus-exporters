@@ -200,6 +200,55 @@ https://grafana.com/dashboards/3300
 https://grafana.com/dashboards/3742
 
 
+Blackbox exporter notes
+-----------------------
+
+startup options should be kind of
+```
+OPTIONS="--config.file=/opt/prometheus/exporters/blackbox_exporter/blackbox.yml"
+```
+
+where blackbox.yml is
+
+```yaml
+
+modules:
+  http_2xx:
+    prober: http
+    http:
+  http_post_2xx:
+    prober: http
+    http:
+      method: POST
+  tcp_connect:
+    prober: tcp
+  pop3s_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - expect: "^+OK"
+      tls: true
+      tls_config:
+        insecure_skip_verify: false
+  ssh_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - expect: "^SSH-2.0-"
+  irc_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - send: "NICK prober"
+      - send: "USER prober prober prober :prober"
+      - expect: "PING :([^ ]+)"
+        send: "PONG ${1}"
+      - expect: "^:[^ ]+ 001"
+  icmp:
+    prober: icmp
+```
+
+
 Usage with ansible galaxy workflow
 ----------------------------------
 
