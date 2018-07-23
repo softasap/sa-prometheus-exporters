@@ -11,7 +11,7 @@
   - name: Prometheus BlackBox Exporter | Download distribution
     get_url:
       url: "https://github.com/prometheus/blackbox_exporter/releases/download/v{{prometheus_blackbox_exporter_version}}/blackbox_exporter-{{prometheus_blackbox_exporter_version}}.linux-amd64.tar.gz"
-      dest: "/tmp/{{prometheus_exporters_dir}}/blackbox_exporter-{{prometheus_blackbox_exporter_version}}.linux-amd64.tar.gz"
+      dest: "/tmp/blackbox_exporter-{{prometheus_blackbox_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ blackbox_exporter_user }}"
     tags:
@@ -19,7 +19,7 @@
 
   - name: Prometheus BlackBox Exporter | unpack distribution
     unarchive:
-      src: "/tmp/{{prometheus_exporters_dir}}/blackbox_exporter-{{prometheus_blackbox_exporter_version}}.linux-amd64.tar.gz"
+      src: "/tmp/blackbox_exporter-{{prometheus_blackbox_exporter_version}}.linux-amd64.tar.gz"
       dest: "{{prometheus_exporters_dir}}"
       remote_src: yes
     become: yes

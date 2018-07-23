@@ -11,7 +11,7 @@
   - name: Prometheus memcached Exporter | Download distribution
     get_url:
       url: "https://github.com/prometheus/memcached_exporter/releases/download/v{{prometheus_memcached_exporter_version}}/memcached_exporter-{{prometheus_memcached_exporter_version}}.linux-amd64.tar.gz"
-      dest: "/tmp/{{prometheus_exporters_dir}}/memcached_exporter-{{prometheus_memcached_exporter_version}}.linux-amd64.tar.gz"
+      dest: "/tmp/memcached_exporter-{{prometheus_memcached_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ memcached_exporter_user }}"
     tags:
@@ -19,7 +19,7 @@
 
   - name: Prometheus memcached Exporter | unpack distribution
     unarchive:
-      src: "/tmp/{{prometheus_exporters_dir}}/memcached_exporter-{{prometheus_memcached_exporter_version}}.linux-amd64.tar.gz"
+      src: "/tmp/memcached_exporter-{{prometheus_memcached_exporter_version}}.linux-amd64.tar.gz"
       dest: "{{prometheus_exporters_dir}}"
       remote_src: yes
     become: yes

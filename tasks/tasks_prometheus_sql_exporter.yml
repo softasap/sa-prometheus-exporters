@@ -12,7 +12,7 @@
   - name: Prometheus sql Exporter | Download distribution
     get_url:
       url: "https://github.com/justwatchcom/sql_exporter/releases/download/v{{prometheus_sql_exporter_version}}/sql_exporter-{{prometheus_sql_exporter_version}}.linux-amd64.tar.gz"
-      dest: "/tmp/{{prometheus_exporters_dir}}/sql_exporter-{{prometheus_sql_exporter_version}}.linux-amd64.tar.gz"
+      dest: "/tmp/sql_exporter-{{prometheus_sql_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ sql_exporter_user }}"
     tags:
@@ -20,8 +20,8 @@
 
   - name: Prometheus sql Exporter | unpack distribution
     unarchive:
-      src: "{{prometheus_exporters_dir}}/sql_exporter-{{prometheus_sql_exporter_version}}.linux-amd64.tar.gz"
-      dest: "/tmp/{{prometheus_exporters_dir}}"
+      src: "/tmp/{{prometheus_exporters_dir}}/sql_exporter-{{prometheus_sql_exporter_version}}.linux-amd64.tar.gz"
+      dest: "{{prometheus_exporters_dir}}"
       remote_src: yes
     become: yes
     become_user: "{{ sql_exporter_user }}"
