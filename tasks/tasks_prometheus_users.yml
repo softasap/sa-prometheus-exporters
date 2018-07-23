@@ -11,5 +11,3 @@
     become: yes
     tags:
       - prometheus
-
-    

@@ -1,0 +1,10 @@
+description "Google CAdvisor"
+
+start on runlevel [2345]
+stop on runlevel [016]
+
+respawn
+console log
+
+exec start-stop-daemon --chdir ${HOME} --start --make-pidfile --pid=/var/run/cadvisor.pid --exec {{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}/cadvisor_exporter -- --port {{ cadvisor_port | default(9280) }}
+

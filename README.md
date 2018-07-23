@@ -16,12 +16,11 @@ Bundled exporters:
 | redis | Redis exporter | 9121 | http://192.168.2.66:9121/metrics | [oliver006/redis_exporter](https://github.com/oliver006/redis_exporter/) |
 | memcached | memcached health | 9150 | http://192.168.2.66:9150/metrics | [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter/) |
 | postgres | postgres exporter | 9187 | http://192.168.2.66:9187/metrics | [wrouesnel/postgres_exporter](https://github.com/wrouesnel/postgres_exporter/) |
-| cadvisor | Google's cadvisor exporter | 9199 (configurable) | http://192.168.2.66:9199/metrics | [google/cadvisor](https://github.com/google/cadvisor/) |
 | mongodb | Percona's mongodb exporter | 9216 | http://192.168.2.66:9216/metrics | [percona/mongodb_exporter](https://github.com/percona/mongodb_exporter/) |
 | ecs | aws ecs exporter | 9222 | http://192.168.2.66:9222/metrics | [slok/ecs-exporter](https://github.com/slok/ecs-exporter) |
 | sql | custom sql exporter | 9237 | http://192.168.2.66:9237/metrics | [justwatchcom/sql_exporter](https://github.com/justwatchcom/sql_exporter) |
 | phpfpm | php fpm exporter via sock | 9253 | http://192.168.2.66:9253/metrics | [Lusitaniae/phpfpm_exporter](https://github.com/Lusitaniae/phpfpm_exporter) |
-
+| cadvisor | Google's cadvisor exporter | 9280 (configurable) | http://192.168.2.66:9280/metrics | [google/cadvisor](https://github.com/google/cadvisor/) |
 
 Example of usage:
 
@@ -198,6 +197,55 @@ For presentation, consider grafana dashboards , like
 https://grafana.com/dashboards/3300
 
 https://grafana.com/dashboards/3742
+
+
+Blackbox exporter notes
+-----------------------
+
+startup options should be kind of
+```
+OPTIONS="--config.file=/opt/prometheus/exporters/blackbox_exporter/blackbox.yml"
+```
+
+where blackbox.yml is
+
+```yaml
+
+modules:
+  http_2xx:
+    prober: http
+    http:
+  http_post_2xx:
+    prober: http
+    http:
+      method: POST
+  tcp_connect:
+    prober: tcp
+  pop3s_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - expect: "^+OK"
+      tls: true
+      tls_config:
+        insecure_skip_verify: false
+  ssh_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - expect: "^SSH-2.0-"
+  irc_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - send: "NICK prober"
+      - send: "USER prober prober prober :prober"
+      - expect: "PING :([^ ]+)"
+        send: "PONG ${1}"
+      - expect: "^:[^ ]+ 001"
+  icmp:
+    prober: icmp
+```
 
 
 Usage with ansible galaxy workflow
