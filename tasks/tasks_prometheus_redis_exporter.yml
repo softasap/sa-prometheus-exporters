@@ -19,7 +19,7 @@
   - name: Prometheus redis Exporter | Download distribution
     get_url:
       url: "https://github.com/oliver006/redis_exporter/releases/download/v{{prometheus_redis_exporter_version}}/redis_exporter-v{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
-      dest: "{{prometheus_exporters_dir}}/redis_exporter-{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
+      dest: "/tmp/{{prometheus_exporters_dir}}/redis_exporter-{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ redis_exporter_user }}"
     tags:
@@ -27,7 +27,7 @@
 
   - name: Prometheus redis Exporter | unpack distribution
     unarchive:
-      src: "{{prometheus_exporters_dir}}/redis_exporter-{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
+      src: "/tmp/{{prometheus_exporters_dir}}/redis_exporter-{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
       dest: "{{prometheus_exporters_dir}}/{{redis_exporter_sub_dir}}"
       remote_src: yes
     become: yes

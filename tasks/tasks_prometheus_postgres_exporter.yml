@@ -11,7 +11,7 @@
   - name: Prometheus postgres Exporter | Download distribution
     get_url:
       url: "https://github.com/wrouesnel/postgres_exporter/releases/download/v{{prometheus_postgres_exporter_version}}/postgres_exporter_v{{prometheus_postgres_exporter_version}}_linux-amd64.tar.gz"
-      dest: "{{prometheus_exporters_dir}}/postgres_exporter-{{prometheus_postgres_exporter_version}}.linux-amd64.tar.gz"
+      dest: "/tmp/{{prometheus_exporters_dir}}/postgres_exporter-{{prometheus_postgres_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ postgres_exporter_user }}"
     tags:
@@ -19,7 +19,7 @@
 
   - name: Prometheus postgres Exporter | unpack distribution
     unarchive:
-      src: "{{prometheus_exporters_dir}}/postgres_exporter-{{prometheus_postgres_exporter_version}}.linux-amd64.tar.gz"
+      src: "/tmp/{{prometheus_exporters_dir}}/postgres_exporter-{{prometheus_postgres_exporter_version}}.linux-amd64.tar.gz"
       dest: "{{prometheus_exporters_dir}}"
       remote_src: yes
     become: yes
@@ -33,4 +33,4 @@
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml exporter_startup_config={{exporter_config}}"    
+  - include_tasks: "tasks_startup.yml exporter_startup_config={{exporter_config}}"
