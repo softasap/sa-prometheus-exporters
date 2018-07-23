@@ -28,6 +28,19 @@
     tags:
       - prometheus
 
+  - name: CAdvisor | eliminate prometheus-exporter-cadvisor service, if any (1/2)
+    service: name="prometheus-exporter-cadvisor" state="stopped"
+    become: yes
+    ignore_errors: true
+    tags:
+      - prometheus
+
+  - name: CAdvisor | eliminate prometheus-exporter-cadvisor service, if any (2/2)
+    file: path="/etc/systemd/system/prometheus-exporter-cadvisor service.service" state="absent"
+    become: yes
+    ignore_errors: true
+    tags:
+      - prometheus
 
   - name: CAdvisor | Template startup script
     template: src="{{role_dir}}/templates/cadvisor.systemd.j2" dest="/etc/systemd/system/cadvisor.service"
