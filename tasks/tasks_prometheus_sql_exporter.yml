@@ -20,7 +20,7 @@
 
   - name: Prometheus sql Exporter | unpack distribution
     unarchive:
-      src: "/tmp/{{prometheus_exporters_dir}}/sql_exporter-{{prometheus_sql_exporter_version}}.linux-amd64.tar.gz"
+      src: "/tmp/sql_exporter-{{prometheus_sql_exporter_version}}.linux-amd64.tar.gz"
       dest: "{{prometheus_exporters_dir}}"
       remote_src: yes
     become: yes
