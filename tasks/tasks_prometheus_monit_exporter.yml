@@ -21,7 +21,7 @@
       dest: "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}/monit-exporter"
       mode: "u=rwx,g=rx,o=rx"
     become: yes
-    become_user: "{{ ecs_exporter_user }}"
+    become_user: "{{ monit_exporter_user }}"
     tags:
       - prometheus
 
