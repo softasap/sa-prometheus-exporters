@@ -18,7 +18,7 @@
   - name: Prometheus monit Exporter | Download distribution
     get_url:
       url: "https://github.com/commercetools/monit_exporter/releases/download/v{{prometheus_monit_exporter_version | default('0.0.2')}}/monit_exporter"      
-      dest: "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}/monit-exporter"
+      dest: "{{prometheus_exporters_dir}}/{{monit_exporter_sub_dir}}/monit-exporter"
       mode: "u=rwx,g=rx,o=rx"
     become: yes
     become_user: "{{ monit_exporter_user }}"
