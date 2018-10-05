@@ -1,0 +1,31 @@
+---
+
+# https://github.com/commercetools/monit_exporter/releases/download/v0.0.2/monit_exporter
+
+  - set_fact:
+      monit_exporter_sub_dir: "{{exporter_config.exporter_dir | default('monit_exporter')}}"
+      monit_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
+      monit_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
+
+  - name: Prometheus | Create dirs
+    file: path="{{item}}"  state=directory  owner="root"  group="{{ monit_exporter_group }}"   mode="u=rwx,g=rwx,o="
+    become: yes
+    with_items:
+      - "{{prometheus_exporters_dir}}/{{monit_exporter_sub_dir}}"
+    tags:
+      - prometheus
+
+  - name: Prometheus monit Exporter | Download distribution
+    get_url:
+      url: "https://github.com/ProjectLighthouse/ecs-exporter/releases/download/v{{prometheus_ecs_exporter_version | default('1.1.1')}}/ecs-exporter"
+      url: "https://github.com/commercetools/monit_exporter/releases/download/v{{prometheus_monit_exporter_version | default('0.0.2')}}/monit_exporter"      
+      dest: "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}/monit-exporter"
+      mode: "u=rwx,g=rx,o=rx"
+    become: yes
+    become_user: "{{ ecs_exporter_user }}"
+    tags:
+      - prometheus
+
+  - include_tasks: "tasks_startup.yml"
+    vars:
+      exporter_startup_config: "{{exporter_config}}"

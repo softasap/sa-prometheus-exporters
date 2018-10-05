@@ -21,7 +21,7 @@ Bundled exporters:
 | sql | custom sql exporter | 9237 | http://192.168.2.66:9237/metrics | [justwatchcom/sql_exporter](https://github.com/justwatchcom/sql_exporter) |
 | phpfpm | php fpm exporter via sock | 9253 | http://192.168.2.66:9253/metrics | [Lusitaniae/phpfpm_exporter](https://github.com/Lusitaniae/phpfpm_exporter) |
 | cadvisor | Google's cadvisor exporter | 9280 (configurable) | http://192.168.2.66:9280/metrics | [google/cadvisor](https://github.com/google/cadvisor/) |
-
+| monit | Monit exporter | 9388 (configurable) | http://192.168.2.66:9388/metrics | [commercetools/monit_exporter](https://github.com/commercetools/monit_exporter) |
 Example of usage:
 
 Simple
@@ -99,6 +99,10 @@ box_prometheus_exporters:
   - {
       name: ecs,
       parameters: "--aws.region='us-east-1'"
+    }
+  - {
+      name: monit,
+      parameters: "--monit_user='monit' --monit_password='monit_password'"
     }
 
 
