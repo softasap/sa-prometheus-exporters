@@ -26,6 +26,11 @@
             name: mongodb
           }
         - {
+            name: monit,
+            monit_user: "admin",
+            monit_password: "xeR5hSdSQcCnFVLV8PLy"
+          }          
+        - {
             name: redis
           }
         - {
@@ -61,6 +66,11 @@
 
 
   roles:
+     - {
+         role: "sa-monit",
+         tags: ["create"],
+       }
+
      - {
          role: "sa-prometheus-exporters",
          tags: ["create"],

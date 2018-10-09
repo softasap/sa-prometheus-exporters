@@ -16,7 +16,7 @@ $BOX_ADDRESS
 $BOX_USER
 $BOX_PWD
 
-verbose 4
+verbose 1
 set box_address $BOX_ADDRESS
 
 provision $BOX_NAME
