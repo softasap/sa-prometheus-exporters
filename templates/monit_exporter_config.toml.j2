@@ -1,18 +1,18 @@
-{% if exporter_config.hasKey("listen_address") %}
-listen_address = "{{exporter_config.listen_address}}"
+{% if exporter_config.listen_address is defined %}
+listen_address = "{{exporter_config["listen_address"]}}"
 {% endif %}
-{% if exporter_config.hasKey("metrics_path") %}
-listen_address = "{{exporter_config.metrics_path}}"
+{% if exporter_config.metrics_path is defined %}
+metrics_path = "{{exporter_config["metrics_path"]}}"
 {% endif %}
-{% if exporter_config.hasKey("ignore_ssl") %}
-ignore_ssl = "{{exporter_config.ignore_ssl}}"
+{% if exporter_config.ignore_ssl is defined %}
+ignore_ssl = "{{exporter_config["ignore_ssl"]}}"
 {% endif %}
-{% if exporter_config.hasKey("monit_scrape_uri") %}
-monit_scrape_uri = "{{exporter_config.monit_scrape_uri}}"
+{% if exporter_config.monit_scrape_uri is defined %}
+monit_scrape_uri = "{{exporter_config["monit_scrape_uri"]}}"
 {% endif %}
-{% if exporter_config.hasKey("monit_user") %}
-monit_user = "{{exporter_config.monit_user}}"
+{% if exporter_config.monit_user is defined %}
+monit_user = "{{exporter_config["monit_user"]}}"
 {% endif %}
-{% if exporter_config.hasKey("monit_password") %}
-monit_password = "{{exporter_config.monit_password}}"
+{% if exporter_config.monit_password is defined %}
+monit_password = "{{exporter_config["monit_password"]}}"
 {% endif %}
