@@ -1,3 +1,6 @@
 [submodule "roles/sa-prometheus-exporters"]
         path = roles/sa-prometheus-exporters
         url = https://github.com/softasap/sa-prometheus-exporters.git
+[submodule "roles/sa-monit"]
+        path = roles/sa-monit
+        url = https://github.com/softasap/sa-monit.git

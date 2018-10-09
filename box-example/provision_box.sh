@@ -2,8 +2,8 @@
 WORKSPACE=./
 BOX_PLAYBOOK=$WORKSPACE/box.yml
 BOX_NAME=sixteen
-BOX_ADDRESS=192.168.2.66
-BOX_USER=slavko
+BOX_ADDRESS=188.166.108.227
+BOX_USER=root
 BOX_PWD=
 
 prudentia ssh <<EOF
@@ -16,7 +16,7 @@ $BOX_ADDRESS
 $BOX_USER
 $BOX_PWD
 
-verbose 4
+verbose 1
 set box_address $BOX_ADDRESS
 
 provision $BOX_NAME

@@ -1,2 +1,4 @@
 - src: softasap.sa-prometheus-exporters
   name: sa-prometheus-exporters
+- src: softasap.sa-monit
+  name: sa-monit

@@ -102,7 +102,9 @@ box_prometheus_exporters:
     }
   - {
       name: monit,
-      parameters: "--monit_user='monit' --monit_password='monit_password'"
+      monit_user: "admin",
+      monit_password: "see_box_example_for_example_)",
+      listen_address: "0.0.0.0:9388"
     }
 
 
