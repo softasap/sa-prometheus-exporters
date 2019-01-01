@@ -16,6 +16,11 @@
     tags:
       - prometheus
 
+  - name: Prometheus Node Exporter | exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/node_exporter"
+    register: promotheusdir
+
   - name: Prometheus Node Exporter | unpack distribution
     unarchive:
       src: "/tmp/node_exporter-{{prometheus_node_exporter_version}}.linux-amd64.tar.gz"
@@ -23,6 +28,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ node_exporter_user }}"
+    when: promotheusdir.stat.exists == false
     tags:
       - prometheus
 
