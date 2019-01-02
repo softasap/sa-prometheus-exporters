@@ -4,9 +4,9 @@
 # https://github.com/prometheus/mysqld_exporter/releases/download/v0.10.0/mysqld_exporter-0.10.0.linux-amd64.tar.gz
 
   - set_fact:
-      mysqld_exporter_sub_dir: "{{exporter_config.exporter_dir | default('mysqld_exporter')}}"
-      mysqld_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
-      mysqld_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
+      mysqld_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('mysqld_exporter') }}"
+      mysqld_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+      mysqld_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus mysqld Exporter | Download distribution
     get_url:
@@ -35,4 +35,4 @@
 
   - include_tasks: "tasks_startup.yml"
     vars:
-      exporter_startup_config: "{{exporter_config}}"
+      exporter_startup_config: "{{ exporter_config}}"

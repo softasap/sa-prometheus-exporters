@@ -11,8 +11,8 @@ EnvironmentFile={{prometheus_exporters_config_dir}}/{{exporter_startup_config.na
 WorkingDirectory={{prometheus_exporters_dir}}/{{exporter_startup_config.name}}_exporter
 
 ExecStart={{prometheus_exporters_dir}}/{{exporter_startup_config.name}}_exporter/{{exporter_startup_config.name}}_exporter $OPTIONS
-User={{exporter_startup_config.exporter_user|default('prometheus')}}
-Group={{exporter_startup_config.exporter_group|default('prometheus')}}
+User={{exporter_startup_config.exporter_user|default('prometheus') }}
+Group={{exporter_startup_config.exporter_group|default('prometheus') }}
 
 {% if exporter_startup_config.startup|default({}) %}
 

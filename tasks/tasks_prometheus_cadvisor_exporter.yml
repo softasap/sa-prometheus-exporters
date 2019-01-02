@@ -4,9 +4,9 @@
 # https://github.com/google/cadvisor/releases/download/v0.27.4/cadvisor
 
   - set_fact:
-      cadvisor_exporter_sub_dir: "{{exporter_config.exporter_dir | default('cadvisor_exporter')}}"
-      cadvisor_exporter_user: "{{exporter_config.exporter_user | default('root')}}"
-      cadvisor_exporter_group: "{{exporter_config.exporter_group | default('root')}}"
+      cadvisor_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cadvisor_exporter') }}"
+      cadvisor_exporter_user: "{{ exporter_config.exporter_user | default('root') }}"
+      cadvisor_exporter_group: "{{ exporter_config.exporter_group | default('root') }}"
 
   - name: CAdvisor | Create dirs
     file: path="{{current}}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="

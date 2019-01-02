@@ -3,9 +3,9 @@
 # https://github.com/prometheus/node_exporter/releases/download/0.12.0/node_exporter-0.12.0.linux-amd64.tar.gz
 
   - set_fact:
-      node_exporter_sub_dir: "{{exporter_config.exporter_dir | default('node_exporter')}}"
-      node_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
-      node_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
+      node_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('node_exporter') }}"
+      node_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+      node_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus Node Exporter | Download distribution
     get_url:
@@ -42,4 +42,4 @@
 
   - include_tasks: "tasks_startup.yml"
     vars:
-      exporter_startup_config: "{{exporter_config}}"
+      exporter_startup_config: "{{ exporter_config}}"
