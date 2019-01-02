@@ -16,10 +16,10 @@
     tags:
       - prometheus
 
-  - name: Prometheus Node Exporter | exists
+  - name: Prometheus Node Exporter | check if this exporter version exists
     stat:
-      path: "{{prometheus_exporters_dir}}/node_exporter"
-    register: promotheusdir
+      path: "{{prometheus_exporters_dir}}/node_exporter-{{prometheus_node_exporter_version}}.linux-amd64/"
+    register: node_exporter_version_exists
 
   - name: Prometheus Node Exporter | unpack distribution
     unarchive:
@@ -28,7 +28,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ node_exporter_user }}"
-    when: promotheusdir.stat.exists == false
+    when: node_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
