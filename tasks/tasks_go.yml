@@ -4,12 +4,15 @@
   - name: GO | Check if installed
     command: test -x /usr/local/go/bin/go
     ignore_errors: yes
+    changed_when: False
     register: go_present
     tags:
       -go
 
   - name: Go | Download distribution
-    get_url: url="https://storage.googleapis.com/golang/go{{go_version | default('1.6')}}.linux-amd64.tar.gz"  dest=/tmp/go.tar.gz
+    get_url:
+      url: "https://storage.googleapis.com/golang/go{{ go_version | default('1.6') }}.linux-amd64.tar.gz"
+      dest: /tmp/go.tar.gz
     when: go_present | failed
     tags:
       -go
@@ -28,7 +31,7 @@
       -go
 
   - name: Add the Go bin directory to the PATH environment variable for all users
-    lineinfile: dest=/etc/profile.d/go_path.sh regexp="{{item.regexp}}" line="{{item.line}}"
+    lineinfile: dest=/etc/profile.d/go_path.sh regexp="{{ item.regexp }}" line="{{ item.line }}"
     become: yes
 #    when: go_present | failed
     with_items:
@@ -43,7 +46,7 @@
       -go
 
   - name: Set GOPATH for all users
-    lineinfile: dest=/etc/profile.d/go_path.sh regexp="{{item.regexp}}" line="{{item.line}}"
+    lineinfile: dest=/etc/profile.d/go_path.sh regexp="{{ item.regexp }}" line="{{ item.line }}"
     with_items:
       - {regexp: "^export GOPATH=.*", line: "export GOPATH=/usr/local/go"}
       - {regexp: "^export PATH=.*", line: "export PATH=$GOPATH/bin:$PATH"}

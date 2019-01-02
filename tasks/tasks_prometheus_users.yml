@@ -1,13 +1,18 @@
 ---
 
   - name: Prometheus | Create prometheus group
-    group: name="{{prometheus_group}}" state="present"
+    group: name="{{ prometheus_group }}" state="present"
     become: yes
     tags:
       - prometheus
 
   - name: Prometheus | Create Prometheus exporter user
-    user: name="{{prometheus_user}}" group="{{prometheus_group}}"  comment="Prometheus user" shell="/bin/nologin" createhome="false"
+    user:
+      name: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
+      comment: "Prometheus user"
+      shell: "/bin/nologin"
+      createhome: "false"
     become: yes
     tags:
       - prometheus

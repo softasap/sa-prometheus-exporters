@@ -4,9 +4,9 @@
 # https://github.com/percona/mongodb_exporter/releases/download/v0.3.1/mongodb_exporter-0.3.1.linux-amd64.tar.gz
 
   - set_fact:
-      mongodb_exporter_sub_dir: "{{exporter_config.exporter_dir | default('mongodb_exporter')}}"
-      mongodb_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
-      mongodb_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
+      mongodb_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('mongodb_exporter') }}"
+      mongodb_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+      mongodb_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
 
   - name: Prometheus mongodb Exporter | Download distribution
@@ -36,4 +36,4 @@
 
   - include_tasks: "tasks_startup.yml"
     vars:
-      exporter_startup_config: "{{exporter_config}}"
+      exporter_startup_config: "{{ exporter_config}}"

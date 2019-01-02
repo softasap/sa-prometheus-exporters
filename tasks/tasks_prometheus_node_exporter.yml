@@ -3,9 +3,9 @@
 # https://github.com/prometheus/node_exporter/releases/download/0.12.0/node_exporter-0.12.0.linux-amd64.tar.gz
 
   - set_fact:
-      node_exporter_sub_dir: "{{exporter_config.exporter_dir | default('node_exporter')}}"
-      node_exporter_user: "{{exporter_config.exporter_user | default(prometheus_user)}}"
-      node_exporter_group: "{{exporter_config.exporter_group | default(prometheus_group)}}"
+      node_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('node_exporter') }}"
+      node_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+      node_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus Node Exporter | Download distribution
     get_url:
@@ -16,6 +16,11 @@
     tags:
       - prometheus
 
+  - name: Prometheus Node Exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/node_exporter-{{prometheus_node_exporter_version}}.linux-amd64/"
+    register: node_exporter_version_exists
+
   - name: Prometheus Node Exporter | unpack distribution
     unarchive:
       src: "/tmp/node_exporter-{{prometheus_node_exporter_version}}.linux-amd64.tar.gz"
@@ -23,6 +28,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ node_exporter_user }}"
+    when: node_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
@@ -36,4 +42,4 @@
 
   - include_tasks: "tasks_startup.yml"
     vars:
-      exporter_startup_config: "{{exporter_config}}"
+      exporter_startup_config: "{{ exporter_config}}"
