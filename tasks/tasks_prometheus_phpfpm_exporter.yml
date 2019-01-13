@@ -19,7 +19,7 @@
   - name: Prometheus phpfpm Exporter | check if this exporter version exists
     stat:
       path: "{{prometheus_exporters_dir}}/phpfpm_exporter-{{prometheus_phpfpm_exporter_version}}.linux-amd64/"
-    register: phpftpm_exporter_version_exists
+    register: phpfpm_exporter_version_exists
 
   - name: Prometheus phpfpm Exporter | unpack distribution
     unarchive:
@@ -28,7 +28,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ phpfpm_exporter_user }}"
-    when: phpftpm_exporter_version_exists.stat.exists == false
+    when: phpfpm_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
