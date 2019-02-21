@@ -56,16 +56,16 @@ prometheus_exporters_dir: "{{prometheus_base_dir}}/exporters"
 prometheus_data_dir: "{{prometheus_base_dir}}/data"
 prometheus_exporters_config_dir: /etc/prometheus/exporters
 
-prometheus_node_exporter_version:   0.15.2
-prometheus_blackbox_exporter_version:   "0.11.0"
+prometheus_node_exporter_version:   0.17.0
+prometheus_blackbox_exporter_version:   "0.13.0"
 prometheus_elasticsearch_exporter_version:   "1.0.2"
 prometheus_postgres_exporter_version:   "0.4.1"
 prometheus_cadvisor_exporter_version:   "0.27.4"
 prometheus_mongodb_exporter_version:   "0.3.1"
 prometheus_redis_exporter_version:   "0.14"
 prometheus_sql_exporter_version: "0.2.0"
-prometheus_memcached_exporter_version:   "0.3.0"
-prometheus_mysqld_exporter_version:   "0.10.0"
+prometheus_memcached_exporter_version:   "0.5.0"
+prometheus_mysqld_exporter_version:   "0.11.0"
 prometheus_phpfpm_exporter_version: "0.2.0"
 prometheus_ecs_exporter_version: "1.1.1"
 prometheus_monit_exporter_version: "0.0.2"
