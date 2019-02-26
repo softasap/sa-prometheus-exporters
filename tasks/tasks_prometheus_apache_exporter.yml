@@ -1,4 +1,4 @@
-  ---
+---
 
 # https://github.com/Lusitaniae/apache_exporter
 # https://github.com/Lusitaniae/apache_exporter/releases/download/v0.5.0/apache_exporter-0.5.0.linux-amd64.tar.gz
@@ -17,6 +17,13 @@
     tags:
       - prometheus
 
+  - name: Prometheus apache Exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/apache_exporter-{{prometheus_apache_exporter_version}}.linux-amd64/"
+    register: apache_exporter_version_exists
+    become: yes
+    become_user: "{{ apache_exporter_user }}"
+
   - name: Prometheus apache Exporter | unpack distribution
     unarchive:
       src: "/tmp/apache_exporter-{{prometheus_apache_exporter_version}}.linux-amd64.tar.gz"
@@ -24,6 +31,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ apache_exporter_user }}"
+    when: apache_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 

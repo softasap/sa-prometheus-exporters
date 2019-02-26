@@ -20,6 +20,8 @@
     stat:
       path: "{{prometheus_exporters_dir}}/phpfpm_exporter-{{prometheus_phpfpm_exporter_version}}.linux-amd64/"
     register: phpfpm_exporter_version_exists
+    become: yes
+    become_user: "{{ phpfpm_exporter_user }}"
 
   - name: Prometheus phpfpm Exporter | unpack distribution
     unarchive:
