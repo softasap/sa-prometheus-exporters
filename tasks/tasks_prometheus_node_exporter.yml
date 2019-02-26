@@ -20,6 +20,8 @@
     stat:
       path: "{{prometheus_exporters_dir}}/node_exporter-{{prometheus_node_exporter_version}}.linux-amd64/"
     register: node_exporter_version_exists
+    become: yes
+    become_user: "{{ node_exporter_user }}"
 
   - name: Prometheus Node Exporter | unpack distribution
     unarchive:
