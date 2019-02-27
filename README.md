@@ -201,6 +201,64 @@ prometheus.yml
         target_label: __address__
 ```
 
+blackbox exporter configuration
+-------------------------------
+
+Blackbox exporter running on a monitoring host can, for example be used
+
+Example: monitoring ssh connectivity for external boxes
+
+prometheus.yml
+```
+  - job_name: 'blackbox_ssh'
+    metrics_path: /probe
+    params:
+      module: [ssh_banner]
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9100
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_private_ip]
+        regex: (.*)(:.*)?
+        replacement: ${1}:22
+        target_label: __param_target
+      # Actually talk to the blackbox exporter though
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+```
+
+And in a result you can tune prometheus alert manager to alert if you got issues with ssh connectivity
+
+/etc/prometheus/rules/ssh_alerts.yml
+```
+groups:
+- name: ssh_alerts.rules
+  rules:
+  - alert: SSHDown
+    expr: probe_success{job="blackbox_ssh"} == 0
+    annotations:
+      description: '[{{ $labels.env }}]{{ $labels.instance }} {{ $labels.name }} of job {{ $labels.job }} is not responding on ssh.'
+      summary: 'Instance {{ $labels.instance }} has possible ssh issue'
+    for: 10m
+```
+
 
 memcached exporter configuration
 --------------------------------
@@ -275,6 +333,83 @@ prometheus.yml
         replacement: ${1}:9100
         action: replace
         target_label: __address__
+```
+
+Some reasonable set of linked prometheus alerts to consider
+
+/etc/prometheus/rules/node_alerts.yml
+```
+groups:                                                                                                                                                                                                            
+- name: node_alerts.rules                                                                                                                                                                            
+  rules:                                                                                                                                                                                             
+  - alert: LowDiskSpace                                                                                                                                                                              
+    expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}* 100 <= 10                                                                  
+    for: 15m                                                                                                                                                                                         
+    labels:                                                                                                                                                                                          
+      severity: warn                                                                                                                                                                                 
+    annotations:                                                                                                                                                                                     
+      title: 'Less than 10% disk space left'                                                                                                                                                         
+      description: |                                                                                                                                                                                 
+        Consider sshing into the instance and removing old logs, clean                                                                                                                               
+        temp files, or remove old apt packages with `apt-get autoremove`                                                                                                                             
+      runbook: troubleshooting/filesystem_alerts.md                                                                                                                                                  
+      value: '{{ $value | humanize }}%'                                                                                                                                                              
+      device: '{{ $labels.device }}%'                                                                                                                                                                
+      mount_point: '{{ $labels.mountpoint }}%'                                                                                                                                                                     
+  - alert: NoDiskSpace                                                                                                                                                                               
+    expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}* 100 <= 1                                                                   
+    for: 15m                                                                                                                                                                                         
+    labels:                                                                                                                                                                                          
+      pager: pagerduty                                                                                                                                                                               
+      severity: critical                                                                                                                                                                             
+    annotations:                                                                                                                                                                                     
+      title: '1% disk space left'                                                                                                                                                                    
+      description: "There's only 1% disk space left"                                                                                                                                                 
+      runbook: troubleshooting/filesystem_alerts.md
+      value: '{{ $value | humanize }}%'
+      device: '{{ $labels.device }}%'
+      mount_point: '{{ $labels.mountpoint }}%'
+
+  - alert: HighInodeUsage
+    expr: node_filesystem_files_free{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_files{fstype=~"(ext.|xfs)",job="node"}* 100 <= 20
+    for: 15m
+    labels:
+      severity: critical
+    annotations:
+      title: "High number of inode usage"
+      description: |
+        "Consider ssh'ing into the instance and removing files or clean
+        temp files"
+      runbook: troubleshooting/filesystem_alerts_inodes.md
+      value: '{{ $value | printf "%.2f" }}%'
+      device: '{{ $labels.device }}%'
+      mount_point: '{{ $labels.mountpoint }}%'
+
+  - alert: ExtremelyHighCPU
+    expr: instance:node_cpu_in_use:ratio > 0.95
+    for: 2h
+    labels:
+      pager: pagerduty
+      severity: critical
+    annotations:
+      description: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+        }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+      runbook: troubleshooting
+      title: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+        }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+
+  - alert: HighCPU
+    expr: instance:node_cpu_in_use:ratio > 0.8
+    for: 2h
+    labels:
+      severity: critical
+    annotations:
+      description: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+        }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+      runbook: troubleshooting
+      title: CPU use percent is high on {{ if $labels.fqdn }}{{ $labels.fqdn }}{{
+        else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+
 ```
 
 phpfpm exporter configuration
