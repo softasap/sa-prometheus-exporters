@@ -13,6 +13,7 @@ Bundled exporters:
 | mysqld | Prometheus MySQL exporter | 9104 | http://192.168.2.66:9104/metrics | [prometheus/mysqld_exporter](https://github.com/prometheus/mysqld_exporter/) |
 | elasticsearch | Elastic search | 9108 | http://192.168.2.66:9108/metrics | [justwatchcom/elasticsearch_exporter](https://github.com/justwatchcom/elasticsearch_exporter/) |
 | blackbox | External services | 9115 | http://192.168.2.66:9115/metrics | [prometheus/blackbox_exporter](https://github.com/prometheus/blackbox_exporter/) |
+| apache | Apache webserver | 9117 | http://192.168.2.66:9117/metrics | [Lusitaniae/apache_exporter](https://github.com/Lusitaniae/apache_exporter/) |
 | redis | Redis exporter | 9121 | http://192.168.2.66:9121/metrics | [oliver006/redis_exporter](https://github.com/oliver006/redis_exporter/) |
 | memcached | memcached health | 9150 | http://192.168.2.66:9150/metrics | [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter/) |
 | postgres | postgres exporter | 9187 | http://192.168.2.66:9187/metrics | [wrouesnel/postgres_exporter](https://github.com/wrouesnel/postgres_exporter/) |
@@ -69,42 +70,53 @@ box_prometheus_exporters:
 
     }
   - {
+      name: apache
+    }
+  - {
       name: blackbox
     }
   - {
-      name: elasticsearch
-    }
-  - {
-      name: postgres
-    }
-  - {
       name: cadvisor
-    }
-  - {
-      name: mongodb
-    }
-  - {
-      name: redis
-    }
-  - {
-      name: sql
-    }
-  - {
-      name: memcached
-    }
-  - {
-      name: mysqld,
-      parameters: "-config.my-cnf=/etc/prometheus/.mycnf -collect.binlog_size=true -collect.info_schema.processlist=true"
     }
   - {
       name: ecs,
       parameters: "--aws.region='us-east-1'"
     }
   - {
+      name: elasticsearch
+    }
+  - {
+      name: memcached
+    }
+  - {
+      name: mongodb
+    }
+  - {
       name: monit,
       monit_user: "admin",
       monit_password: "see_box_example_for_example_)",
       listen_address: "0.0.0.0:9388"
+    }
+  - {
+      name: mysqld,
+      parameters: "-config.my-cnf=/etc/prometheus/.mycnf -collect.binlog_size=true -collect.info_schema.processlist=true"
+    }
+  - {
+      name: node
+    }
+  - {
+      name: phpfpm,
+      exporter_user: "www-data",
+      parameters: "--phpfpm.socket-paths /var/run/php/php7.0-fpm.sock"
+    }
+  - {
+      name: postgres
+    }
+  - {
+      name: redis
+    }
+  - {
+      name: sql
     }
 
 
@@ -154,6 +166,322 @@ For presentation, consider grafana dashboards , like
 
 https://github.com/percona/grafana-dashboards
 
+For troubleshouting, must have grafana dashboard is  https://grafana.com/dashboards/456
+
+
+apache exporter configuration
+-----------------------------
+
+apache	Server params	9117	http://192.168.2.66:9117/metrics	Lusitaniae/apache_exporter
+
+
+prometheus.yml
+```
+  - job_name: "apache"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9117
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_public_ip]
+        regex: (.*) 
+        replacement: ${1}:9117
+        action: replace
+        target_label: __address__
+```
+
+Grafana dashboard compatible with this exporter is, for example  https://grafana.com/dashboards/3894
+
+blackbox exporter configuration
+-------------------------------
+
+Blackbox exporter running on a monitoring host can, for example be used
+
+Example: monitoring ssh connectivity for external boxes
+
+prometheus.yml
+```
+  - job_name: 'blackbox_ssh'
+    metrics_path: /probe
+    params:
+      module: [ssh_banner]
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9100
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_private_ip]
+        regex: (.*)(:.*)?
+        replacement: ${1}:22
+        target_label: __param_target
+      # Actually talk to the blackbox exporter though
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+```
+
+And in a result you can tune prometheus alert manager to alert if you got issues with ssh connectivity
+
+/etc/prometheus/rules/ssh_alerts.yml
+```
+groups:
+- name: ssh_alerts.rules
+  rules:
+  - alert: SSHDown
+    expr: probe_success{job="blackbox_ssh"} == 0
+    annotations:
+      description: '[{{ $labels.env }}]{{ $labels.instance }} {{ $labels.name }} of job {{ $labels.job }} is not responding on ssh.'
+      summary: 'Instance {{ $labels.instance }} has possible ssh issue'
+    for: 10m
+```
+
+
+memcached exporter configuration
+--------------------------------
+
+memcached	memcached health	9150	http://192.168.2.66:9150/metrics	prometheus/memcached_exporter
+
+
+prometheus.yml
+```
+  - job_name: "memcached"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9150
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_public_ip]
+        regex: (.*) 
+        replacement: ${1}:9150
+        action: replace
+        target_label: __address__
+```
+
+Compatible grafana dashboard  
+https://grafana.com/dashboards/37
+
+
+
+
+node exporter configuration
+---------------------------
+
+node	Server params	9100	http://192.168.2.66:9100/metrics	prometheus/node_exporter
+
+Auto discovery in aws cloud, with filtering
+
+prometheus.yml
+```
+  - job_name: "node"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9100
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_public_ip]
+        regex: (.*) 
+        replacement: ${1}:9100
+        action: replace
+        target_label: __address__
+```
+
+Some reasonable set of linked prometheus alerts to consider
+
+/etc/prometheus/rules/node_alerts.yml
+```
+groups:                                                                                                                                                                                                            
+- name: node_alerts.rules                                                                                                                                                                            
+  rules:                                                                                                                                                                                             
+  - alert: LowDiskSpace                                                                                                                                                                              
+    expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}* 100 <= 10                                                                  
+    for: 15m                                                                                                                                                                                         
+    labels:                                                                                                                                                                                          
+      severity: warn                                                                                                                                                                                 
+    annotations:                                                                                                                                                                                     
+      title: 'Less than 10% disk space left'                                                                                                                                                         
+      description: |                                                                                                                                                                                 
+        Consider sshing into the instance and removing old logs, clean                                                                                                                               
+        temp files, or remove old apt packages with `apt-get autoremove`                                                                                                                             
+      runbook: troubleshooting/filesystem_alerts.md                                                                                                                                                  
+      value: '{{ $value | humanize }}%'                                                                                                                                                              
+      device: '{{ $labels.device }}%'                                                                                                                                                                
+      mount_point: '{{ $labels.mountpoint }}%'                                                                                                                                                                     
+  - alert: NoDiskSpace                                                                                                                                                                               
+    expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}* 100 <= 1                                                                   
+    for: 15m                                                                                                                                                                                         
+    labels:                                                                                                                                                                                          
+      pager: pagerduty                                                                                                                                                                               
+      severity: critical                                                                                                                                                                             
+    annotations:                                                                                                                                                                                     
+      title: '1% disk space left'                                                                                                                                                                    
+      description: "There's only 1% disk space left"                                                                                                                                                 
+      runbook: troubleshooting/filesystem_alerts.md
+      value: '{{ $value | humanize }}%'
+      device: '{{ $labels.device }}%'
+      mount_point: '{{ $labels.mountpoint }}%'
+
+  - alert: HighInodeUsage
+    expr: node_filesystem_files_free{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_files{fstype=~"(ext.|xfs)",job="node"}* 100 <= 20
+    for: 15m
+    labels:
+      severity: critical
+    annotations:
+      title: "High number of inode usage"
+      description: |
+        "Consider ssh'ing into the instance and removing files or clean
+        temp files"
+      runbook: troubleshooting/filesystem_alerts_inodes.md
+      value: '{{ $value | printf "%.2f" }}%'
+      device: '{{ $labels.device }}%'
+      mount_point: '{{ $labels.mountpoint }}%'
+
+  - alert: ExtremelyHighCPU
+    expr: instance:node_cpu_in_use:ratio > 0.95
+    for: 2h
+    labels:
+      pager: pagerduty
+      severity: critical
+    annotations:
+      description: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+        }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+      runbook: troubleshooting
+      title: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+        }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+
+  - alert: HighCPU
+    expr: instance:node_cpu_in_use:ratio > 0.8
+    for: 2h
+    labels:
+      severity: critical
+    annotations:
+      description: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+        }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+      runbook: troubleshooting
+      title: CPU use percent is high on {{ if $labels.fqdn }}{{ $labels.fqdn }}{{
+        else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+
+```
+
+Grafana dashboard might be   https://grafana.com/dashboards/22 (label_values(node_exporter_build_info, instance))
+
+Consider:  https://grafana.com/dashboards/6014 or https://grafana.com/dashboards/718
+
+phpfpm exporter configuration
+-----------------------------
+
+phpfpm	php fpm exporter via sock	9253	http://192.168.2.66:9253/metrics	Lusitaniae/phpfpm_exporter
+
+
+Pay attention to configuration
+
+First of all, exporter should work under user, that can read php-fpm sock (for example www-data if you used sa-php-fpm role),
+Second - you should provide path to sock, like `--phpfpm.socket-paths /var/run/php/php7.0-fpm.sock`
+
+```yaml
+      exporter_user: "www-data",
+      parameters: "--phpfpm.socket-paths /var/run/php/php7.0-fpm.sock"
+```
+
+Third, the FPM status page must be enabled in every pool you'd like to monitor by defining pm.status_path = /status
+
+
+Auto discovery in aws cloud, with filtering
+
+prometheus.yml
+```
+  - job_name: "phpfpm"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9253
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_public_ip]
+        regex: (.*) 
+        replacement: ${1}:9253
+        action: replace
+        target_label: __address__
+```
+
+Linked grafana dashboard:
+
+https://grafana.com/dashboards/5579  (single pool)
+
+https://grafana.com/dashboards/5714 (multiple pools)
 
 
 postgres exporter configuration
