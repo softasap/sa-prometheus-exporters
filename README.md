@@ -105,7 +105,9 @@ box_prometheus_exporters:
       name: node
     }
   - {
-      name: phpfpm
+      name: phpfpm,
+      exporter_user: "www-data",
+      parameters: "--phpfpm.socket-paths /var/run/php/php7.0-fpm.sock"
     }
   - {
       name: postgres
@@ -164,6 +166,8 @@ For presentation, consider grafana dashboards , like
 
 https://github.com/percona/grafana-dashboards
 
+For troubleshouting, must have grafana dashboard is  https://grafana.com/dashboards/456
+
 
 apache exporter configuration
 -----------------------------
@@ -200,6 +204,8 @@ prometheus.yml
         action: replace
         target_label: __address__
 ```
+
+Grafana dashboard compatible with this exporter is, for example  https://grafana.com/dashboards/3894
 
 blackbox exporter configuration
 -------------------------------
@@ -295,6 +301,10 @@ prometheus.yml
         action: replace
         target_label: __address__
 ```
+
+Compatible grafana dashboard  
+https://grafana.com/dashboards/37
+
 
 
 
@@ -412,10 +422,28 @@ groups:
 
 ```
 
+Grafana dashboard might be   https://grafana.com/dashboards/22 (label_values(node_exporter_build_info, instance))
+
+Consider:  https://grafana.com/dashboards/6014 or https://grafana.com/dashboards/718
+
 phpfpm exporter configuration
 -----------------------------
 
 phpfpm	php fpm exporter via sock	9253	http://192.168.2.66:9253/metrics	Lusitaniae/phpfpm_exporter
+
+
+Pay attention to configuration
+
+First of all, exporter should work under user, that can read php-fpm sock (for example www-data if you used sa-php-fpm role),
+Second - you should provide path to sock, like `--phpfpm.socket-paths /var/run/php/php7.0-fpm.sock`
+
+```yaml
+      exporter_user: "www-data",
+      parameters: "--phpfpm.socket-paths /var/run/php/php7.0-fpm.sock"
+```
+
+Third, the FPM status page must be enabled in every pool you'd like to monitor by defining pm.status_path = /status
+
 
 Auto discovery in aws cloud, with filtering
 
@@ -449,7 +477,11 @@ prometheus.yml
         target_label: __address__
 ```
 
+Linked grafana dashboard:
 
+https://grafana.com/dashboards/5579  (single pool)
+
+https://grafana.com/dashboards/5714 (multiple pools)
 
 
 postgres exporter configuration
