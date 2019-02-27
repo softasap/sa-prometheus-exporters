@@ -8,43 +8,46 @@ go_version: 1.6
 
 prometheus_exporters:
   - {
-      name: node
+      name: apache
     }
   - {
       name: blackbox
     }
   - {
-      name: elasticsearch
-    }
-  - {
-      name: postgres
-    }
-  - {
       name: cadvisor
     }
   - {
+      name: ecs
+    }
+  - {
+      name: elasticsearch
+    }
+  - {
+      name: memcached
+    }
+  - {
       name: mongodb
+    }
+  - {
+      name: monit
+    }
+  - {
+      name: mysqld
+    }
+  - {
+      name: node
+    }
+  - {
+      name: phpfpm
+    }
+  - {
+      name: postgres
     }
   - {
       name: redis
     }
   - {
       name: sql
-    }
-  - {
-      name: memcached
-    }
-  - {
-      name: mysqld
-    }
-  - {
-      name: phpfpm
-    }
-  - {
-      name: ecs
-    }
-  - {
-      name: monit
     }
 
 

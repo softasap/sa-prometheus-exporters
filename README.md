@@ -13,6 +13,7 @@ Bundled exporters:
 | mysqld | Prometheus MySQL exporter | 9104 | http://192.168.2.66:9104/metrics | [prometheus/mysqld_exporter](https://github.com/prometheus/mysqld_exporter/) |
 | elasticsearch | Elastic search | 9108 | http://192.168.2.66:9108/metrics | [justwatchcom/elasticsearch_exporter](https://github.com/justwatchcom/elasticsearch_exporter/) |
 | blackbox | External services | 9115 | http://192.168.2.66:9115/metrics | [prometheus/blackbox_exporter](https://github.com/prometheus/blackbox_exporter/) |
+| apache | Apache webserver | 9117 | http://192.168.2.66:9117/metrics | [Lusitaniae/apache_exporter](https://github.com/Lusitaniae/apache_exporter/) |
 | redis | Redis exporter | 9121 | http://192.168.2.66:9121/metrics | [oliver006/redis_exporter](https://github.com/oliver006/redis_exporter/) |
 | memcached | memcached health | 9150 | http://192.168.2.66:9150/metrics | [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter/) |
 | postgres | postgres exporter | 9187 | http://192.168.2.66:9187/metrics | [wrouesnel/postgres_exporter](https://github.com/wrouesnel/postgres_exporter/) |
@@ -69,42 +70,51 @@ box_prometheus_exporters:
 
     }
   - {
+      name: apache
+    }
+  - {
       name: blackbox
     }
   - {
-      name: elasticsearch
-    }
-  - {
-      name: postgres
-    }
-  - {
       name: cadvisor
-    }
-  - {
-      name: mongodb
-    }
-  - {
-      name: redis
-    }
-  - {
-      name: sql
-    }
-  - {
-      name: memcached
-    }
-  - {
-      name: mysqld,
-      parameters: "-config.my-cnf=/etc/prometheus/.mycnf -collect.binlog_size=true -collect.info_schema.processlist=true"
     }
   - {
       name: ecs,
       parameters: "--aws.region='us-east-1'"
     }
   - {
+      name: elasticsearch
+    }
+  - {
+      name: memcached
+    }
+  - {
+      name: mongodb
+    }
+  - {
       name: monit,
       monit_user: "admin",
       monit_password: "see_box_example_for_example_)",
       listen_address: "0.0.0.0:9388"
+    }
+  - {
+      name: mysqld,
+      parameters: "-config.my-cnf=/etc/prometheus/.mycnf -collect.binlog_size=true -collect.info_schema.processlist=true"
+    }
+  - {
+      name: node
+    }
+  - {
+      name: phpfpm
+    }
+  - {
+      name: postgres
+    }
+  - {
+      name: redis
+    }
+  - {
+      name: sql
     }
 
 
@@ -153,6 +163,157 @@ password=XXXXXX
 For presentation, consider grafana dashboards , like
 
 https://github.com/percona/grafana-dashboards
+
+
+apache exporter configuration
+-----------------------------
+
+apache	Server params	9117	http://192.168.2.66:9117/metrics	Lusitaniae/apache_exporter
+
+
+prometheus.yml
+```
+  - job_name: "apache"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9117
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_public_ip]
+        regex: (.*) 
+        replacement: ${1}:9117
+        action: replace
+        target_label: __address__
+```
+
+
+memcached exporter configuration
+--------------------------------
+
+memcached	memcached health	9150	http://192.168.2.66:9150/metrics	prometheus/memcached_exporter
+
+
+prometheus.yml
+```
+  - job_name: "memcached"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9150
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_public_ip]
+        regex: (.*) 
+        replacement: ${1}:9150
+        action: replace
+        target_label: __address__
+```
+
+
+
+node exporter configuration
+---------------------------
+
+node	Server params	9100	http://192.168.2.66:9100/metrics	prometheus/node_exporter
+
+Auto discovery in aws cloud, with filtering
+
+prometheus.yml
+```
+  - job_name: "node"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9100
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_public_ip]
+        regex: (.*) 
+        replacement: ${1}:9100
+        action: replace
+        target_label: __address__
+```
+
+phpfpm exporter configuration
+-----------------------------
+
+phpfpm	php fpm exporter via sock	9253	http://192.168.2.66:9253/metrics	Lusitaniae/phpfpm_exporter
+
+Auto discovery in aws cloud, with filtering
+
+prometheus.yml
+```
+  - job_name: "phpfpm"
+    ec2_sd_configs:
+      - region: us-east-1
+        port: 9253
+    relabel_configs:
+        # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_public_ip]
+        regex: (.*) 
+        replacement: ${1}:9253
+        action: replace
+        target_label: __address__
+```
+
 
 
 
