@@ -28,7 +28,7 @@
 - include_tasks: "tasks_startup.yml"
   vars:
     exporter_startup_config: "{{ exporter_config}}"
-    exporter_startup_template: "clouldwatch"
+    exporter_startup_template: "cloudwatch"
 
 - name: Prometheus cloudwatch Exporter | Configuration file
   template:
