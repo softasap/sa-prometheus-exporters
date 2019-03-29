@@ -584,6 +584,83 @@ modules:
 ```
 
 
+cloudwatch exporter configuration
+---------------------------------
+
+You will need to give appropriate rights to your monitoring instance
+
+```tf
+
+resource "aws_iam_role" "monitoring_iam_role" {
+  name = "monitoring_iam_role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ec2-read-only-policy-attachment" {
+  role = "${aws_iam_role.monitoring_iam_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "CloudWatchFullAccess" {
+  role = "${aws_iam_role.monitoring_iam_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+}
+
+
+resource "aws_iam_role_policy_attachment" "ec2-read-only-policy-attachment" {
+  role = "${aws_iam_role.monitoring_iam_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "CloudWatchFullAccess" {
+  role = "${aws_iam_role.monitoring_iam_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+}
+
+resource "aws_iam_role_policy" "iam_role_policy_prometheuscloudwatch" {
+  name = "iam_role_policy_prometheuscloudwatch"
+  role = "${aws_iam_role.monitoring_iam_role.id}"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "prometheuscloudwatchexporter",
+            "Effect": "Allow",
+            "Action": [
+                "tag:GetResources",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:ListMetrics"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+```
+
+config.yml by default is scripted to give you idea about possibilities.
+Amend it.
+
+
 Usage with ansible galaxy workflow
 ----------------------------------
 
