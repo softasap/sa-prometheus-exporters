@@ -3,7 +3,7 @@
 # https://github.com/ivx/yet-another-cloudwatch-exporter
 
 - set_fact:
-    cloudwatch_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('yet-another-cloudwatch-exporter') }}"
+    cloudwatch_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cloudwatch_exporter') }}"
     cloudwatch_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
     cloudwatch_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
