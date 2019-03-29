@@ -1,0 +1,114 @@
+discovery:
+  exportedTagsOnMetrics:
+    ec2:
+      - Name
+  jobs:
+  - region: eu-west-1
+    type: "es"
+    searchTags:
+      - Key: type
+        Value: ^(easteregg|k8s)$
+    metrics:
+      - name: FreeStorageSpace
+        statistics:
+        - 'Sum'
+        period: 600
+        length: 60
+      - name: ClusterStatus.green
+        statistics:
+        - 'Minimum'
+        period: 600
+        length: 60
+      - name: ClusterStatus.yellow
+        statistics:
+        - 'Maximum'
+        period: 600
+        length: 60
+      - name: ClusterStatus.red
+        statistics:
+        - 'Maximum'
+        period: 600
+        length: 60
+  - type: "elb"
+    region: eu-west-1
+    searchTags:
+      - Key: KubernetesCluster
+        Value: production-19
+    metrics:
+      - name: HealthyHostCount
+        statistics:
+        - 'Minimum'
+        period: 600
+        length: 600
+      - name: HTTPCode_Backend_4XX
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 900
+        delay: 300
+        nilToZero: true
+  - type: "alb"
+    region: eu-west-1
+    searchTags:
+      - Key: kubernetes.io/service-name
+        Value: .*
+    metrics:
+      - name: UnHealthyHostCount
+        statistics: [Maximum]
+        period: 60
+        length: 600
+  - type: "vpn"
+    region: eu-west-1
+    searchTags:
+      - Key: kubernetes.io/service-name
+        Value: .*
+    metrics:
+      - name: TunnelState
+        statistics:
+        - 'p90'
+        period: 60
+        length: 300
+  - type: "kinesis"
+    region: eu-west-1
+    metrics:
+      - name: PutRecords.Success
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+  - type: "s3"
+    region: eu-west-1
+    searchTags:
+      - Key: type
+        Value: public
+    additionalDimensions:
+      - name: StorageType
+        value: StandardStorage
+    metrics:
+      - name: NumberOfObjects
+        statistics:
+          - Average
+        period: 86400
+        length: 172800
+        disableTimestamp: true
+      - name: BucketSizeBytes
+        statistics:
+          - Average
+        period: 86400
+        length: 172800
+        disableTimestamp: true
+static:
+  - namespace: AWS/AutoScaling
+    region: eu-west-1
+    dimensions:
+     - name: AutoScalingGroupName
+       value: Test
+    customTags:
+      - Key: CustomTag
+        Value: CustomValue
+    metrics:
+      - name: GroupInServiceInstances
+        statistics:
+        - 'Minimum'
+        period: 60
+        length: 300
