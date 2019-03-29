@@ -33,11 +33,7 @@
 - name: Prometheus cloudwatch Exporter | Configuration file
   template:
     src: "{{role_dir}}/templates/cloudwatch_exporter_config.yml.j2"
-<<<<<<< HEAD
-    dest: "/etc/prometheus/exporters/cloudwatch_exporter_config.xml"
-=======
     dest: "/etc/prometheus/exporters/cloudwatch_exporter_config.yml"
->>>>>>> 0a41b51db602d9c90c771adda454a03c030b7866
     owner: "root"
     group: "{{ cloudwatch_exporter_group }}"
   become: yes
