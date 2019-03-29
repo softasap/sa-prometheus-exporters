@@ -1,0 +1,54 @@
+---
+
+# https://github.com/ivx/yet-another-cloudwatch-exporter
+
+- set_fact:
+    cloudwatch_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cloudwatch_exporter') }}"
+    cloudwatch_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+    cloudwatch_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+
+- name: Prometheus cloudwatch Exporter | Create dirs
+  file: path="{{ item }}"  state=directory  owner="root"  group="{{ cloudwatch_exporter_group }}"   mode="u=rwx,g=rwx,o="
+  become: yes
+  with_items:
+    - "{{prometheus_exporters_dir}}/{{cloudwatch_exporter_sub_dir}}"
+  tags:
+    - prometheus
+
+- name: Prometheus cloudwatch Exporter | Download distribution
+  get_url:
+    url: "https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/{{ prometheus_cloudwatch_exporter_version | default('0.12.0') }}/yace-linux-amd64-{{ prometheus_cloudwatch_exporter_version | default('0.12.0') }}"
+    dest: "{{prometheus_exporters_dir}}/{{cloudwatch_exporter_sub_dir}}/cloudwatch_exporter"
+    mode: "u=rwx,g=rx,o=rx"
+  become: yes
+  become_user: "{{ cloudwatch_exporter_user }}"
+  tags:
+    - prometheus
+
+- include_tasks: "tasks_startup.yml"
+  vars:
+    exporter_startup_config: "{{ exporter_config}}"
+    exporter_startup_template: "cloudwatch"
+
+- name: Prometheus cloudwatch Exporter | Configuration file
+  template:
+    src: "{{role_dir}}/templates/cloudwatch_exporter_config.yml.j2"
+    dest: "/etc/prometheus/exporters/cloudwatch_exporter_config.yml"
+    owner: "root"
+    group: "{{ cloudwatch_exporter_group }}"
+  become: yes
+  tags:
+    - prometheus
+
+- name: Prometheus cloudwatch Exporter | Configuration file link to config.xml
+  file:
+    src: "/etc/prometheus/exporters/cloudwatch_exporter_config.yml"
+    dest: "{{prometheus_exporters_dir}}/{{cloudwatch_exporter_sub_dir}}/config.yml"
+    state: link
+    owner: "root"
+    group: "{{cloudwatch_exporter_group}}"
+  become: yes
+  tags:
+    - prometheus
+
+

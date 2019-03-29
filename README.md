@@ -23,6 +23,8 @@ Bundled exporters:
 | phpfpm | php fpm exporter via sock | 9253 | http://192.168.2.66:9253/metrics | [Lusitaniae/phpfpm_exporter](https://github.com/Lusitaniae/phpfpm_exporter) |
 | cadvisor | Google's cadvisor exporter | 9280 (configurable) | http://192.168.2.66:9280/metrics | [google/cadvisor](https://github.com/google/cadvisor/) |
 | monit | Monit exporter | 9388 (configurable) | http://192.168.2.66:9388/metrics | [commercetools/monit_exporter](https://github.com/commercetools/monit_exporter) |
+| cloudwatch | Cloudwatch exporter | 9400 (configurable) | http://192.168.2.66:9400/metrics | [ivx/yet-another-cloudwatch-exporter](https://github.com/ivx/yet-another-cloudwatch-exporter) |
+
 Example of usage:
 
 Simple
@@ -580,6 +582,83 @@ modules:
   icmp:
     prober: icmp
 ```
+
+
+cloudwatch exporter configuration
+---------------------------------
+
+You will need to give appropriate rights to your monitoring instance
+
+```tf
+
+resource "aws_iam_role" "monitoring_iam_role" {
+  name = "monitoring_iam_role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ec2-read-only-policy-attachment" {
+  role = "${aws_iam_role.monitoring_iam_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "CloudWatchFullAccess" {
+  role = "${aws_iam_role.monitoring_iam_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+}
+
+
+resource "aws_iam_role_policy_attachment" "ec2-read-only-policy-attachment" {
+  role = "${aws_iam_role.monitoring_iam_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "CloudWatchFullAccess" {
+  role = "${aws_iam_role.monitoring_iam_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+}
+
+resource "aws_iam_role_policy" "iam_role_policy_prometheuscloudwatch" {
+  name = "iam_role_policy_prometheuscloudwatch"
+  role = "${aws_iam_role.monitoring_iam_role.id}"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "prometheuscloudwatchexporter",
+            "Effect": "Allow",
+            "Action": [
+                "tag:GetResources",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:ListMetrics"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+```
+
+config.yml by default is scripted to give you idea about possibilities.
+Amend it.
 
 
 Usage with ansible galaxy workflow

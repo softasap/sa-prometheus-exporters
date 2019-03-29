@@ -12,7 +12,10 @@
       - prometheus
 
   - name: Exporter | Configuring systemd file for exporter {{exporter_startup_config.name}}
-    template: src={{role_dir}}/templates/systemd.service.j2 dest=/etc/systemd/system/prometheus-exporter-{{exporter_startup_config.name}}.service mode=0644
+    template:
+      src: "{{role_dir}}/templates/{{ exporter_startup_template | default('systemd') }}.service.j2"
+      dest: "/etc/systemd/system/prometheus-exporter-{{exporter_startup_config.name}}.service"
+      mode: 0644
     when: docker_test is not defined
     become: yes
     tags:
