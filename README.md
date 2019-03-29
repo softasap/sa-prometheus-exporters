@@ -23,6 +23,8 @@ Bundled exporters:
 | phpfpm | php fpm exporter via sock | 9253 | http://192.168.2.66:9253/metrics | [Lusitaniae/phpfpm_exporter](https://github.com/Lusitaniae/phpfpm_exporter) |
 | cadvisor | Google's cadvisor exporter | 9280 (configurable) | http://192.168.2.66:9280/metrics | [google/cadvisor](https://github.com/google/cadvisor/) |
 | monit | Monit exporter | 9388 (configurable) | http://192.168.2.66:9388/metrics | [commercetools/monit_exporter](https://github.com/commercetools/monit_exporter) |
+| cloudwatch | Cloudwatch exporter | 9400 (configurable) | http://192.168.2.66:9400/metrics | [ivx/yet-another-cloudwatch-exporter](https://github.com/ivx/yet-another-cloudwatch-exporter) |
+
 Example of usage:
 
 Simple
