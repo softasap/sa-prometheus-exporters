@@ -132,6 +132,10 @@ roles:
 
 ```
 
+More exporters to consider:   https://prometheus.io/docs/instrumenting/exporters/
+
+If you want some to be included into role defaults, open the issue or PR (preferable)
+
 mysqld exporter configuration
 -----------------------------
 
