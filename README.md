@@ -15,6 +15,7 @@ Bundled exporters:
 | blackbox | External services | 9115 | http://192.168.2.66:9115/metrics | [prometheus/blackbox_exporter](https://github.com/prometheus/blackbox_exporter/) |
 | apache | Apache webserver | 9117 | http://192.168.2.66:9117/metrics | [Lusitaniae/apache_exporter](https://github.com/Lusitaniae/apache_exporter/) |
 | redis | Redis exporter | 9121 | http://192.168.2.66:9121/metrics | [oliver006/redis_exporter](https://github.com/oliver006/redis_exporter/) |
+| proxysql | ProxySQL exporter | 42004 | http://192.168.2.66:42004/metrics | [percona/proxysql_exporter](https://github.com/percona/proxysql_exporter) |
 | memcached | memcached health | 9150 | http://192.168.2.66:9150/metrics | [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter/) |
 | postgres | postgres exporter | 9187 | http://192.168.2.66:9187/metrics | [wrouesnel/postgres_exporter](https://github.com/wrouesnel/postgres_exporter/) |
 | mongodb | Percona's mongodb exporter | 9216 | http://192.168.2.66:9216/metrics | [percona/mongodb_exporter](https://github.com/percona/mongodb_exporter/) |
@@ -105,6 +106,9 @@ box_prometheus_exporters:
     }
   - {
       name: node
+    }
+  - {
+      name: proxysql
     }
   - {
       name: phpfpm,
