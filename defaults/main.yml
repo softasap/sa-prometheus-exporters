@@ -38,6 +38,9 @@ prometheus_exporters:
       name: mysqld
     }
   - {
+    name: proxysql
+    }
+  - {
       name: node
     }
   - {
@@ -73,6 +76,7 @@ prometheus_redis_exporter_version:   "0.14"
 prometheus_sql_exporter_version: "0.2.0"
 prometheus_memcached_exporter_version:   "0.5.0"
 prometheus_mysqld_exporter_version:   "0.11.0"
+prometheus_proxysql_exporter_version: "1.1.0"
 prometheus_phpfpm_exporter_version: "0.2.0"
 prometheus_ecs_exporter_version: "1.1.1"
 prometheus_monit_exporter_version: "0.0.2"
