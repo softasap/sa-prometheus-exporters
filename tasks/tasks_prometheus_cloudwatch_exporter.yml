@@ -25,9 +25,21 @@
 
   - name: Prometheus cloudwatch Exporter | Download distribution
     get_url:
-      url: "https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/{{ prometheus_cloudwatch_exporter_version | default('0.12.0') }}/yace-linux-amd64-{{ prometheus_cloudwatch_exporter_version | default('0.12.0') }}"
-      dest: "{{prometheus_exporters_dir}}/{{cloudwatch_exporter_sub_dir}}/cloudwatch_exporter"
+          # https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v0.13.3/yet-another-cloudwatch-exporter_0.13.3_Linux_x86_64.tar.gz
+      url: "https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
+      dest: "/tmp/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
       mode: "u=rwx,g=rx,o=rx"
+    become: yes
+    become_user: "{{ cloudwatch_exporter_user }}"
+    when: cloudwatch_exporter_version_exists.stat.exists == false
+    tags:
+      - prometheus
+
+  - name: Prometheus cloudwatch Exporter | unpack distribution
+    unarchive:
+      src: "/tmp/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
+      dest: "{{prometheus_exporters_dir}}"
+      remote_src: yes
     become: yes
     become_user: "{{ cloudwatch_exporter_user }}"
     when: cloudwatch_exporter_version_exists.stat.exists == false

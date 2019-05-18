@@ -666,7 +666,214 @@ EOF
 ```
 
 config.yml by default is scripted to give you idea about possibilities.
-Amend it.
+Amend it. You should adjust it's structure to your environment
+
+
+```
+discovery:
+  exportedTagsOnMetrics:
+    vpn:
+      - Project
+      - Name
+    elb:
+      - Project
+      - Name
+    rds:
+      - Project
+      - Name
+    ec:
+     - Project
+     - Name
+    lambda:
+     - Project
+     - Name
+    alb:
+     - Project
+     - Name
+
+  jobs:
+  - region: {{ ec2_region }}
+    type: "vpn"
+    searchTags:
+      - Key: {{ prometheus_yace_tag_filter }}
+        Value: {{ prometheus_yace_tag_value }}
+    metrics:
+      - name: TunnelState
+        statistics:
+        - 'Maximum'
+        period: 60
+        length: 300
+      - name: TunnelDataOut
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: TunnelDataIn
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+  - region: {{ ec2_region }}
+    type: "lambda"
+    searchTags:
+      - Key: {{ prometheus_yace_tag_filter }}
+        Value: {{ prometheus_yace_tag_value }}
+    metrics:
+      - name: Throttles
+        statistics:
+        - 'Average'
+        period: 60
+        length: 300
+      - name: Invocations
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: Errors
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: Duration
+        statistics:
+        - 'Average'
+        period: 60
+        length: 300
+      - name: Duration
+        statistics:
+        - 'Minimum'
+        period: 60
+        length: 300
+      - name: Duration
+        statistics:
+        - 'Maximum'
+        period: 60
+        length: 300
+  - region: {{ ec2_region }}
+    type: "ec"
+    searchTags:
+      - Key: {{ prometheus_yace_tag_filter }}
+        Value: {{ prometheus_yace_tag_value }}
+    metrics:
+      - name: NewConnections
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: GetTypeCmds
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: SetTypeCmds
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: CacheMisses
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: CacheHits
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+  - region: {{ ec2_region }}
+    type: "rds"
+    searchTags:
+      - Key: {{ prometheus_yace_tag_filter }}
+        Value: {{ prometheus_yace_tag_value }}
+    metrics:
+      - name: DatabaseConnections
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: ReadIOPS
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: WriteIOPS
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+  - region: {{ ec2_region }}
+    type: "elb"
+    searchTags:
+      - Key: {{ prometheus_yace_tag_filter }}
+        Value: {{ prometheus_yace_tag_value }}
+    metrics:
+      - name: RequestCount
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: HealthyHostCount
+        statistics:
+        - 'Minimum'
+        period: 60
+        length: 300
+      - name: UnHealthyHostCount
+        statistics:
+        - 'Maximum'
+        period: 60
+        length: 300
+      - name: HTTPCode_Backend_2XX
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: HTTPCode_Backend_5XX
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+      - name: HTTPCode_Backend_4XX
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 300
+  - region: {{ ec2_region }}
+    type: "alb"
+    searchTags:
+      - Key: {{ prometheus_yace_tag_filter }}
+        Value: {{ prometheus_yace_tag_value }}
+    metrics:
+      - name: RequestCount
+        statistics:
+        - 'Sum'
+        period: 600
+        length: 600
+      - name: HealthyHostCount
+        statistics:
+        - 'Minimum'
+        period: 600
+        length: 600
+      - name: UnHealthyHostCount
+        statistics:
+        - 'Maximum'
+        period: 600
+        length: 600
+      - name: HTTPCode_Target_2XX
+        statistics:
+        - 'Sum'
+        period: 600
+        length: 600
+      - name: HTTPCode_Target_5XX
+        statistics:
+        - 'Sum'
+        period: 600
+        length: 600
+      - name: HTTPCode_Target_4XX
+        statistics:
+        - 'Sum'
+        period: 60
+        length: 60
+```
 
 
 Usage with ansible galaxy workflow

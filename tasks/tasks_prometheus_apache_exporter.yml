@@ -8,12 +8,11 @@
       apache_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       apache_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus blackbox exporter | check if this exporter version exists
+  - name: Prometheus apache exporter | check if this exporter version exists
     stat:
       path: "{{prometheus_exporters_dir}}/apache_exporter-{{prometheus_apache_exporter_version}}.linux-amd64"
     register: apache_exporter_version_exists
     become: yes
-    become_user: "{{ apache_exporter_user }}"
 
   - name: Prometheus apache Exporter | Download distribution
     get_url:
@@ -24,14 +23,6 @@
     when: apache_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
-
-  - name: Prometheus apache Exporter | check if this exporter version exists
-    stat:
-      path: "{{prometheus_exporters_dir}}/apache_exporter-{{prometheus_apache_exporter_version}}.linux-amd64/"
-    register: apache_exporter_version_exists
-    become: yes
-    become_user: "{{ apache_exporter_user }}"
-    when: apache_exporter_version_exists.stat.exists == false
 
   - name: Prometheus apache Exporter | unpack distribution
     unarchive:
