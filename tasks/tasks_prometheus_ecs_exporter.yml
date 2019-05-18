@@ -2,29 +2,39 @@
 
 # https://github.com/ProjectLighthouse/ecs-exporter/releases/tag/v1.1.1
 
-  - set_fact:
+  - name: Set exporter facts
+    set_fact:
       ecs_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('ecs_exporter') }}"
       ecs_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       ecs_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+
+  - name: Prometheus ecs exporter | check if this exporter version exists
+    stat:
+      path: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}/ecs-exporter"
+    register: ecs_exporter_version_exists
+    become: yes
+    become_user: "{{ ecs_exporter_user }}"
 
   - name: Prometheus | Create dirs
     file: path="{{ item }}"  state=directory  owner="root"  group="{{ ecs_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
     with_items:
-      - "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}"
+      - "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}"
+    when: not ecs_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus ecs Exporter | Download distribution
     get_url:
-      url: "https://github.com/ProjectLighthouse/ecs-exporter/releases/download/v{{prometheus_ecs_exporter_version | default('1.1.1') }}/ecs-exporter"
-      dest: "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}/ecs-exporter"
+      url: "https://github.com/ProjectLighthouse/ecs-exporter/releases/download/v{{ prometheus_ecs_exporter_version | default('1.1.1') }}/ecs-exporter"
+      dest: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}/ecs-exporter"
       mode: "u=rwx,g=rx,o=rx"
     become: yes
     become_user: "{{ ecs_exporter_user }}"
+    when: not ecs_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - include_tasks: "tasks_startup.yml"
     vars:
-      exporter_startup_config: "{{ exporter_config}}"
+      exporter_startup_config: "{{ exporter_config }}"

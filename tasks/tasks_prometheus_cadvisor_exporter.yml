@@ -3,28 +3,38 @@
 # https://github.com/google/cadvisor/releases
 # https://github.com/google/cadvisor/releases/download/v0.27.4/cadvisor
 
-  - set_fact:
+  - name: Set exporter facts
+    set_fact:
       cadvisor_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cadvisor_exporter') }}"
       cadvisor_exporter_user: "{{ exporter_config.exporter_user | default('root') }}"
       cadvisor_exporter_group: "{{ exporter_config.exporter_group | default('root') }}"
 
+  - name: Prometheus cadvisor exporter | check if this exporter version exists
+    stat:
+      path: "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}/cadvisor_exporter"
+    register: cadvisor_exporter_version_exists
+    become: yes
+    become_user: "{{ cadvisor_exporter_user }}"
+
   - name: CAdvisor | Create dirs
-    file: path="{{current}}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="
+    file: path="{{ current }}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
     with_items:
-      - "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}"
+      - "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}"
     loop_control:
         loop_var: current
+    when: not cadvisor_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: CAdvisor | Download distribution
     get_url:
-      url: "https://github.com/google/cadvisor/releases/download/v{{prometheus_cadvisor_exporter_version}}/cadvisor"
-      dest: "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}/cadvisor_exporter"
+      url: "https://github.com/google/cadvisor/releases/download/v{{ prometheus_cadvisor_exporter_version }}/cadvisor"
+      dest: "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}/cadvisor_exporter"
       mode: "u=rwx,g=rx,o=rx"
     become: yes
     become_user: "{{ cadvisor_exporter_user }}"
+    when: not cadvisor_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
@@ -43,28 +53,31 @@
       - prometheus
 
   - name: CAdvisor | Template startup script
-    template: src="{{role_dir}}/templates/cadvisor.systemd.j2" dest="/etc/systemd/system/cadvisor.service"
+    template: src="{{ role_dir }}/templates/cadvisor.systemd.j2" dest="/etc/systemd/system/cadvisor.service"
     when: ansible_service_mgr == "systemd"
     become: yes
     tags:
       - prometheus
 
   - block:
-    
+
     - name: Detect start-stop-daemon
       shell: type start-stop-daemon
       register: startstop_exists
+      changed_when: False
       ignore_errors: true
+      tags:
+        - skip_ansible_lint
 
     - name: CAdvisor | Template startup script
-      template: src="{{role_dir}}/templates/cadvisor.amzn.j2" dest="/etc/init/cadvisor.conf"
+      template: src="{{ role_dir }}/templates/cadvisor.amzn.j2" dest="/etc/init/cadvisor.conf"
       become: yes
       tags:
         - prometheus
 
     - name: CAdvisor | Template startup script
-      template: src="{{role_dir}}/templates/cadvisor.upstart.j2" dest="/etc/init/cadvisor.conf"
-      when: startstop_exists | failed 
+      template: src="{{ role_dir }}/templates/cadvisor.upstart.j2" dest="/etc/init/cadvisor.conf"
+      when: startstop_exists | failed
       become: yes
       tags:
         - prometheus

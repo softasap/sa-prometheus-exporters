@@ -8,9 +8,9 @@ Requires=network.target
 
 [Service]
 EnvironmentFile={{prometheus_exporters_config_dir}}/{{exporter_startup_config.name}}_exporter
-WorkingDirectory={{prometheus_exporters_dir}}/{{exporter_startup_config.name}}_exporter
+WorkingDirectory={{ prometheus_exporters_dir }}/{{exporter_startup_config.name}}_exporter
 
-ExecStart={{prometheus_exporters_dir}}/{{exporter_startup_config.name}}_exporter/{{exporter_startup_config.name}}_exporter -listen-address :9400 $OPTIONS
+ExecStart={{ prometheus_exporters_dir }}/{{exporter_startup_config.name}}_exporter/{{exporter_startup_config.name}}_exporter -listen-address :9400 $OPTIONS
 User={{exporter_startup_config.exporter_user|default('prometheus') }}
 Group={{exporter_startup_config.exporter_group|default('prometheus') }}
 

@@ -3,7 +3,7 @@ Description=Google CAdvisor
 
 [Service]
 #User=root
-ExecStart={{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}/cadvisor_exporter --port {{ cadvisor_port | default(9280) }}
+ExecStart={{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}/cadvisor_exporter --port {{ cadvisor_port | default(9280) }}
 
 [Install]
 WantedBy=multi-user.target
