@@ -1,8 +1,6 @@
 ---
-
 # https://github.com/oliver006/redis_exporter/releases
 # https://github.com/oliver006/redis_exporter/releases/download/v0.14/redis_exporter-v0.14.linux-amd64.tar.gz
-
   - name: Set exporter facts
     set_fact:
       redis_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('redis_exporter') }}"

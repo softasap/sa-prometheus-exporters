@@ -1,8 +1,6 @@
 ---
-
 # https://github.com/wrouesnel/postgres_exporter/releases
 # https://github.com/wrouesnel/postgres_exporter/releases/download/v0.4.1/postgres_exporter_v0.4.1_linux-amd64.tar.gz
-
   - name: Set exporter facts
     set_fact:
       postgres_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('postgres_exporter') }}"

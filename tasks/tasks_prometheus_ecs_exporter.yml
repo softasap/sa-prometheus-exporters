@@ -1,7 +1,5 @@
 ---
-
 # https://github.com/ProjectLighthouse/ecs-exporter/releases/tag/v1.1.1
-
   - name: Set exporter facts
     set_fact:
       ecs_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('ecs_exporter') }}"

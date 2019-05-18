@@ -1,8 +1,6 @@
 ---
-
 # https://github.com/justwatchcom/sql_exporter
 # https://github.com/justwatchcom/sql_exporter/releases/download/v0.2.0/sql_exporter-0.2.0.linux-amd64.tar.gz
-
   - name: Set exporter facts
     set_fact:
       sql_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('sql_exporter') }}"
