@@ -7,7 +7,7 @@ respawn limit 20 5
 
 script  
     echo $$ > /var/run/cadvisor.pid
-    exec {{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}/cadvisor_exporter --port {{ cadvisor_port | default(9280) }}
+    exec {{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}/cadvisor_exporter --port {{ cadvisor_port | default(9280) }}
 end script
 
 pre-start script  

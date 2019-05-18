@@ -2,14 +2,15 @@
 
 # https://github.com/commercetools/monit_exporter/releases/download/v0.0.2/monit_exporter
 
-  - set_fact:
+  - name: Set exporter facts
+    set_fact:
       monit_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('monit_exporter') }}"
       monit_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       monit_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus monit exporter | check if this exporter version exists
     stat:
-      path: "{{prometheus_exporters_dir}}/{{monit_exporter_sub_dir}}/monit_exporter"
+      path: "{{ prometheus_exporters_dir }}/{{ monit_exporter_sub_dir }}/monit_exporter"
     register: monit_exporter_version_exists
     become: yes
     become_user: "{{ monit_exporter_user }}"
@@ -17,43 +18,47 @@
   - name: Prometheus | Create dirs
     file: path="{{ item }}"  state=directory  owner="root"  group="{{ monit_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
-    when: monit_exporter_version_exists.stat.exists == false
+    when: not monit_exporter_version_exists.stat.exists
     with_items:
-      - "{{prometheus_exporters_dir}}/{{monit_exporter_sub_dir}}"
+      - "{{ prometheus_exporters_dir }}/{{ monit_exporter_sub_dir }}"
     tags:
       - prometheus
 
   - name: Prometheus monit Exporter | Download distribution
     get_url:
-      url: "https://github.com/commercetools/monit_exporter/releases/download/v{{prometheus_monit_exporter_version | default('0.0.2') }}/monit_exporter"      
-      dest: "{{prometheus_exporters_dir}}/{{monit_exporter_sub_dir}}/monit_exporter"
+      url: "https://github.com/commercetools/monit_exporter/releases/download/v{{ prometheus_monit_exporter_version | default('0.0.2') }}/monit_exporter"
+      dest: "{{ prometheus_exporters_dir }}/{{ monit_exporter_sub_dir }}/monit_exporter"
       mode: "u=rwx,g=rx,o=rx"
     become: yes
     become_user: "{{ monit_exporter_user }}"
-    when: monit_exporter_version_exists.stat.exists == false
+    when: not monit_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - include_tasks: "tasks_startup.yml"
     vars:
-      exporter_startup_config: "{{ exporter_config}}"
+      exporter_startup_config: "{{ exporter_config }}"
 
   - name: Prometheus monit Exporter | Configuration file
-    template: src={{role_dir}}/templates/monit_exporter_config.toml.j2 dest=/etc/prometheus/exporters/monit_exporter_config.toml owner="root" group="{{monit_exporter_group}}"
+    template:
+      src: "{{ role_dir }}/templates/monit_exporter_config.toml.j2"
+      dest: /etc/prometheus/exporters/monit_exporter_config.toml
+      owner: "root"
+      group: "{{ monit_exporter_group }}"
     become: yes
     tags:
-      - prometheus      
+      - prometheus
 
   - name: Prometheus monit Exporter | Configuration file link to config.toml
     file:
       src: "/etc/prometheus/exporters/monit_exporter_config.toml"
-      dest: "{{prometheus_exporters_dir}}/{{monit_exporter_sub_dir}}/config.toml"
+      dest: "{{ prometheus_exporters_dir }}/{{ monit_exporter_sub_dir }}/config.toml"
       state: link
-      owner: "root" 
-      group: "{{monit_exporter_group}}"      
-    with_items: "{{monit_presets | default([]) }}"
+      owner: "root"
+      group: "{{ monit_exporter_group }}"
+    with_items: "{{ monit_presets | default([]) }}"
     become: yes
     tags:
       - monit
-      - update      
+      - update
 

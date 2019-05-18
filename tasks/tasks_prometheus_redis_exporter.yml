@@ -3,14 +3,15 @@
 # https://github.com/oliver006/redis_exporter/releases
 # https://github.com/oliver006/redis_exporter/releases/download/v0.14/redis_exporter-v0.14.linux-amd64.tar.gz
 
-  - set_fact:
+  - name: Set exporter facts
+    set_fact:
       redis_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('redis_exporter') }}"
       redis_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       redis_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus redis exporter | check if this exporter version exists
     stat:
-      path: "{{prometheus_exporters_dir}}/{{redis_exporter_sub_dir}}"
+      path: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
     register: redis_exporter_version_exists
     become: yes
     become_user: "{{ redis_exporter_user }}"
@@ -19,32 +20,32 @@
     file: path="{{ item }}"  state=directory  owner="root"  group="{{ redis_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
     with_items:
-      - "{{prometheus_exporters_dir}}/{{redis_exporter_sub_dir}}"
-    when: redis_exporter_version_exists.stat.exists == false
+      - "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
+    when: not redis_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus redis Exporter | Download distribution
     get_url:
-      url: "https://github.com/oliver006/redis_exporter/releases/download/v{{prometheus_redis_exporter_version}}/redis_exporter-v{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
-      dest: "/tmp/redis_exporter-{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
+      url: "https://github.com/oliver006/redis_exporter/releases/download/v{{ prometheus_redis_exporter_version }}/redis_exporter-v{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
+      dest: "/tmp/redis_exporter-{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ redis_exporter_user }}"
-    when: redis_exporter_version_exists.stat.exists == false
+    when: not redis_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus redis Exporter | unpack distribution
     unarchive:
-      src: "/tmp/redis_exporter-{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
-      dest: "{{prometheus_exporters_dir}}/{{redis_exporter_sub_dir}}"
+      src: "/tmp/redis_exporter-{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
+      dest: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
       remote_src: yes
     become: yes
     become_user: "{{ redis_exporter_user }}"
-    when: redis_exporter_version_exists.stat.exists == false
+    when: not redis_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - include_tasks: "tasks_startup.yml"
     vars:
-      exporter_startup_config: "{{ exporter_config}}"
+      exporter_startup_config: "{{ exporter_config }}"
