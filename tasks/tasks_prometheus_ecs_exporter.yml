@@ -12,7 +12,7 @@
       path: "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}/ecs-exporter"
     register: ecs_exporter_version_exists
     become: yes
-    become_user: "{{ elasticsearch_exporter_user }}"
+    become_user: "{{ ecs_exporter_user }}"
 
   - name: Prometheus | Create dirs
     file: path="{{ item }}"  state=directory  owner="root"  group="{{ ecs_exporter_group }}"   mode="u=rwx,g=rwx,o="
