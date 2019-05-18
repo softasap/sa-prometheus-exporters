@@ -7,6 +7,12 @@
       blackbox_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       blackbox_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
+  - name: Prometheus blackbox exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/blackbox_exporter-{{prometheus_blackbox_exporter_version}}.linux-amd64"
+    register: blackbox_exporter_version_exists
+    become: yes
+    become_user: "{{ blackbox_exporter_user }}"
 
   - name: Prometheus BlackBox Exporter | Download distribution
     get_url:
@@ -14,6 +20,7 @@
       dest: "/tmp/blackbox_exporter-{{prometheus_blackbox_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ blackbox_exporter_user }}"
+    when: blackbox_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
@@ -24,6 +31,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ blackbox_exporter_user }}"
+    when: blackbox_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 

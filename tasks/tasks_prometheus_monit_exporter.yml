@@ -7,9 +7,17 @@
       monit_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       monit_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
+  - name: Prometheus monit exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/{{monit_exporter_sub_dir}}/monit_exporter"
+    register: monit_exporter_version_exists
+    become: yes
+    become_user: "{{ monit_exporter_user }}"
+
   - name: Prometheus | Create dirs
     file: path="{{ item }}"  state=directory  owner="root"  group="{{ monit_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
+    when: monit_exporter_version_exists.stat.exists == false
     with_items:
       - "{{prometheus_exporters_dir}}/{{monit_exporter_sub_dir}}"
     tags:
@@ -22,6 +30,7 @@
       mode: "u=rwx,g=rx,o=rx"
     become: yes
     become_user: "{{ monit_exporter_user }}"
+    when: monit_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 

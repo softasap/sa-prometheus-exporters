@@ -8,11 +8,19 @@
       redis_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       redis_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
+  - name: Prometheus redis exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/{{redis_exporter_sub_dir}}"
+    register: redis_exporter_version_exists
+    become: yes
+    become_user: "{{ redis_exporter_user }}"
+
   - name: Prometheus | Create dirs
     file: path="{{ item }}"  state=directory  owner="root"  group="{{ redis_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
     with_items:
       - "{{prometheus_exporters_dir}}/{{redis_exporter_sub_dir}}"
+    when: redis_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
@@ -22,6 +30,7 @@
       dest: "/tmp/redis_exporter-{{prometheus_redis_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ redis_exporter_user }}"
+    when: redis_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
@@ -32,6 +41,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ redis_exporter_user }}"
+    when: redis_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 

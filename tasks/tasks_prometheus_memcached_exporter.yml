@@ -8,12 +8,20 @@
       memcached_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       memcached_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
+  - name: Prometheus memcached exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/memcached_exporter-{{prometheus_memcached_exporter_version}}.linux-amd64"
+    register: memcached_exporter_version_exists
+    become: yes
+    become_user: "{{ memcached_exporter_user }}"
+
   - name: Prometheus memcached Exporter | Download distribution
     get_url:
       url: "https://github.com/prometheus/memcached_exporter/releases/download/v{{prometheus_memcached_exporter_version}}/memcached_exporter-{{prometheus_memcached_exporter_version}}.linux-amd64.tar.gz"
       dest: "/tmp/memcached_exporter-{{prometheus_memcached_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ memcached_exporter_user }}"
+    when: memcached_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
@@ -24,6 +32,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ memcached_exporter_user }}"
+    when: memcached_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 

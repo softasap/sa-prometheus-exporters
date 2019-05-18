@@ -8,6 +8,13 @@
       cadvisor_exporter_user: "{{ exporter_config.exporter_user | default('root') }}"
       cadvisor_exporter_group: "{{ exporter_config.exporter_group | default('root') }}"
 
+  - name: Prometheus cadvisor exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}/cadvisor_exporter"
+    register: cadvisor_exporter_version_exists
+    become: yes
+    become_user: "{{ cadvisor_exporter_user }}"
+
   - name: CAdvisor | Create dirs
     file: path="{{current}}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
@@ -15,6 +22,7 @@
       - "{{prometheus_exporters_dir}}/{{cadvisor_exporter_sub_dir}}"
     loop_control:
         loop_var: current
+    when: cadvisor_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
@@ -25,6 +33,7 @@
       mode: "u=rwx,g=rx,o=rx"
     become: yes
     become_user: "{{ cadvisor_exporter_user }}"
+    when: cadvisor_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
