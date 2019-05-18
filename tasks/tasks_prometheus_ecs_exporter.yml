@@ -7,11 +7,19 @@
       ecs_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       ecs_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
+  - name: Prometheus ecs exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}/ecs-exporter"
+    register: ecs_exporter_version_exists
+    become: yes
+    become_user: "{{ elasticsearch_exporter_user }}"
+
   - name: Prometheus | Create dirs
     file: path="{{ item }}"  state=directory  owner="root"  group="{{ ecs_exporter_group }}"   mode="u=rwx,g=rwx,o="
     become: yes
     with_items:
       - "{{prometheus_exporters_dir}}/{{ecs_exporter_sub_dir}}"
+    when: ecs_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
@@ -22,6 +30,7 @@
       mode: "u=rwx,g=rx,o=rx"
     become: yes
     become_user: "{{ ecs_exporter_user }}"
+    when: ecs_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 

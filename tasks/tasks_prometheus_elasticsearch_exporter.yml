@@ -7,6 +7,12 @@
       elasticsearch_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       elasticsearch_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
+  - name: Prometheus elasticsearch exporter | check if this exporter version exists
+    stat:
+      path: "{{prometheus_exporters_dir}}/elasticsearch_exporter-{{prometheus_elasticsearch_exporter_version}}.linux-amd64"
+    register: elasticsearch_exporter_version_exists
+    become: yes
+    become_user: "{{ elasticsearch_exporter_user }}"
 
   - name: Prometheus elasticsearch Exporter | Download distribution
     get_url:
@@ -14,6 +20,7 @@
       dest: "/tmp/elasticsearch_exporter-{{prometheus_elasticsearch_exporter_version}}.linux-amd64.tar.gz"
     become: yes
     become_user: "{{ elasticsearch_exporter_user }}"
+    when: elasticsearch_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
@@ -24,6 +31,7 @@
       remote_src: yes
     become: yes
     become_user: "{{ elasticsearch_exporter_user }}"
+    when: elasticsearch_exporter_version_exists.stat.exists == false
     tags:
       - prometheus
 
