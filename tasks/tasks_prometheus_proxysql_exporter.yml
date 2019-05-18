@@ -1,8 +1,5 @@
 ---
-
-#
 # https://github.com/percona/proxysql_exporter/releases/download/v1.1.0/proxysql_exporter-1.1.0.linux-amd64.tar.gz
-
   - name: Set exporter facts
     set_fact:
       proxysql_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('proxysql_exporter') }}"

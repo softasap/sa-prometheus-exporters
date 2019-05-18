@@ -1,8 +1,6 @@
 ---
-
 # https://github.com/google/cadvisor/releases
 # https://github.com/google/cadvisor/releases/download/v0.27.4/cadvisor
-
   - name: Set exporter facts
     set_fact:
       cadvisor_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cadvisor_exporter') }}"
@@ -97,4 +95,3 @@
     become: yes
     tags:
       - prometheus
-

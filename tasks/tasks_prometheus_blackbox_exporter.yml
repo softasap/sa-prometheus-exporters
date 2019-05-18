@@ -1,7 +1,5 @@
 ---
-
 # https://github.com/prometheus/blackbox_exporter/releases/download/v0.11.0/blackbox_exporter-0.11.0.linux-amd64.tar.gz
-
   - name: Set exporter facts
     set_fact:
       blackbox_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('blackbox_exporter') }}"

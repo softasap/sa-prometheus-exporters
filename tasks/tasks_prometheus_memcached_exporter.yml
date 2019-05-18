@@ -1,8 +1,6 @@
 ---
-
 # Memcached https://github.com/prometheus/memcached_exporter/
 # https://github.com/prometheus/memcached_exporter/releases/download/v0.3.0/memcached_exporter-0.3.0.linux-amd64.tar.gz
-
   - name: Set exporter facts
     set_fact:
       memcached_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('memcached_exporter') }}"

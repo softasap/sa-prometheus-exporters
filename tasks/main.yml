@@ -1,6 +1,5 @@
 ---
 # tasks file for sa-prometheus-exporters
-
   - include_tasks: use/__detect_init_system.yml
 
   - include_tasks: tasks_prometheus_users.yml
@@ -13,7 +12,6 @@
       - "{{ prometheus_exporters_config_dir }}"
     tags:
       - prometheus
-
 
   - include_tasks: tasks_go.yml
     when: option_install_go

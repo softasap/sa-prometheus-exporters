@@ -1,7 +1,5 @@
 ---
-
 # https://github.com/commercetools/monit_exporter/releases/download/v0.0.2/monit_exporter
-
   - name: Set exporter facts
     set_fact:
       monit_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('monit_exporter') }}"
@@ -61,4 +59,3 @@
     tags:
       - monit
       - update
-

@@ -1,6 +1,4 @@
-#  installs Go (http://golang.org/)  Dependency for gitlab
 ---
-
   - name: GO | Check if installed
     command: test -x /usr/local/go/bin/go
     ignore_errors: yes

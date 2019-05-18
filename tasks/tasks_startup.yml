@@ -1,5 +1,4 @@
 ---
-
   - name: Exporter | Configuring settings file for exporter {{ exporter_startup_config.name }}
     template:
       src: "{{ exporter_startup_config.exporter_configuration_template | default(role_dir + '/templates/exporter_configuration.j2') }}"

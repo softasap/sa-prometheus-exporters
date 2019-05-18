@@ -1,5 +1,4 @@
 ---
-
   - name: Prometheus | Create prometheus group
     group: name="{{ prometheus_group }}" state="present"
     become: yes

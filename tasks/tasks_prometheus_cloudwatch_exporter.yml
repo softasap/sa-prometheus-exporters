@@ -1,7 +1,5 @@
 ---
-
 # https://github.com/ivx/yet-another-cloudwatch-exporter
-
   - name: Set exporter facts
     set_fact:
       cloudwatch_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cloudwatch_exporter') }}"
@@ -72,5 +70,3 @@
     become: yes
     tags:
       - prometheus
-
-
