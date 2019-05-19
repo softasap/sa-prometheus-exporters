@@ -19,6 +19,7 @@ Bundled exporters:
 | memcached | memcached health | 9150 | http://192.168.2.66:9150/metrics | [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter/) |
 | postgres | postgres exporter | 9187 | http://192.168.2.66:9187/metrics | [wrouesnel/postgres_exporter](https://github.com/wrouesnel/postgres_exporter/) |
 | mongodb | Percona's mongodb exporter | 9216 | http://192.168.2.66:9216/metrics | [percona/mongodb_exporter](https://github.com/percona/mongodb_exporter/) |
+| ssl | ssl exporter | 9219 | http://192.168.2.66:9219/metrics | [ribbybibby/ssl_exporter](https://github.com/ribbybibby/ssl_exporter) |
 | ecs | aws ecs exporter | 9222 | http://192.168.2.66:9222/metrics | [slok/ecs-exporter](https://github.com/slok/ecs-exporter) |
 | sql | custom sql exporter | 9237 | http://192.168.2.66:9237/metrics | [justwatchcom/sql_exporter](https://github.com/justwatchcom/sql_exporter) |
 | phpfpm | php fpm exporter via sock | 9253 | http://192.168.2.66:9253/metrics | [Lusitaniae/phpfpm_exporter](https://github.com/Lusitaniae/phpfpm_exporter) |
@@ -60,7 +61,7 @@ box_prometheus_exporters:
       startup: {
         env:
           - ENV_VAR1: "ENV_VAR1 value",
-          - ENV_VAR2: "ENV_VAR1 value"          
+          - ENV_VAR2: "ENV_VAR1 value"
 
         execstop: "/some/script/to/execute/on/stop",
         pidfile: "/if/you/need/pidfile",
@@ -68,7 +69,7 @@ box_prometheus_exporters:
           - "IF YOU WANT"
           - "SOME REALLY CUSTOM STUFF"
           - "in Service section of the systemd file"
-          - "(see templates folder)"          
+          - "(see templates folder)"
       }
 
     }
@@ -123,6 +124,9 @@ box_prometheus_exporters:
     }
   - {
       name: sql
+    }
+  - {
+      name: ssl
     }
 
 
@@ -209,7 +213,7 @@ prometheus.yml
       - source_labels: [__meta_ec2_tag_Role]
         target_label: role
       - source_labels: [__meta_ec2_public_ip]
-        regex: (.*) 
+        regex: (.*)
         replacement: ${1}:9117
         action: replace
         target_label: __address__
@@ -306,13 +310,13 @@ prometheus.yml
       - source_labels: [__meta_ec2_tag_Role]
         target_label: role
       - source_labels: [__meta_ec2_public_ip]
-        regex: (.*) 
+        regex: (.*)
         replacement: ${1}:9150
         action: replace
         target_label: __address__
 ```
 
-Compatible grafana dashboard  
+Compatible grafana dashboard
 https://grafana.com/dashboards/37
 
 
@@ -349,7 +353,7 @@ prometheus.yml
       - source_labels: [__meta_ec2_tag_Role]
         target_label: role
       - source_labels: [__meta_ec2_public_ip]
-        regex: (.*) 
+        regex: (.*)
         replacement: ${1}:9100
         action: replace
         target_label: __address__
@@ -359,32 +363,32 @@ Some reasonable set of linked prometheus alerts to consider
 
 /etc/prometheus/rules/node_alerts.yml
 ```
-groups:                                                                                                                                                                                                            
-- name: node_alerts.rules                                                                                                                                                                            
-  rules:                                                                                                                                                                                             
-  - alert: LowDiskSpace                                                                                                                                                                              
-    expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}* 100 <= 10                                                                  
-    for: 15m                                                                                                                                                                                         
-    labels:                                                                                                                                                                                          
-      severity: warn                                                                                                                                                                                 
-    annotations:                                                                                                                                                                                     
-      title: 'Less than 10% disk space left'                                                                                                                                                         
-      description: |                                                                                                                                                                                 
-        Consider sshing into the instance and removing old logs, clean                                                                                                                               
-        temp files, or remove old apt packages with `apt-get autoremove`                                                                                                                             
-      runbook: troubleshooting/filesystem_alerts.md                                                                                                                                                  
-      value: '{{ $value | humanize }}%'                                                                                                                                                              
-      device: '{{ $labels.device }}%'                                                                                                                                                                
-      mount_point: '{{ $labels.mountpoint }}%'                                                                                                                                                                     
-  - alert: NoDiskSpace                                                                                                                                                                               
-    expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}* 100 <= 1                                                                   
-    for: 15m                                                                                                                                                                                         
-    labels:                                                                                                                                                                                          
-      pager: pagerduty                                                                                                                                                                               
-      severity: critical                                                                                                                                                                             
-    annotations:                                                                                                                                                                                     
-      title: '1% disk space left'                                                                                                                                                                    
-      description: "There's only 1% disk space left"                                                                                                                                                 
+groups:
+- name: node_alerts.rules
+  rules:
+  - alert: LowDiskSpace
+    expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}* 100 <= 10
+    for: 15m
+    labels:
+      severity: warn
+    annotations:
+      title: 'Less than 10% disk space left'
+      description: |
+        Consider sshing into the instance and removing old logs, clean
+        temp files, or remove old apt packages with `apt-get autoremove`
+      runbook: troubleshooting/filesystem_alerts.md
+      value: '{{ $value | humanize }}%'
+      device: '{{ $labels.device }}%'
+      mount_point: '{{ $labels.mountpoint }}%'
+  - alert: NoDiskSpace
+    expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}* 100 <= 1
+    for: 15m
+    labels:
+      pager: pagerduty
+      severity: critical
+    annotations:
+      title: '1% disk space left'
+      description: "There's only 1% disk space left"
       runbook: troubleshooting/filesystem_alerts.md
       value: '{{ $value | humanize }}%'
       device: '{{ $labels.device }}%'
@@ -481,7 +485,7 @@ prometheus.yml
       - source_labels: [__meta_ec2_tag_Role]
         target_label: role
       - source_labels: [__meta_ec2_public_ip]
-        regex: (.*) 
+        regex: (.*)
         replacement: ${1}:9253
         action: replace
         target_label: __address__
@@ -873,6 +877,54 @@ discovery:
         - 'Sum'
         period: 60
         length: 60
+```
+
+ssl exporter configuration
+--------------------------
+
+Just like with the blackbox_exporter, you should pass the targets to a single instance of the exporter in a scrape config with a clever bit of relabelling. This allows you to leverage service discovery and keeps configuration centralised to your Prometheus config.
+
+```yml
+
+scrape_configs:
+  - job_name: 'ssl'
+    metrics_path: /probe
+    static_configs:
+      - targets:
+        - example.com:443
+        - prometheus.io:443
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9219  # SSL exporter.
+```
+
+Example Queries
+Certificates that expire within 7 days, with Subject Common Name and Subject Alternative Names joined on:
+
+```
+((ssl_cert_not_after - time() < 86400 * 7) * on (instance,issuer_cn,serial_no) group_left (dnsnames) ssl_cert_subject_alternative_dnsnames) * on (instance,issuer_cn,serial_no) group_left (subject_cn) ssl_cert_subject_common_name
+```
+
+Only return wildcard certificates that are expiring:
+
+```
+((ssl_cert_not_after - time() < 86400 * 7) * on (instance,issuer_cn,serial_no) group_left (subject_cn) ssl_cert_subject_common_name{subject_cn=~"\\*.*"})
+```
+
+Number of certificates in the chain:
+
+```
+count(ssl_cert_subject_common_name) by (instance)
+
+```
+Identify instances that have failed to create a valid SSL connection:
+
+```
+ssl_tls_connect_success == 0
 ```
 
 
