@@ -1,0 +1,52 @@
+---
+# https://github.com/ribbybibby/ssl_exporter
+# https://github.com/ribbybibby/ssl_exporter/releases/download/v0.5.0/ssl_exporter-0.5.0.linux-amd64.tar.gz
+  - name: Set exporter facts
+    set_fact:
+      ssl_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('ssl_exporter') }}"
+      ssl_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+      ssl_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+
+  - name: Prometheus ssl exporter | check if this exporter version exists
+    stat:
+      path: "{{ prometheus_exporters_dir }}/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64/"
+    register: ssl_exporter_version_exists
+    become: yes
+    become_user: "{{ ssl_exporter_user }}"
+
+  - name: Prometheus ssl Exporter | Download distribution
+    get_url:
+      url: "https://github.com/ribbybibby/ssl_exporter/releases/download/v{{ prometheus_ssl_exporter_version }}/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64.tar.gz"
+      dest: "/tmp/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64.tar.gz"
+    become: yes
+    become_user: "{{ ssl_exporter_user }}"
+    when: not ssl_exporter_version_exists.stat.exists
+    tags:
+      - prometheus
+
+  - name: Prometheus ssl Exporter | unpack distribution
+    unarchive:
+      src: "/tmp/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64.tar.gz"
+      dest: "{{ prometheus_exporters_dir }}"
+      remote_src: yes
+    become: yes
+    become_user: "{{ ssl_exporter_user }}"
+    when: not ssl_exporter_version_exists.stat.exists
+    tags:
+      - prometheus
+
+  - name: Prometheus ssl Exporter | link ssl exporter dir
+    file:
+      src: "{{ prometheus_exporters_dir }}/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64/"
+      dest: "{{ prometheus_exporters_dir }}/{{ ssl_exporter_sub_dir }}"
+      owner: "root"
+      group: "{{ ssl_exporter_group }}"
+      state: link
+    become: yes
+    when: not ssl_exporter_version_exists.stat.exists
+    tags:
+      - prometheus
+
+  - include_tasks: "tasks_startup.yml"
+    vars:
+      exporter_startup_config: "{{ exporter_config }}"
