@@ -3,7 +3,7 @@ FROM fedora:25
 
 ENV container docker
 
-RUN dnf -y update && dnf install -y findutils
+RUN dnf -y update && dnf install -y findutils && dnf -y install dnf-plugins-core
 
 # Don't start any optional services except for the few we need.
 RUN find /etc/systemd/system \
@@ -22,8 +22,9 @@ STOPSIGNAL SIGRTMIN+3
 
 # Install Ansible
 RUN dnf -y update
-RUN dnf install -y python2 python2-dnf libselinux-python sudo
+RUN dnf install -y python2 python-pip python2-dnf libselinux-python sudo
 RUN dnf -y install ansible
+RUN pip install -U ansible-lint
 RUN mkdir -p /etc/ansible
 
 # Install Ansible inventory file
