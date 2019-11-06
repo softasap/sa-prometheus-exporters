@@ -496,6 +496,16 @@ Resolver.
 Connect to the /metrics page of the running exporter to see the complete list of metrics along with their descriptions. Note: to see server zones related metrics you must configure status zones and to see upstream related metrics you must configure upstreams with a shared memory zone.
 
 
+You would need also activate
+
+```
+location /stub_status {
+ 	stub_status;
+ 	allow 127.0.0.1;	#only allow requests from localhost
+ 	deny all;		#deny all other hosts	
+ }
+```
+
 phpfpm exporter configuration
 -----------------------------
 

@@ -30,13 +30,43 @@
     tags:
       - prometheus
 
+  - name: Prometheus nginx Exporter | create versioned directory
+    file:
+      path: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
+      state: directory
+      owner: "{{ nginx_exporter_user }}"
+      group: root
+    become: yes
+    when: not nginx_exporter_version_exists.stat.exists
+    tags:
+      - prometheus
+
   - name: Prometheus nginx Exporter | unpack distribution
     unarchive:
-      src: "/tmp/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64.tar.gz"
+      src: "/tmp/nginx-prometheus-exporter-{{ prometheus_nginx_exporter_version }}-linux-amd64.tar.gz"
       dest: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
       remote_src: yes
     become: yes
-    become_user: "{{ nginx_exporter_user }}"
+    when: not nginx_exporter_version_exists.stat.exists
+    tags:
+      - prometheus
+
+  - name: Prometheus nginx Exporter | adapt expected exporter name
+    command: mv nginx-prometheus-exporter
+    args:
+      chdir: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
+    become: yes
+    when: not nginx_exporter_version_exists.stat.exists
+    tags:
+      - prometheus
+
+  - name: Prometheus nginx Exporter | Fix permissions
+    file:
+      path: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64/nginx_exporter"
+      owner: "{{ nginx_exporter_user }}"
+      group: "root"
+      mode: "u=rx,g=rwx,o=rx"
+    become: yes
     when: not nginx_exporter_version_exists.stat.exists
     tags:
       - prometheus
@@ -54,4 +84,4 @@
 
   - include_tasks: "tasks_startup.yml"
     vars:
-      exporter_startup_config: "{{ exporter_config }}"
+      exporter_startup_config: "{{ final_exporter_config }}"
