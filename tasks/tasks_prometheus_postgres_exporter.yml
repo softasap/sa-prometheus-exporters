@@ -9,10 +9,9 @@
 
   - name: Prometheus postgres exporter | check if this exporter version exists
     stat:
-      path: "{{ prometheus_exporters_dir }}/postgres_exporter_v{{ prometheus_postgres_exporter_version }}.linux-amd64/"
+      path: "{{ prometheus_exporters_dir }}/postgres_exporter_v{{ prometheus_postgres_exporter_version }}_linux-amd64/"
     register: postgres_exporter_version_exists
     become: yes
-    become_user: "{{ postgres_exporter_user }}"
 
   - name: Prometheus postgres Exporter | Download distribution
     get_url:
