@@ -52,7 +52,7 @@
       - prometheus
 
   - name: Prometheus nginx Exporter | adapt expected exporter name
-    command: mv nginx-prometheus-exporter
+    command: "mv nginx-prometheus-exporter nginx_exporter"
     args:
       chdir: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
     become: yes
