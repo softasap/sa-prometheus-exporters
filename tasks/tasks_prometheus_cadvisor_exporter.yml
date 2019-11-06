@@ -75,12 +75,12 @@
 
     - name: CAdvisor | Template startup script
       template: src="{{ role_dir }}/templates/cadvisor.upstart.j2" dest="/etc/init/cadvisor.conf"
-      when: startstop_exists | failed
+      when: startstop_exists is failed
       become: yes
       tags:
         - prometheus
 
-    when: ansible_service_mgr == "upstart" and cadvisor_exists | failed
+    when: ansible_service_mgr == "upstart" and cadvisor_exists is failed
 
   - name: CAdvisor | Ensure service started
     service: name="cadvisor" state="started" enabled="yes"

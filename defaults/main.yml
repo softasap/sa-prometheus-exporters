@@ -11,6 +11,9 @@ prometheus_exporters:
       name: apache
     }
   - {
+      name: nginx
+    }
+  - {
       name: blackbox
     }
   - {
@@ -68,8 +71,9 @@ prometheus_exporters_dir: "{{prometheus_base_dir}}/exporters"
 prometheus_data_dir: "{{prometheus_base_dir}}/data"
 prometheus_exporters_config_dir: /etc/prometheus/exporters
 
-prometheus_apache_exporter_version: 0.5.0
-prometheus_node_exporter_version:   0.17.0
+prometheus_apache_exporter_version: "0.5.0"
+prometheus_nginx_exporter_version: "0.4.2"
+prometheus_node_exporter_version:   "0.17.0"
 prometheus_blackbox_exporter_version:   "0.13.0"
 prometheus_elasticsearch_exporter_version:   "1.0.2"
 prometheus_postgres_exporter_version:   "0.4.1"

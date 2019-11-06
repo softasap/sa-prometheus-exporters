@@ -12,6 +12,7 @@ Bundled exporters:
 | node | Server params | 9100 | http://192.168.2.66:9100/metrics | [prometheus/node_exporter](https://github.com/prometheus/node_exporter/) |
 | mysqld | Prometheus MySQL exporter | 9104 | http://192.168.2.66:9104/metrics | [prometheus/mysqld_exporter](https://github.com/prometheus/mysqld_exporter/) |
 | elasticsearch | Elastic search | 9108 | http://192.168.2.66:9108/metrics | [justwatchcom/elasticsearch_exporter](https://github.com/justwatchcom/elasticsearch_exporter/) |
+| nginx | Nginx exporter | 9113 | http://192.168.2.66:9115/metrics | [nginxinc/nginx-prometheus-exporter](https://github.com/nginxinc/nginx-prometheus-exporter) |
 | blackbox | External services | 9115 | http://192.168.2.66:9115/metrics | [prometheus/blackbox_exporter](https://github.com/prometheus/blackbox_exporter/) |
 | apache | Apache webserver | 9117 | http://192.168.2.66:9117/metrics | [Lusitaniae/apache_exporter](https://github.com/Lusitaniae/apache_exporter/) |
 | redis | Redis exporter | 9121 | http://192.168.2.66:9121/metrics | [oliver006/redis_exporter](https://github.com/oliver006/redis_exporter/) |
@@ -107,6 +108,10 @@ box_prometheus_exporters:
     }
   - {
       name: node
+    }
+  - {
+      name: nginx,
+      parameters: "-nginx.scrape-uri http://<nginx>:8080/stub_status
     }
   - {
       name: proxysql
@@ -439,6 +444,57 @@ groups:
 Grafana dashboard might be   https://grafana.com/dashboards/22 (label_values(node_exporter_build_info, instance))
 
 Consider:  https://grafana.com/dashboards/6014 or https://grafana.com/dashboards/718
+
+
+nginx exporter configuration
+----------------------------
+
+Additional parameters for that might be passed for nginx-prometheus-exporter:
+  -nginx.plus
+        Start the exporter for NGINX Plus. By default, the exporter is started for NGINX. The default value can be overwritten by NGINX_PLUS environment variable.
+  -nginx.retries int
+        A number of retries the exporter will make on start to connect to the NGINX stub_status page/NGINX Plus API before exiting with an error. The default value can be overwritten by NGINX_RETRIES environment variable.
+  -nginx.retry-interval duration
+        An interval between retries to connect to the NGINX stub_status page/NGINX Plus API on start. The default value can be overwritten by NGINX_RETRY_INTERVAL environment variable. (default 5s)
+  -nginx.scrape-uri string
+        A URI for scraping NGINX or NGINX Plus metrics.
+        For NGINX, the stub_status page must be available through the URI. For NGINX Plus -- the API. The default value can be overwritten by SCRAPE_URI environment variable. (default "http://127.0.0.1:8080/stub_status")
+  -nginx.ssl-verify
+        Perform SSL certificate verification. The default value can be overwritten by SSL_VERIFY environment variable. (default true)
+  -nginx.timeout duration
+        A timeout for scraping metrics from NGINX or NGINX Plus. The default value can be overwritten by TIMEOUT environment variable. (default 5s)
+  -web.listen-address string
+        An address to listen on for web interface and telemetry. The default value can be overwritten by LISTEN_ADDRESS environment variable. (default ":9113")
+  -web.telemetry-path string
+        A path under which to expose metrics. The default value can be overwritten by TELEMETRY_PATH environment variable. (default "/metrics")
+
+Exported metrics
+
+Exported Metrics
+Common metrics:
+
+nginxexporter_build_info -- shows the exporter build information.
+For NGINX, the following metrics are exported:
+
+All stub_status metrics.
+nginx_up -- shows the status of the last metric scrape: 1 for a successful scrape and 0 for a failed one.
+Connect to the /metrics page of the running exporter to see the complete list of metrics along with their descriptions.
+
+For NGINX Plus, the following metrics are exported:
+
+Connections.
+HTTP.
+SSL.
+HTTP Server Zones.
+Stream Server Zones.
+HTTP Upstreams. Note: for the state metric, the string values are converted to float64 using the following rule: "up" -> 1.0, "draining" -> 2.0, "down" -> 3.0, "unavail" –> 4.0, "checking" –> 5.0, "unhealthy" -> 6.0.
+Stream Upstreams. Note: for the state metric, the string values are converted to float64 using the following rule: "up" -> 1.0, "down" -> 3.0, "unavail" –> 4.0, "checking" –> 5.0, "unhealthy" -> 6.0.
+Stream Zone Sync.
+nginxplus_up -- shows the status of the last metric scrape: 1 for a successful scrape and 0 for a failed one.
+Location Zones.
+Resolver.
+Connect to the /metrics page of the running exporter to see the complete list of metrics along with their descriptions. Note: to see server zones related metrics you must configure status zones and to see upstream related metrics you must configure upstreams with a shared memory zone.
+
 
 phpfpm exporter configuration
 -----------------------------
