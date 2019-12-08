@@ -12,14 +12,12 @@
       path: "{{ prometheus_exporters_dir }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64/"
     register: phpfpm_exporter_version_exists
     become: yes
-    become_user: "{{ phpfpm_exporter_user }}"
 
   - name: Prometheus phpfpm Exporter | Download distribution
     get_url:
       url: "https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v{{ prometheus_phpfpm_exporter_version }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64.tar.gz"
       dest: "/tmp/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64.tar.gz"
     become: yes
-    become_user: "{{ phpfpm_exporter_user }}"
     when: not phpfpm_exporter_version_exists.stat.exists
     tags:
       - prometheus
@@ -30,7 +28,6 @@
       dest: "{{ prometheus_exporters_dir }}"
       remote_src: yes
     become: yes
-    become_user: "{{ phpfpm_exporter_user }}"
     when: not phpfpm_exporter_version_exists.stat.exists
     tags:
       - prometheus
