@@ -1016,6 +1016,7 @@ Please adjust the path accordingly.
 ```
 
 
+Ideas for more alerts:  https://awesome-prometheus-alerts.grep.to/
 
 
 Copyright and license

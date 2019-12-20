@@ -57,6 +57,15 @@ ansible:
 platforms:
   - name: bionic
     box: ubuntu/bionic64
+    memory: 4096
+    cpus: 2
+    # optional - box is accesible from your real network
+#    interfaces:
+#      - network_name: private_network
+#        type: dhcp
+#        auto_config: true
+
+
     # interfaces:
     #   - auto_config: true
     #     network_name: private_network
