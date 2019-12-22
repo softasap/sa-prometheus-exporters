@@ -1,0 +1,80 @@
+# switch to LABELS descriptions, if you don't have nice template
+groups:
+- name: blackbox_alerts.rules
+  rules:
+  # Probe failed
+  - alert: ProbeFailed
+    expr: probe_success == 0
+    for: 5m
+    labels:
+      severity: error
+    annotations:
+      summary: "Probe failed (instance {{ $labels.instance }})"
+#      description: "Probe failed\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Probe failed  VALUE = {{ $value }}"
+
+  #  Blackbox probe took more than 1s to complete
+  - alert: SlowProbe
+    expr: avg_over_time(probe_duration_seconds[1m]) > 10
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Slow probe (instance {{ $labels.instance }})"
+#      description: "Blackbox probe took more than 1s to complete\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Blackbox probe took enormous more than 10s to complete,  VALUE = {{ $value }}"
+
+  # HTTP status code is not 200-399
+  - alert: HttpStatusCode
+    expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
+    for: 5m
+    labels:
+      severity: error
+    annotations:
+      summary: "HTTP Status Code (instance {{ $labels.instance }})"
+#      description: "HTTP status code is not 200-399\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "HTTP status code is not 200-399,  VALUE = {{ $value }}"
+
+  # SSL certificate expires in 30 days
+  - alert: SslCertificateWillExpireSoon
+    expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 30
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "SSL certificate will expire soon (instance {{ $labels.instance }})"
+#      description: "SSL certificate expires in 30 days\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "SSL certificate expires in 30 days,  VALUE = {{ $value }}"
+
+  #  SSL certificate has expired already
+  - alert: SslCertificateExpired
+    expr: probe_ssl_earliest_cert_expiry - time()  <= 0
+    for: 5m
+    labels:
+      severity: error
+    annotations:
+      summary: "SSL certificate expired (instance {{ $labels.instance }})"
+#      description: "SSL certificate has expired already\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "SSL certificate has expired already,  VALUE = {{ $value }}"
+
+  #  HTTP request took more than 1s
+  - alert: HttpSlowRequests
+    expr: avg_over_time(probe_http_duration_seconds[1m]) > 5
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "HTTP slow requests (instance {{ $labels.instance }})"
+#      description: "HTTP request took more than 1s\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "HTTP request took more than 5s,  VALUE = {{ $value }}"
+
+  # Blackbox ping took more than 1s
+  - alert: SlowPing
+    expr: avg_over_time(probe_icmp_duration_seconds[1m]) > 2
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Slow ping (instance {{ $labels.instance }})"
+#      description: "Blackbox ping took more than 1s\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Blackbox ping took more than 2s,  VALUE = {{ $value }}"

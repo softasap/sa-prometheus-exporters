@@ -1,0 +1,31 @@
+groups:
+- name: ssl_alerts.rules
+  rules:
+  - alert: Certificate expired
+    expr: probe_success{job="ssl"} == 0
+    labels:
+      severity: critical
+    annotations:
+      description: '[{{ $labels.env }}]{{ $labels.instance }} {{ $labels.name }} of job {{ $labels.job }} seems have ssl cert expired'
+      summary: 'Portal {{ $labels.instance }} has possible ssl certificate issue issue'
+    for: 10m
+
+  - alert: Valid SSL connection cannot be established
+    expr: ssl_tls_connect_success == 0
+    labels:
+      severity: warning
+    annotations:
+      description: '[{{ $labels.env }}]{{ $labels.instance }} {{ $labels.name }} of job {{ $labels.job }} seems have ssl issues'
+      summary: 'Portal {{ $labels.instance }} has possible ssl issues'
+    for: 10m
+
+  - alert: Certificate expires soon
+    expr: ((ssl_cert_not_after - time() < 86400 * 10) * on (instance,issuer_cn,serial_no) group_left (dnsnames) ssl_cert_subject_alternative_dnsnames) * on (instance,issuer_cn,serial_no) group_left (subject_cn) ssl_cert_subject_common_name > 0
+    labels:
+      severity: warn
+    annotations:
+      title: Certificate expires within next 10 days
+      description: |
+        Consider checking soon {{ $labels.instance }} portal {{ $labels.dnsnames }}
+    for: 15m
+

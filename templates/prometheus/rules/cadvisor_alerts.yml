@@ -1,0 +1,59 @@
+# switch to LABELS descriptions, if you don't have nice template
+groups:
+- name: cadvisor_alerts.rules
+  rules:
+  #A container has disappeared
+  - alert: ContainerKilled
+    expr: time() - container_last_seen > 60
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container killed (instance {{ $labels.instance }})"
+#      description: "A container has disappeared\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "A container has disappeared,  VALUE = {{ $value }}"
+
+  # Container CPU usage
+  - alert: ContainerCpuUsage
+    expr: (sum(rate(container_cpu_usage_seconds_total[3m])) BY (ip, name) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container CPU usage (instance {{ $labels.instance }})"
+#      description: "Container CPU usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Container CPU usage is above 80%,  VALUE = {{ $value }}"
+
+  #  Container Memory usage
+  - alert: ContainerMemoryUsage
+    expr: (sum(container_memory_usage_bytes) BY (ip) / sum(container_memory_max_usage_bytes) BY (ip) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container Memory usage (instance {{ $labels.instance }})"
+#      description: "Container Memory usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Container Memory usage is above 80%,  VALUE = {{ $value }}"
+
+  # Container Volume usage is above 80%
+  - alert: ContainerVolumeUsage
+    expr: (1 - (sum(container_fs_inodes_free) BY (ip) / sum(container_fs_inodes_total) BY (ip)) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container Volume usage (instance {{ $labels.instance }})"
+#      description: "Container Volume usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Container Volume usage is above 80%, VALUE = {{ $value }}"
+
+  #  Container Volume IO usage is above 80%
+  - alert: ContainerVolumeIoUsage
+    expr: (sum(container_fs_io_current) BY (ip, name) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container Volume IO usage (instance {{ $labels.instance }})"
+#      description: "Container Volume IO usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Container Volume IO usage is above 80%, VALUE = {{ $value }}"
+

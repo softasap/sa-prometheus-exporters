@@ -1,0 +1,240 @@
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 15s # By default, scrape targets every 15 seconds.
+  # scrape_timeout is set to the global default (10s).
+
+#  access_key: AKIAHIHI
+#  secret_key: DVubvHAHA
+
+  # The labels to add to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'master'
+
+rule_files:
+  - /etc/prometheus/rules/*.yaml
+  - /etc/prometheus/rules/*.yml
+
+# A list of scrape configurations.
+scrape_configs:
+
+  - job_name: 'prometheus'
+    scrape_interval: 10s
+    scrape_timeout:  10s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: "custom"
+    scrape_interval:     60s # By default, scrape targets every 15 seconds.
+    file_sd_configs:
+      - files:
+          - "/etc/prometheus/targets/custom/*.yml"
+
+  - job_name: "customtargets_detect"
+    scrape_interval:     60s # By default, scrape targets every 15 seconds.
+    ec2_sd_configs:
+      - region: eu-west-1
+        access_key: AKIAHIHI
+        secret_key: DVubvDUHAHA
+        port: 9999
+    relabel_configs:
+      # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: skip_target_detect
+        action: drop
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: v3
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+      - source_labels: [__meta_ec2_tag_Role]
+        regex: ^somerolematch
+        action: keep
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_private_ip]
+        regex: (.*)
+        replacement: ${1}:9999
+        action: replace
+        target_label: __address__
+
+  - job_name: "node"
+    ec2_sd_configs:
+      - region: eu-west-1
+        access_key: AKIAHIHI
+        secret_key: DVubvHAHA
+        port: 9100
+    relabel_configs:
+      # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_private_ip]
+        regex: (.*)
+        replacement: ${1}:9100
+        action: replace
+        target_label: __address__
+
+#  - job_name: "node"
+#    file_sd_configs:
+#      - files:
+#        - '/etc/prometheus/targets/node/*.json'
+#        - '/etc/prometheus/targets/node/*.yaml'
+#        - '/etc/prometheus/targets/node/*.yml'
+
+
+  - job_name: "cadvisor"
+    #    file_sd_configs:
+    #      - files:
+    #        - '/etc/prometheus/targets/cadvisor/*.json'
+    #        - '/etc/prometheus/targets/cadvisor/*.yaml'
+    #        - '/etc/prometheus/targets/cadvisor/*.yml'
+    ec2_sd_configs:
+      - region: eu-west-1
+        access_key: AKIAHIHI
+        secret_key: DVubvDUHAHA
+        port: 9100
+    relabel_configs:
+      # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+      - source_labels: [__meta_ec2_tag_Role]
+        regex: ^strategyrunner
+        action: keep
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_private_ip]
+        regex: (.*)
+        replacement: ${1}:9280
+        action: replace
+        target_label: __address__
+
+  - job_name: "mysql"
+    file_sd_configs:
+      - files:
+          - '/etc/prometheus/targets/mysql/*.json'
+          - '/etc/prometheus/targets/mysql/*.yaml'
+          - '/etc/prometheus/targets/mysql/*.yml'
+
+  - job_name: "postgres"
+    file_sd_configs:
+      - files:
+          - '/etc/prometheus/targets/postgres/*.json'
+          - '/etc/prometheus/targets/postgres/*.yaml'
+          - '/etc/prometheus/targets/postgres/*.yml'
+
+  - job_name: "mongo"
+    file_sd_configs:
+      - files:
+          - '/etc/prometheus/targets/mongo/*.json'
+          - '/etc/prometheus/targets/mongo/*.yaml'
+          - '/etc/prometheus/targets/mongo/*.yml'
+
+  - job_name: 'blackbox_web'
+    scrape_interval: 120s
+    scrape_timeout:  10s
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response.
+    file_sd_configs:
+      - files:
+          - '/etc/prometheus/targets/portals/*.json'
+          - '/etc/prometheus/targets/portals/*.yaml'
+          - '/etc/prometheus/targets/portals/*.yml'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115  # The blackbox exporter's real hostname:port.
+
+
+  - job_name: 'blackbox_ssh'
+    metrics_path: /probe
+    params:
+      module: [ssh_banner]
+    ec2_sd_configs:
+      - region: eu-west-1
+        access_key: AKIAHIHI
+        secret_key: DVubvDHAHA
+        port: 9100
+    relabel_configs:
+      # Only monitor instances with a non-no Prometheus tag
+      - source_labels: [__meta_ec2_tag_Prometheus]
+        regex: no
+        action: drop
+      - source_labels: [__meta_ec2_instance_state]
+        regex: stopped
+        action: drop
+        # Use the instance ID as the instance label
+      - source_labels: [__meta_ec2_instance_id]
+        target_label: instance
+      - source_labels: [__meta_ec2_tag_Name]
+        target_label: name
+      - source_labels: [__meta_ec2_tag_Environment]
+        target_label: env
+      - source_labels: [__meta_ec2_tag_Role]
+        target_label: role
+      - source_labels: [__meta_ec2_private_ip]
+        regex: (.*)(:.*)?
+        replacement: ${1}:22
+        target_label: __param_target
+      # Actually talk to the blackbox exporter though
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+  - job_name: 'ssl'
+    metrics_path: /probe
+    static_configs:
+      - targets:
+          - https://www.softasap.com/
+          - https://voronenko.info/
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9219  # SSL exporter.
+
+alerting:
+  alertmanagers:
+    - scheme: http
+      static_configs:
+        - targets:
+            - "127.0.0.1:9093"

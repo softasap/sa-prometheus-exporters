@@ -1,0 +1,22 @@
+groups:
+  - name: portals.rules
+    rules:
+      - alert: voronenko_info
+        expr: probe_http_status_code{instance="voronenko.info"} != 200
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          description: The voronenko.info site is returning status codes other than 200,
+            this usually means that the site down
+          title: voronenko.info is returning errors for 2m
+      - alert: softasap_com
+        expr: probe_http_status_code{instance="softasap.com"} != 200
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          description: The softasap.com site is returning status codes other than 200,
+            this usually means that the site down
+          title: softasap.com is returning errors for 2m
+
