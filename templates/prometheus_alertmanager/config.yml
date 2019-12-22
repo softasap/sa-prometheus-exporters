@@ -9,9 +9,6 @@ global:
   # Alternative host for Hipchat.
   hipchat_api_url: 'https://hipchat.foobar.org/'
 
-templates:
-- '/etc/prometheus_alertmanager/template/*.tmpl'
-
 # The root route on which each incoming alert enters.
 route:
   # The labels by which incoming alerts are grouped together. For example,
@@ -101,5 +98,13 @@ receivers:
     api_url: https://hooks.slack.com/services/HIHI/HAHA
     icon_url: https://avatars3.githubusercontent.com/u/4029521
     title: '{{ template "custom_title" . }}'
+    title_link: '{{ template "slack.default.titlelink" . }}'
+    pretext: '{{ .CommonAnnotations.summary }}'
     text: '{{ template "custom_slack_message" . }}'
+    username: '{{ template "slack.default.username" . }}'
+    color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+    fallback: '{{ template "slack.default.fallback" . }}'
+    icon_emoji: '{{ template "slack.default.iconemoji" . }}'
 
+templates:
+- '/etc/prometheus_alertmanager/template/*.tmpl'
