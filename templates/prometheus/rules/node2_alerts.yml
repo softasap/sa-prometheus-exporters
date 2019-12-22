@@ -1,0 +1,83 @@
+# switch to LABELS descriptions, if you don't have nice template
+groups:
+  - name: node2_alerts.rules
+    rules:
+
+      - alert: LowDiskSpace
+        expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}
+          * 100 <= 10
+        for: 15m
+        labels:
+          severity: warn
+        annotations:
+          title: 'Less than 10% disk space left'
+          description: |
+            Consider sshing into the instance and removing old logs, clean
+            temp files, or remove old apt packages with `apt-get autoremove`
+          runbook: troubleshooting/filesystem_alerts.md
+          value: '{{ $value | humanize }}%'
+          device: '{{ $labels.device }}%'
+          mount_point: '{{ $labels.mountpoint }}%'
+
+      - alert: NoDiskSpace
+        expr: node_filesystem_avail{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_size{fstype=~"(ext.|xfs)",job="node"}
+          * 100 <= 1
+        for: 15m
+        labels:
+          pager: pagerduty
+          severity: critical
+        annotations:
+          title: '1% disk space left'
+          description: "There's only 1% disk space left"
+          runbook: troubleshooting/filesystem_alerts.md
+          value: '{{ $value | humanize }}%'
+          device: '{{ $labels.device }}%'
+          mount_point: '{{ $labels.mountpoint }}%'
+
+      - alert: HighInodeUsage
+        expr: node_filesystem_files_free{fstype=~"(ext.|xfs)",job="node"} / node_filesystem_files{fstype=~"(ext.|xfs)",job="node"}
+          * 100 <= 20
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          title: "High number of inode usage"
+          description: |
+            "Consider ssh'ing into the instance and removing files or clean
+            temp files"
+          runbook: troubleshooting/filesystem_alerts_inodes.md
+          value: '{{ $value | printf "%.2f" }}%'
+          device: '{{ $labels.device }}%'
+          mount_point: '{{ $labels.mountpoint }}%'
+
+      - alert: ExtremelyHighCPU
+        expr: instance:node_cpu_in_use:ratio > 0.95
+        for: 2h
+        labels:
+          pager: pagerduty
+          severity: critical
+        annotations:
+          description: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+            }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+          runbook: troubleshooting
+          title: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+            }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+
+      - alert: HighCPU
+        expr: instance:node_cpu_in_use:ratio > 0.8
+        for: 2h
+        labels:
+          severity: critical
+        annotations:
+          description: CPU use percent is extremely high on {{ if $labels.fqdn }}{{ $labels.fqdn
+            }}{{ else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+          runbook: troubleshooting
+          title: CPU use percent is high on {{ if $labels.fqdn }}{{ $labels.fqdn }}{{
+            else }}{{ $labels.instance }}{{ end }} for the past 2 hours.
+
+      - alert: SSHDown
+        expr: up{job="blackbox_ssh"} == 0
+        annotations:
+          description: '{{ $labels.instance }} of job {{ $labels.job }} is not responding by ssh for more than 5 minutes.'
+          summary: 'Instance {{ $labels.instance }} ssh down'
+        for: 5m

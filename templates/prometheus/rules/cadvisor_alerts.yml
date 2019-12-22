@@ -1,3 +1,4 @@
+# switch to LABELS descriptions, if you don't have nice template
 groups:
 - name: cadvisor_alerts.rules
   rules:
@@ -9,7 +10,8 @@ groups:
       severity: warning
     annotations:
       summary: "Container killed (instance {{ $labels.instance }})"
-      description: "A container has disappeared\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "A container has disappeared\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "A container has disappeared,  VALUE = {{ $value }}"
 
   # Container CPU usage
   - alert: ContainerCpuUsage
@@ -19,7 +21,8 @@ groups:
       severity: warning
     annotations:
       summary: "Container CPU usage (instance {{ $labels.instance }})"
-      description: "Container CPU usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Container CPU usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Container CPU usage is above 80%,  VALUE = {{ $value }}"
 
   #  Container Memory usage
   - alert: ContainerMemoryUsage
@@ -29,7 +32,8 @@ groups:
       severity: warning
     annotations:
       summary: "Container Memory usage (instance {{ $labels.instance }})"
-      description: "Container Memory usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Container Memory usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Container Memory usage is above 80%,  VALUE = {{ $value }}"
 
   # Container Volume usage is above 80%
   - alert: ContainerVolumeUsage
@@ -39,7 +43,8 @@ groups:
       severity: warning
     annotations:
       summary: "Container Volume usage (instance {{ $labels.instance }})"
-      description: "Container Volume usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Container Volume usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Container Volume usage is above 80%, VALUE = {{ $value }}"
 
   #  Container Volume IO usage is above 80%
   - alert: ContainerVolumeIoUsage
@@ -49,5 +54,6 @@ groups:
       severity: warning
     annotations:
       summary: "Container Volume IO usage (instance {{ $labels.instance }})"
-      description: "Container Volume IO usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Container Volume IO usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Container Volume IO usage is above 80%, VALUE = {{ $value }}"
 

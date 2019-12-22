@@ -1,3 +1,4 @@
+# switch to LABELS descriptions, if you don't have nice template
 groups:
 - name: redis_alerts.rules
   rules:
@@ -9,7 +10,8 @@ groups:
       severity: error
     annotations:
       summary: "Redis down (instance {{ $labels.instance }})"
-      description: "Redis instance is down\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Redis instance is down\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Redis instance is down, VALUE = {{ $value }}"
 
   #  Redis has not been backuped for 24 hours
   - alert: MissingBackup
@@ -19,7 +21,8 @@ groups:
       severity: error
     annotations:
       summary: "Missing backup (instance {{ $labels.instance }})"
-      description: "Redis has not been backuped for 24 hours\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Redis has not been backuped for 24 hours\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Redis has not been backuped for 24 hours, VALUE = {{ $value }}"
 
   # Redis is running out of memory (> 90%)
   - alert: OutOfMemory
@@ -29,7 +32,8 @@ groups:
       severity: warning
     annotations:
       summary: "Out of memory (instance {{ $labels.instance }})"
-      description: "Redis is running out of memory (> 90%)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Redis is running out of memory (> 90%)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Redis is running out of memory (> 90%), VALUE = {{ $value }}"
 
   #  Redis instance lost a slave
   - alert: ReplicationBroken
@@ -39,7 +43,8 @@ groups:
       severity: error
     annotations:
       summary: "Replication broken (instance {{ $labels.instance }})"
-      description: "Redis instance lost a slave\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Redis instance lost a slave\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Redis instance lost a slave, VALUE = {{ $value }}"
 
   #  Redis instance has too many connections
   - alert: TooManyConnections
@@ -49,7 +54,8 @@ groups:
       severity: warning
     annotations:
       summary: "Too many connections (instance {{ $labels.instance }})"
-      description: "Redis instance has too many connections\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Redis instance has too many connections\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Redis instance has too many connections, VALUE = {{ $value }}"
 
   #  Redis instance should have more connections (> 5)
   - alert: NotEnoughConnections
@@ -59,7 +65,8 @@ groups:
       severity: warning
     annotations:
       summary: "Not enough connections (instance {{ $labels.instance }})"
-      description: "Redis instance should have more connections (> 5)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Redis instance should have more connections (> 5)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Redis instance should have more connections (> 5), VALUE = {{ $value }}"
 
   # Some connections to Redis has been rejected
   - alert: RejectedConnections
@@ -69,4 +76,5 @@ groups:
       severity: error
     annotations:
       summary: "Rejected connections (instance {{ $labels.instance }})"
-      description: "Some connections to Redis has been rejected\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Some connections to Redis has been rejected\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Some connections to Redis has been rejected,  VALUE = {{ $value }}"

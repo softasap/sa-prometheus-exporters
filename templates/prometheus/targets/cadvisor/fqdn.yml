@@ -1,0 +1,7 @@
+---
+- targets:
+    - 10.22.3.150:9280
+  labels:
+    instance: i-XX
+    env: prod
+    name: readable.env.name

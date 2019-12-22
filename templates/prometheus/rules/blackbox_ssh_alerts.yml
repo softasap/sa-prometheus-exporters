@@ -1,0 +1,6 @@
+- alert: SSHDown
+  expr: up{job="blackbox_ssh"} == 0
+  annotations:
+    description: '{{ $labels.instance }} of job {{ $labels.job }} is not responding by ssh for more than 5 minutes.'
+    summary: 'Instance {{ $labels.instance }} ssh down'
+  for: 5m

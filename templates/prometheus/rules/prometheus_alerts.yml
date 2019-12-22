@@ -1,3 +1,4 @@
+# switch to LABELS descriptions, if you don't have nice template
 groups:
 - name: prometheus.rules
   rules:
@@ -9,7 +10,8 @@ groups:
       severity: error
     annotations:
       summary: "Prometheus configuration reload (instance {{ $labels.instance }})"
-      description: "Prometheus configuration reload error\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Prometheus configuration reload error\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Prometheus configuration reload error, VALUE = {{ $value }}"
 
   # Prometheus not connected to alertmanager
   - alert: PrometheusNotConnectedToAlertmanager
@@ -19,7 +21,8 @@ groups:
       severity: error
     annotations:
       summary: "Prometheus not connected to alertmanager (instance {{ $labels.instance }})"
-      description: "Prometheus cannot connect the alertmanager\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Prometheus cannot connect the alertmanager\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Prometheus cannot connect the alertmanager, VALUE = {{ $value }}"
 
   #  AlertManager configuration reload error
   - alert: AlertmanagerConfigurationReload
@@ -29,7 +32,8 @@ groups:
       severity: error
     annotations:
       summary: "AlertManager configuration reload (instance {{ $labels.instance }})"
-      description: "AlertManager configuration reload error\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "AlertManager configuration reload error\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "AlertManager configuration reload error, VALUE = {{ $value }}"
 
   #Prometheus exporter down
   - alert: ExporterDown
@@ -39,4 +43,5 @@ groups:
       severity: warning
     annotations:
       summary: "Exporter down (instance {{ $labels.instance }})"
-      description: "Prometheus exporter down\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Prometheus exporter down\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Prometheus exporter down, VALUE = {{ $value }}"

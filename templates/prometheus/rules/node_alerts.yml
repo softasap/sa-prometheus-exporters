@@ -1,3 +1,4 @@
+# switch to LABELS descriptions, if you don't have nice template
 groups:
 - name: node_alerts.rules
   rules:
@@ -9,7 +10,9 @@ groups:
       severity: warning
     annotations:
       summary: "Out of memory (instance {{ $labels.instance }})"
-      description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Node memory is filling up (< 10% left),  VALUE = {{ $value }}"
+
   #Host network interfaces are probably receiving too much data (> 100 MB/s)
   - alert: UnusualNetworkThroughputIn
     expr: sum by (instance) (irate(node_network_receive_bytes_total[2m])) / 1024 / 1024 > 100
@@ -18,7 +21,8 @@ groups:
       severity: warning
     annotations:
       summary: "Unusual network throughput in (instance {{ $labels.instance }})"
-      description: "Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Host network interfaces are probably receiving too much data (> 100 MB/s), VALUE = {{ $value }}"
 
   # Unusual network throughput out
   - alert: UnusualNetworkThroughputOut
@@ -28,7 +32,8 @@ groups:
       severity: warning
     annotations:
       summary: "Unusual network throughput out (instance {{ $labels.instance }})"
-      description: "Host network interfaces are probably sending too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Host network interfaces are probably sending too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Host network interfaces are probably sending too much data (> 100 MB/s), VALUE = {{ $value }}"
 
   #  Disk is probably reading too much data (> 50 MB/s)
   - alert: UnusualDiskReadRate
@@ -38,7 +43,8 @@ groups:
       severity: warning
     annotations:
       summary: "Unusual disk read rate (instance {{ $labels.instance }})"
-      description: "Disk is probably reading too much data (> 50 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Disk is probably reading too much data (> 50 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Disk is probably reading too much data (> 50 MB/s),  VALUE = {{ $value }}"
 
   #  Disk is probably writing too much data (> 50 MB/s)
   - alert: UnusualDiskWriteRate
@@ -48,7 +54,8 @@ groups:
       severity: warning
     annotations:
       summary: "Unusual disk write rate (instance {{ $labels.instance }})"
-      description: "Disk is probably writing too much data (> 50 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Disk is probably writing too much data (> 50 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Disk is probably writing too much data (> 50 MB/s), VALUE = {{ $value }}"
 
   #  Disk is almost full (< 10% left)
   - alert: OutOfDiskSpace
@@ -58,7 +65,8 @@ groups:
       severity: warning
     annotations:
       summary: "Out of disk space (instance {{ $labels.instance }})"
-      description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Disk is almost full (< 10% left), VALUE = {{ $value }}"
 
   #  Disk will fill in 4 hours at current write rate
   - alert: DiskWillFillIn4Hours
@@ -68,7 +76,8 @@ groups:
       severity: warning
     annotations:
       summary: "Disk will fill in 4 hours (instance {{ $labels.instance }})"
-      description: "Disk will fill in 4 hours at current write rate\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Disk will fill in 4 hours at current write rate\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Disk will fill in 4 hours at current write rate, VALUE = {{ $value }}"
 
   # Disk is almost running out of available inodes (< 10% left)
   - alert: OutOfInodes
@@ -78,7 +87,8 @@ groups:
       severity: warning
     annotations:
       summary: "Out of inodes (instance {{ $labels.instance }})"
-      description: "Disk is almost running out of available inodes (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Disk is almost running out of available inodes (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Disk is almost running out of available inodes (< 10% left), VALUE = {{ $value }}"
 
   #  Disk latency is growing (read operations > 100ms)
 
@@ -89,7 +99,8 @@ groups:
       severity: warning
     annotations:
       summary: "Unusual disk read latency (instance {{ $labels.instance }})"
-      description: "Disk latency is growing (read operations > 100ms)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Disk latency is growing (read operations > 100ms)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Disk latency is growing (read operations > 100ms), VALUE = {{ $value }}"
 
   #  Disk latency is growing (write operations > 100ms)
   - alert: UnusualDiskWriteLatency
@@ -99,7 +110,8 @@ groups:
       severity: warning
     annotations:
       summary: "Unusual disk write latency (instance {{ $labels.instance }})"
-      description: "Disk latency is growing (write operations > 100ms)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Disk latency is growing (write operations > 100ms)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Disk latency is growing (write operations > 100ms), VALUE = {{ $value }}"
 
   # CPU load is > 80%
 
@@ -110,7 +122,8 @@ groups:
       severity: warning
     annotations:
       summary: "High CPU load (instance {{ $labels.instance }})"
-      description: "CPU load is > 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "CPU load is > 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "CPU load is > 80%, VALUE = {{ $value }}"
 
   #  Context switching is growing on node (> 1000 / s)
 
@@ -125,7 +138,8 @@ groups:
       severity: warning
     annotations:
       summary: "Context switching (instance {{ $labels.instance }})"
-      description: "Context switching is growing on node (> 1000 / s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Context switching is growing on node (> 1000 / s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Context switching is growing on node (> 1000 / s), VALUE = {{ $value }}"
 
   #  Swap is filling up (>80%)
   - alert: SwapIsFillingUp
@@ -135,7 +149,8 @@ groups:
       severity: warning
     annotations:
       summary: "Swap is filling up (instance {{ $labels.instance }})"
-      description: "Swap is filling up (>80%)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Swap is filling up (>80%)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Swap is filling up (>80%), VALUE = {{ $value }}"
 
   # SystemD service crashed
   - alert: SystemdServiceCrashed
@@ -145,7 +160,8 @@ groups:
       severity: warning
     annotations:
       summary: "SystemD service crashed (instance {{ $labels.instance }})"
-      description: "SystemD service crashed\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "SystemD service crashed\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "SystemD service crashed, VALUE = {{ $value }}"
 
   # Physical hardware component too hot
   - alert: PhysicalComponentTooHot
@@ -155,7 +171,8 @@ groups:
       severity: warning
     annotations:
       summary: "Physical component too hot (instance {{ $labels.instance }})"
-      description: "Physical hardware component too hot\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Physical hardware component too hot\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Physical hardware component too hot, VALUE = {{ $value }}"
 
   #  Physical node temperature alarm triggered
 
@@ -166,4 +183,5 @@ groups:
       severity: critical
     annotations:
       summary: "Node overtemperature alarm (instance {{ $labels.instance }})"
-      description: "Physical node temperature alarm triggered\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Physical node temperature alarm triggered\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Physical node temperature alarm triggered, VALUE = {{ $value }}"

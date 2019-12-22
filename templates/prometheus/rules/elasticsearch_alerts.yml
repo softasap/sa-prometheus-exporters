@@ -1,3 +1,4 @@
+# switch to LABELS descriptions, if you don't have nice template
 groups:
 - name: elasticsearch.rules
   rules:
@@ -9,7 +10,8 @@ groups:
       severity: error
     annotations:
       summary: "Elastic Heap Usage Too High (instance {{ $labels.instance }})"
-      description: "The heap usage is over 90% for 5m\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "The heap usage is over 90% for 5m\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "The heap usage is over 90% for 5m, VALUE = {{ $value }}"
 
   #  The heap usage is over 80% for 5m
   - alert: ElasticHeapUsageWarning
@@ -19,7 +21,8 @@ groups:
       severity: warning
     annotations:
       summary: "Elastic Heap Usage warning (instance {{ $labels.instance }})"
-      description: "The heap usage is over 80% for 5m\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "The heap usage is over 80% for 5m\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "The heap usage is over 80% for 5m, VALUE = {{ $value }}"
 
   #  Elastic Cluster Red status
   - alert: ElasticClusterRed
@@ -29,7 +32,8 @@ groups:
       severity: error
     annotations:
       summary: "Elastic Cluster Red (instance {{ $labels.instance }})"
-      description: "Elastic Cluster Red status\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Elastic Cluster Red status\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Elastic Cluster Red status, VALUE = {{ $value }}"
 
   # Elastic Cluster Yellow status
   - alert: ElasticClusterYellow
@@ -39,7 +43,8 @@ groups:
       severity: warning
     annotations:
       summary: "Elastic Cluster Yellow (instance {{ $labels.instance }})"
-      description: "Elastic Cluster Yellow status\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Elastic Cluster Yellow status\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Elastic Cluster Yellow status, VALUE = {{ $value }}"
 
   #  Number Healthy Nodes less then number_of_nodes
   - alert: NumberOfElasticHealthyNodes
@@ -49,7 +54,8 @@ groups:
       severity: error
     annotations:
       summary: "Number of Elastic Healthy Nodes (instance {{ $labels.instance }})"
-      description: "Number Healthy Nodes less then number_of_nodes\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Number Healthy Nodes less then number_of_nodes\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Number Healthy Nodes less then number_of_nodes,  VALUE = {{ $value }}"
 
   #  Number Healthy Data Nodes less then number_of_data_nodes
   - alert: NumberOfElasticHealthyDataNodes
@@ -59,7 +65,8 @@ groups:
       severity: error
     annotations:
       summary: "Number of Elastic Healthy Data Nodes (instance {{ $labels.instance }})"
-      description: "Number Healthy Data Nodes less then number_of_data_nodes\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Number Healthy Data Nodes less then number_of_data_nodes\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Number Healthy Data Nodes less then number_of_data_nodes, VALUE = {{ $value }}"
 
   # Number of relocation shards for 20 min
   - alert: NumberOfRelocationShards
@@ -69,7 +76,8 @@ groups:
       severity: error
     annotations:
       summary: "Number of relocation shards (instance {{ $labels.instance }})"
-      description: "Number of relocation shards for 20 min\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Number of relocation shards for 20 min\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Number of relocation shards for 20 min, VALUE = {{ $value }}"
 
   # Number of initializing shards for 10 min
   - alert: NumberOfInitializingShards
@@ -79,7 +87,8 @@ groups:
       severity: error
     annotations:
       summary: "Number of initializing shards (instance {{ $labels.instance }})"
-      description: "Number of initializing shards for 10 min\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Number of initializing shards for 10 min\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Number of initializing shards for 10 min, VALUE = {{ $value }}"
 
   # Number of unassigned shards for 2 min
   - alert: NumberOfUnassignedShards
@@ -89,7 +98,8 @@ groups:
       severity: error
     annotations:
       summary: "Number of unassigned shards (instance {{ $labels.instance }})"
-      description: "Number of unassigned shards for 2 min\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Number of unassigned shards for 2 min\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Number of unassigned shards for 2 min, VALUE = {{ $value }}"
 
   #  Number of pending tasks for 10 min. Cluster works slowly.
   - alert: NumberOfPendingTasks
@@ -99,7 +109,8 @@ groups:
       severity: warning
     annotations:
       summary: "Number of pending tasks (instance {{ $labels.instance }})"
-      description: "Number of pending tasks for 10 min. Cluster works slowly.\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "Number of pending tasks for 10 min. Cluster works slowly.\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "Number of pending tasks for 10 min. Cluster works slowly, VALUE = {{ $value }}"
 
   # No new documents for 10 min!
   - alert: ElasticNoNewDocuments
@@ -109,4 +120,5 @@ groups:
       severity: warning
     annotations:
       summary: "Elastic no new documents (instance {{ $labels.instance }})"
-      description: "No new documents for 10 min!\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+#      description: "No new documents for 10 min!\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      description: "No new documents for 10 min!, VALUE = {{ $value }}"
