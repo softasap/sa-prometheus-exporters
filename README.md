@@ -169,6 +169,12 @@ then either ensure environment variable in startup script (see configuration exa
 export DATA_SOURCE_NAME='prometheus_exporter:XXX@(localhost:3306)/'
 ```
 
+also option to do that via exporter environment file `/etc/prometheus/exporters/mysqld_exporter`
+```
+OPTIONS=""
+DATA_SOURCE_NAME='prometheus_exporter:devroot@(localhost:3306)/'
+```
+
 or
 
 create  ~/.my.cnf

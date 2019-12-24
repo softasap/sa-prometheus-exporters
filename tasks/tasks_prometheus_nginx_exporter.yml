@@ -7,7 +7,7 @@
       nginx_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       nginx_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
       default_nginx_exporter_config:
-         parameters: "-nginx.scrape-uri http://localhost/stub_status"
+         parameters: "-nginx.scrape-uri http://localhost:8113/stub_status"
 
 
   - name: Calculate final config
