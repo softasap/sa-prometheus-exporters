@@ -1,0 +1,6 @@
+exporter_host: {{exporter_config.exporter_port | d('0.0.0.0')}}
+exporter_port: {{ exporter_config.exporter_port | d(9127)}}
+pgbouncers:
+{% for dsn in exporter_config.dsns %}
+  - dsn: {{ dsn }}
+{% end %}

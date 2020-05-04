@@ -42,6 +42,17 @@
     tags:
       - prometheus
 
+  - name: Prometheus pgbouncer Exporter | Configuration file
+    template:
+      src: "{{ role_dir }}/templates/pgbouncer_exporter_config.yml.j2"
+      dest: "{{ prometheus_exporters_config_dir }}/pgbouncer_exporter_config.yml"
+      owner: "root"
+      group: "{{ pgbouncer_exporter_group }}"
+    become: yes
+    tags:
+      - prometheus
+
   - include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"
+      exporter_startup_template: 'pgbouncer'
