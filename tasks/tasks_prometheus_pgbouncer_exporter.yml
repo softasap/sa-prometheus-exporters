@@ -1,6 +1,7 @@
 ---
   - name: Set exporter facts
     set_fact:
+      pgbouncer_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('pgbouncer_exporter') }}"
       pgbouncer_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       pgbouncer_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
@@ -16,6 +17,27 @@
       name: prometheus-pgbouncer-exporter
       version: '{{ prometheus_pgbouncer_exporter_version }}'
       executable: pip3
+    become: yes
+    tags:
+      - prometheus
+
+  - name: Prometheus pgbouncer exporter | create pgbouncer exporter dir
+    file:
+      path: "{{ prometheus_exporters_dir }}/{{ pgbouncer_exporter_sub_dir }}"
+      owner: "root"
+      group: "{{ pgbouncer_exporter_group }}"
+      state: directory
+    become: yes
+    tags:
+      - prometheus
+
+  - name: Prometheus pgbouncer exporter | link pgbouncer binary into exporter dir
+    file:
+      src: "/usr/local/bin/pgbouncer-exporter"
+      dest: "{{ prometheus_exporters_dir }}/{{ pgbouncer_exporter_sub_dir }}/pgbouncer_exporter"
+      owner: "root"
+      group: "{{ pgbouncer_exporter_group }}"
+      state: link
     become: yes
     tags:
       - prometheus
