@@ -1,0 +1,25 @@
+---
+  - name: Set exporter facts
+    set_fact:
+      pgbouncer_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+      pgbouncer_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+
+  - name: Prometheus pgbouncer exporter | ensure that python3 and dependencies are installed
+    become: yes
+    apt:
+      pkg:
+        - python3
+        - python3-pip
+
+  - name: Prometheus pgbouncer Exporter | install exporter with pip3
+    pip:
+      name: prometheus-pgbouncer-exporter
+      version: '{{ prometheus_pgbouncer_exporter_version }}'
+      executable: pip3
+    become: yes
+    tags:
+      - prometheus
+
+  - include_tasks: "tasks_startup.yml"
+    vars:
+      exporter_startup_config: "{{ exporter_config }}"
