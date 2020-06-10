@@ -1,8 +1,11 @@
 ---
 - hosts: all
+  vars:
+    ansible_python_interpreter: auto
   roles:
     - {
         role: "role_under_test",
+        firewall_used: docker,
         docker_test: true,
-        firewall_used: docker
+        preferred_python_version: "3"
       }

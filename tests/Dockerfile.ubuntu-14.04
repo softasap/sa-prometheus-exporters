@@ -6,8 +6,9 @@ ENV container docker
 RUN apt-get update
 
 # Install Ansible
-RUN apt-get update -y
-RUN apt-get upgrade -y
+RUN    apt-get update -y \
+    && apt-get install -y openssl \
+    && apt-get install -y ca-certificates
 RUN apt-get install -y software-properties-common curl git python-dev wget apt-transport-https libffi-dev libssl-dev libmysqlclient-dev
 RUN apt-get install -y python-pip
 RUN pip install -U pip

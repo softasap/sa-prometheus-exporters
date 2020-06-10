@@ -31,14 +31,13 @@ CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]
 
 # Install Ansible
 RUN apt-get update -y
-RUN apt-get install -y software-properties-common git python-dev wget apt-transport-https libffi-dev libssl-dev libmysqlclient-dev
-RUN apt-get install -y python-pip
-RUN pip install -U pip
-RUN pip install ansible ansible-lint
+RUN apt-get install -y software-properties-common git python3-dev wget apt-transport-https libffi-dev libssl-dev libmysqlclient-dev
+RUN apt-get install -y python3-pip
+RUN pip3 install ansible ansible-lint
 RUN mkdir -p /etc/ansible
 
 # setup tools 3.3 conflict
-RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python
+#RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python
 
 RUN mkdir -p /home/root/Desktop
 

@@ -22,10 +22,12 @@ STOPSIGNAL SIGRTMIN+3
 
 # Install Ansible
 RUN dnf -y update
-RUN dnf install -y python2 python2-dnf python-pip libselinux-python sudo
-RUN dnf -y install ansible-2.5.2-1.fc26
-RUN pip install -U ansible-lint
+RUN dnf install -y python3 python3-pip python3-dnf libselinux-python3 sudo
+RUN pip3 install -U ansible==2.9.6
+RUN pip3 install -U ansible-lint
 RUN mkdir -p /etc/ansible
+
+RUN dnf -y groupinstall "Development Tools"
 
 # Install Ansible inventory file
 RUN echo "[local]" > /etc/ansible/hosts

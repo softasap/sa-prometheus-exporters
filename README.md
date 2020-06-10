@@ -7,26 +7,26 @@ Re-usable list of exporters usually used with Prometheus
 
 Bundled exporters:
 
-| Exporter | Description | Port | Example | Github |
-| --- | --- | --- | --- | --- |
-| node | Server params | 9100 | http://192.168.2.66:9100/metrics | [prometheus/node_exporter](https://github.com/prometheus/node_exporter/) |
-| mysqld | Prometheus MySQL exporter | 9104 | http://192.168.2.66:9104/metrics | [prometheus/mysqld_exporter](https://github.com/prometheus/mysqld_exporter/) |
-| elasticsearch | Elastic search | 9108 | http://192.168.2.66:9108/metrics | [justwatchcom/elasticsearch_exporter](https://github.com/justwatchcom/elasticsearch_exporter/) |
-| nginx | Nginx exporter | 9113 | http://192.168.2.66:9115/metrics | [nginxinc/nginx-prometheus-exporter](https://github.com/nginxinc/nginx-prometheus-exporter) |
-| blackbox | External services | 9115 | http://192.168.2.66:9115/metrics | [prometheus/blackbox_exporter](https://github.com/prometheus/blackbox_exporter/) |
-| apache | Apache webserver | 9117 | http://192.168.2.66:9117/metrics | [Lusitaniae/apache_exporter](https://github.com/Lusitaniae/apache_exporter/) |
-| redis | Redis exporter | 9121 | http://192.168.2.66:9121/metrics | [oliver006/redis_exporter](https://github.com/oliver006/redis_exporter/) |
-| proxysql | ProxySQL exporter | 42004 | http://192.168.2.66:42004/metrics | [percona/proxysql_exporter](https://github.com/percona/proxysql_exporter) |
-| memcached | memcached health | 9150 | http://192.168.2.66:9150/metrics | [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter/) |
-| postgres | postgres exporter | 9187 | http://192.168.2.66:9187/metrics | [wrouesnel/postgres_exporter](https://github.com/wrouesnel/postgres_exporter/) |
-| mongodb | Percona's mongodb exporter | 9216 | http://192.168.2.66:9216/metrics | [percona/mongodb_exporter](https://github.com/percona/mongodb_exporter/) |
-| ssl | ssl exporter | 9219 | http://192.168.2.66:9219/metrics | [ribbybibby/ssl_exporter](https://github.com/ribbybibby/ssl_exporter) |
-| ecs | aws ecs exporter | 9222 | http://192.168.2.66:9222/metrics | [slok/ecs-exporter](https://github.com/slok/ecs-exporter) |
-| sql | custom sql exporter | 9237 | http://192.168.2.66:9237/metrics | [justwatchcom/sql_exporter](https://github.com/justwatchcom/sql_exporter) |
-| phpfpm | php fpm exporter via sock | 9253 | http://192.168.2.66:9253/metrics | [Lusitaniae/phpfpm_exporter](https://github.com/Lusitaniae/phpfpm_exporter) |
-| cadvisor | Google's cadvisor exporter | 9280 (configurable) | http://192.168.2.66:9280/metrics | [google/cadvisor](https://github.com/google/cadvisor/) |
-| monit | Monit exporter | 9388 (configurable) | http://192.168.2.66:9388/metrics | [commercetools/monit_exporter](https://github.com/commercetools/monit_exporter) |
-| cloudwatch | Cloudwatch exporter | 9400 (configurable) | http://192.168.2.66:9400/metrics | [ivx/yet-another-cloudwatch-exporter](https://github.com/ivx/yet-another-cloudwatch-exporter) |
+| Exporter | Description | Port | Grafana | Example | Github |
+| --- | --- | --- | --- | --- | --- |
+| node | Server params | 9100 | 1860  | http://192.168.2.66:9100/metrics | [prometheus/node_exporter](https://github.com/prometheus/node_exporter/) |
+| mysqld | Prometheus MySQL exporter | 9104 | 7362 | http://192.168.2.66:9104/metrics | [prometheus/mysqld_exporter](https://github.com/prometheus/mysqld_exporter/) |
+| elasticsearch | Elastic search | 9108 | 2322 | http://192.168.2.66:9108/metrics | [justwatchcom/elasticsearch_exporter](https://github.com/justwatchcom/elasticsearch_exporter/) |
+| nginx | Nginx exporter | 9113 | 11199 | http://192.168.2.66:9115/metrics | [nginxinc/nginx-prometheus-exporter](https://github.com/nginxinc/nginx-prometheus-exporter) |
+| blackbox | External services | 9115 | | http://192.168.2.66:9115/metrics | [prometheus/blackbox_exporter](https://github.com/prometheus/blackbox_exporter/) |
+| apache | Apache webserver | 9117 | | http://192.168.2.66:9117/metrics | [Lusitaniae/apache_exporter](https://github.com/Lusitaniae/apache_exporter/) |
+| redis | Redis exporter | 9121 | 763  | http://192.168.2.66:9121/metrics | [oliver006/redis_exporter](https://github.com/oliver006/redis_exporter/) |
+| proxysql | ProxySQL exporter | 42004 | | http://192.168.2.66:42004/metrics | [percona/proxysql_exporter](https://github.com/percona/proxysql_exporter) |
+| memcached | memcached health | 9150 | 37 | http://192.168.2.66:9150/metrics | [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter/) |
+| postgres | postgres exporter | 9187 | | http://192.168.2.66:9187/metrics | [wrouesnel/postgres_exporter](https://github.com/wrouesnel/postgres_exporter/) |
+| mongodb | Percona's mongodb exporter | 9216 | | http://192.168.2.66:9216/metrics | [percona/mongodb_exporter](https://github.com/percona/mongodb_exporter/) |
+| ssl | ssl exporter | 9219 | | http://192.168.2.66:9219/metrics | [ribbybibby/ssl_exporter](https://github.com/ribbybibby/ssl_exporter) |
+| ecs | aws ecs exporter | 9222 | | http://192.168.2.66:9222/metrics | [slok/ecs-exporter](https://github.com/slok/ecs-exporter) |
+| sql | custom sql exporter | 9237 | | http://192.168.2.66:9237/metrics | [justwatchcom/sql_exporter](https://github.com/justwatchcom/sql_exporter) |
+| phpfpm | php fpm exporter via sock | 9253 | 5579 | http://192.168.2.66:9253/metrics | [Lusitaniae/phpfpm_exporter](https://github.com/Lusitaniae/phpfpm_exporter) |
+| cadvisor | Google's cadvisor exporter | 9280 (configurable) | | http://192.168.2.66:9280/metrics | [google/cadvisor](https://github.com/google/cadvisor/) |
+| monit | Monit exporter | 9388 (configurable) | | http://192.168.2.66:9388/metrics | [commercetools/monit_exporter](https://github.com/commercetools/monit_exporter) |
+| cloudwatch | Cloudwatch exporter | 9400 (configurable) | | http://192.168.2.66:9400/metrics | [ivx/yet-another-cloudwatch-exporter](https://github.com/ivx/yet-another-cloudwatch-exporter) |
 
 Example of usage:
 
@@ -167,6 +167,12 @@ GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'prometheus_exporter'@'local
 then either ensure environment variable in startup script (see configuration example in advanced)
 ```shell
 export DATA_SOURCE_NAME='prometheus_exporter:XXX@(localhost:3306)/'
+```
+
+also option to do that via exporter environment file `/etc/prometheus/exporters/mysqld_exporter`
+```
+OPTIONS=""
+DATA_SOURCE_NAME='prometheus_exporter:devroot@(localhost:3306)/'
 ```
 
 or
