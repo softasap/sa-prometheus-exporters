@@ -6,11 +6,11 @@ dependency:
 scenario:
   name: default
 
-lint:
-  name: yamllint
-  enabled: false
-  # options:
-  #   config-file: ../../../.yamllint
+lint: |
+       set -e
+       yamllint .
+       ansible-lint
+       flake8  
 
 molecule:
   raw_ssh_args:
@@ -56,9 +56,14 @@ ansible:
 
 platforms:
   - name: bionic
+    provider_raw_config_args:
+      - "customize [ 'modifyvm', :id, '--uartmode1', 'disconnected' ]"
     box: ubuntu/bionic64
     memory: 4096
     cpus: 2
+#    groups:
+#      - groupname
+
     # optional - box is accesible from your real network
 #    interfaces:
 #      - network_name: private_network
@@ -95,6 +100,8 @@ platforms:
   #   box: centos/6
   #- name: centos7
   #  box: centos/7
+  #- name: centos8
+  #  box: centos/8
   # - name: fedora28
   #   box: generic/fedora28
   # - name: alpine
@@ -116,5 +123,3 @@ verifier:
   name: testinfra
   env:
     PYTHONWARNINGS: "ignore:.*U.*mode is deprecated:DeprecationWarning"
-  lint:
-    name: flake8

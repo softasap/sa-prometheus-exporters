@@ -1,12 +1,13 @@
 
-FROM centos:6.10
+FROM centos:8
 
 ENV container docker
 
-RUN rpm -iUvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+RUN rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-12.noarch.rpm
 
 # Install Ansible
-RUN yum -y install ansible ansible-lint
+RUN yum -y install sudo python3-pip
+RUN pip3 install -U ansible ansible-lint
 RUN mkdir -p /etc/ansible
 
 # Install Ansible inventory file
