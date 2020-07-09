@@ -1,0 +1,58 @@
+---
+  - name: Set exporter facts
+    set_fact:
+      pgbouncer_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('pgbouncer_exporter') }}"
+      pgbouncer_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+      pgbouncer_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+
+  - name: Prometheus pgbouncer exporter | ensure that python3 and dependencies are installed
+    become: yes
+    apt:
+      pkg:
+        - python3
+        - python3-pip
+
+  - name: Prometheus pgbouncer Exporter | install exporter with pip3
+    pip:
+      name: prometheus-pgbouncer-exporter
+      version: '{{ prometheus_pgbouncer_exporter_version }}'
+      executable: pip3
+    become: yes
+    tags:
+      - prometheus
+
+  - name: Prometheus pgbouncer exporter | create pgbouncer exporter dir
+    file:
+      path: "{{ prometheus_exporters_dir }}/{{ pgbouncer_exporter_sub_dir }}"
+      owner: "root"
+      group: "{{ pgbouncer_exporter_group }}"
+      state: directory
+    become: yes
+    tags:
+      - prometheus
+
+  - name: Prometheus pgbouncer exporter | link pgbouncer binary into exporter dir
+    file:
+      src: "/usr/local/bin/pgbouncer-exporter"
+      dest: "{{ prometheus_exporters_dir }}/{{ pgbouncer_exporter_sub_dir }}/pgbouncer_exporter"
+      owner: "root"
+      group: "{{ pgbouncer_exporter_group }}"
+      state: link
+    become: yes
+    tags:
+      - prometheus
+
+  - name: Prometheus pgbouncer Exporter | Configuration file
+    template:
+      src: "{{ role_dir }}/templates/pgbouncer_exporter_config.yml.j2"
+      dest: "{{ prometheus_exporters_config_dir }}/pgbouncer_exporter_config.yml"
+      owner: "root"
+      group: "{{ pgbouncer_exporter_group }}"
+    become: yes
+    tags:
+      - prometheus
+
+  - include_tasks: "tasks_startup.yml"
+    vars:
+      exporter_startup_config: "{{ exporter_config }}"
+      exporter_startup_template: 'pgbouncer'
