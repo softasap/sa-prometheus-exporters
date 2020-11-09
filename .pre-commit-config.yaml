@@ -1,0 +1,47 @@
+repos:
+  - repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v3.1.0
+    hooks:
+      - id: check-merge-conflict
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: detect-private-key
+  - repo: https://github.com/PyCQA/flake8.git
+    rev: 3.7.9
+    hooks:
+      - id: flake8
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.20.0
+    hooks:
+      - id: yamllint
+        files: \.(yaml|yml)$
+        types: [file, yaml]
+        entry: yamllint --strict -f parsable
+  - repo: https://github.com/ansible/ansible-lint
+    rev: 9da220ae3a11c10c10ee43284ad6cad6d8ba52b7
+    hooks:
+      - id: ansible-lint
+        always_run: true
+        pass_filenames: false
+        # do not add file filters here as ansible-lint does not give reliable
+        # results when called with individual files.
+        # https://github.com/ansible/ansible-lint/issues/611
+        verbose: true
+        # plugins is the standard collection dir for modules
+        entry: env ANSIBLE_LIBRARY=plugins ansible-lint --force-color -p -v -c ./.ansible-lint
+        additional_dependencies:
+          - 'ansible<2.10'
+  - repo: https://github.com/openstack-dev/bashate.git
+    rev: 0.6.0
+    hooks:
+      - id: bashate
+        # Run bashate check for all bash scripts
+        # Ignores the following rules:
+        # E003: Indends are not multiple of 4
+        # E006: Line longer than 79 columns (as many scripts use jinja
+        #       templating, this is very difficult)
+        # E040: Syntax error determined using `bash -n` (as many scripts
+        #       use jinja templating, this will often fail and the syntax
+        #       error will be discovered in execution anyway)
+        entry: bashate --error . --verbose --ignore=E006,E040,E003
