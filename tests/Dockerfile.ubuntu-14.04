@@ -1,25 +1,14 @@
 
-FROM ubuntu:14.04
+FROM softasap/ansible:ubuntu1404base
 
 ENV container docker
 
-RUN apt-get update
-
 # Install Ansible
-RUN    apt-get update -y \
-    && apt-get install -y openssl \
-    && apt-get install -y ca-certificates
-RUN apt-get install -y software-properties-common curl git python-dev wget apt-transport-https libffi-dev libssl-dev libmysqlclient-dev
-RUN apt-get install -y python-pip
-RUN pip install -U pip
-RUN pip install ansible ansible-lint pyopenssl ndg-httpsclient pyasn1 urllib3
+RUN pip3 install ansible ansible-lint
 RUN mkdir -p /etc/ansible
 
-# setup tools 3.3 conflict
-RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python
-
-#COPY initctl_faker .
-#RUN chmod +x initctl_faker && rm -fr /sbin/initctl && ln -s /initctl_faker /sbin/initctl
 
 # Install Ansible inventory file
-RUN echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
+RUN echo "[local]" > /etc/ansible/hosts
+RUN echo "localhost ansible_connection=local" >> /etc/ansible/hosts
+RUN echo "#" >> /etc/ansible/hosts
