@@ -1,0 +1,448 @@
+groups:
+  - name: kube_app.rules
+    rules:
+      - alert:  pod-oom-killed
+        expr: sum_over_time(kube_pod_container_status_terminated_reason{reason="OOMKilled"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: pod OOMKilled in {{$labels.namespace}}
+          description: Suspicious - pod {{$labels.namespace}}/{{$labels.pod}} was OOMKilled.
+
+      - alert: container-memory-usage-high
+        expr: (container_memory_usage_bytes{pod!=""} / (container_spec_memory_limit_bytes{pod!=""} != 0)) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod {{ $labels.namespace }}/{{ $labels.pod }}/{{ $labels.name }} uses high memory {{ printf "%.2f" $value }}%.'
+          description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }}/{{ $labels.name }} uses high memory {{ printf "%.2f" $value }}%.'
+
+
+      - alert: pod-not-ready-but-all-containers-ready
+        expr: |
+              (count by (namespace, pod) (kube_pod_status_ready{condition="true"} == 0))
+              and
+              (
+              (count by (namespace, pod) (kube_pod_container_status_ready==1))
+              unless
+              (count by (namespace, pod) (kube_pod_container_status_ready==0))
+              )
+
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} is unready even though all its containers are ready.'
+          description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} is unready even though all its containers are ready.'
+
+      - alert: k8s-pod-crashing-loop
+        expr: rate(kube_pod_container_status_restarts_total[5m]) * 60 * 5 > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 5 minutes.'
+          description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 5 minutes.'
+
+      - alert: k8s-pod-pending
+        expr: sum by (namespace, pod) (kube_pod_status_phase{ phase=~"Failed|Pending|Unknown"}) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in pending state state for longer than 1 minute.'
+          description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in pending state state for longer than 1 minute.'
+
+      - alert: k8s-pod-not-ready
+        expr: sum by (namespace, pod) (kube_pod_status_ready{condition="false"}) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 1 minute.'
+          description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 1 minute.'
+
+      - alert: k8s-deployment-generation-mismatch
+        expr: kube_deployment_status_observed_generation != kube_deployment_metadata_generation
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back.'
+          description: 'Deployment generation for {{ $labels.namespace }}/{{ $labels.deployment }} does not match, this indicates that the Deployment has failed but has not been rolled back.'
+
+      - alert: k8s-deployment-replica-mismatch
+        expr: kube_deployment_spec_replicas != kube_deployment_status_replicas_available
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than 2 minutes.'
+          description: 'Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the expected number of replicas for longer than 2 minutes.'
+
+      - alert: k8s-ss-mismatch
+        expr: kube_statefulset_status_replicas_ready != kube_statefulset_status_replicas
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 5 minutes.'
+          description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 5 minutes.'
+
+      - alert:  k8s-ss-generation-mismatch
+        expr: kube_statefulset_status_observed_generation != kube_statefulset_metadata_generation
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back.'
+          description: 'StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back.'
+
+      - alert: k8s-ss-update-not-rolled-out
+        expr: |
+          max without (revision) (
+            kube_statefulset_status_current_revision
+              unless
+            kube_statefulset_status_update_revision
+          )
+            *
+          (
+            kube_statefulset_replicas
+              !=
+            kube_statefulset_status_replicas_updated
+          )
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.'
+          description: 'StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out.'
+
+      - alert: k8s-daemonset-rollout-stuck
+        expr: kube_daemonset_status_number_ready / kube_daemonset_status_desired_number_scheduled * 100 < 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Only {{ $value }}% of the desired Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are scheduled and ready.'
+          description: 'Only {{ $value }}% of the desired Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are scheduled and ready.'
+
+      - alert: k8s-daemonset-not-scheduled
+        expr: kube_daemonset_status_desired_number_scheduled - kube_daemonset_status_current_number_scheduled > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled.'
+          description: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled.'
+
+      - alert: k8s-daemonset-mischeduled
+        expr: kube_daemonset_status_number_misscheduled > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run.'
+          description: '{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run.'
+
+      - alert: k8s-cronjob-running
+        expr: time() - kube_cronjob_next_schedule_time > 3600
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: 'CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} is taking more than 1h to complete.'
+          description: 'CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} is taking more than 1h to complete.'
+
+      - alert: k8s-job-completion
+        expr: kube_job_spec_completions - kube_job_status_succeeded  > 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than one hour to complete.'
+          description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than one hour to complete.'
+
+      - alert: k8s-job-failed
+        expr: kube_job_status_failed  > 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.'
+          description: 'Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete.'
+
+      - alert:  k8s-cpu-overcommit
+        expr: sum(kube_resourcequota{ type="hard", resource="cpu"}) / sum(kube_node_status_allocatable_cpu_cores) > 1.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Cluster has overcommitted CPU resource requests for Namespaces.
+          description: Cluster has overcommitted CPU resource requests for Namespaces.
+
+      - alert:  k8s-mem-overcommit
+        expr: sum(kube_resourcequota{ type="hard", resource="memory"}) / sum(kube_node_status_allocatable_memory_bytes) > 1.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Cluster has overcommitted memory resource requests for Namespaces.
+          description: Cluster has overcommitted memory resource requests for Namespaces.
+
+      - alert: k8s-quota-exceeded
+        expr: |
+          100 * kube_resourcequota{ type="used"}
+            / ignoring(instance, job, type)
+          (kube_resourcequota{ type="hard"} > 0)
+            > 90
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Namespace {{ $labels.namespace }} is using {{ printf "%0.0f" $value }}% of its {{ $labels.resource }} quota.'
+          description: 'Namespace {{ $labels.namespace }} is using {{ printf "%0.0f" $value }}% of its {{ $labels.resource }} quota.'
+
+      - alert: k8s-persisent-volume-usage
+        expr: 100 * kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes < 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is only {{ printf "%0.2f" $value }}% free.'
+          description: 'The PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is only {{ printf "%0.2f" $value }}% free.'
+
+      - alert: k8s-persisent-volume-usage-projected-full
+        expr: |
+          100 * (
+            kubelet_volume_stats_available_bytes
+              /
+            kubelet_volume_stats_capacity_bytes
+          ) < 15
+          and
+          predict_linear(kubelet_volume_stats_available_bytes[6h], 4 * 24 * 3600) < 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to fill up within four days. Currently {{ printf "%0.2f" $value }}% is available.'
+          description: 'Based on recent sampling, the PersistentVolume claimed by {{ $labels.persistentvolumeclaim }} in Namespace {{ $labels.namespace }} is expected to fill up within four days. Currently {{ printf "%0.2f" $value }}% is available.'
+
+      - alert: k8s-persisent-volume-errors
+        expr: kube_persistentvolume_status_phase{phase=~"Failed|Pending",namespace=~"(kube-.*|default|logging)"} > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'The persistent volume {{ $labels.persistentvolume }} has status {{ $labels.phase }}.'
+          description: 'The persistent volume {{ $labels.persistentvolume }} has status {{ $labels.phase }}.'
+
+      - alert: k8s-node-not-ready
+        expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{{ $labels.node }} has been unready for more than 5 minutes.'
+          description: '{{ $labels.node }} has been unready for more than 5 minutes.'
+
+      - alert: k8s-version-mismatch
+        expr: count(count by (gitVersion) (label_replace(kubernetes_build_info,"gitVersion","$1","gitVersion","(v[0-9]*.[0-9]*.[0-9]*).*"))) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'There are {{ $value }} different semantic versions of Kubernetes components running.'
+          description: 'There are {{ $value }} different semantic versions of Kubernetes components running.'
+
+      - alert: k8s-client-errors
+        expr: |
+          (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (instance, job)
+            /
+          sum(rate(rest_client_requests_total[5m])) by (instance, job))
+          * 100 > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf "%0.0f" $value }}% errors.'
+          description: Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance }}' is experiencing {{ printf "%0.0f" $value }}% errors.'
+
+      - alert: k8s-client-errors-2
+        expr: sum(rate(ksm_scrape_error_total[5m])) by (instance, job) > 0.1
+        for: 25m
+        labels:
+          severity: warning
+        annotations:
+          summary: Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance}}' is experiencing {{ printf "%0.0f" $value }} errors / second.
+          description: Kubernetes API server client '{{ $labels.job }}/{{ $labels.instance}}' is experiencing {{ printf "%0.0f" $value }} errors / second.
+
+      - alert: kubelet-too-may-pods
+        expr: kubelet_running_pod_count > 110 * 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Kubelet {{ $labels.instance }} is running {{ $value }} Pods, close to the limit of 110.
+          description: Kubelet {{ $labels.instance }} is running {{ $value }} Pods, close to the limit of 110.
+
+      - alert: k8s-client-cert-expiration
+        expr: apiserver_client_certificate_expiration_seconds_count > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket[5m]))) < 2592000
+        labels:
+          severity: warning
+        annotations:
+          summary: A client certificate used to authenticate to the apiserver is expiring in less than 30 days
+          description: A client certificate used to authenticate to the apiserver is expiring in less than 30 days
+
+      - alert: k8s-client-cert-expiration-2
+        expr: apiserver_client_certificate_expiration_seconds_count > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket[5m]))) < 86400
+        labels:
+          severity: warning
+        annotations:
+          summary: A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.
+          description: A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.
+
+      - alert: clock-skew-detected
+        expr: abs(node_timex_offset_seconds) > 0.03
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Clock skew detected on hostname {{ $labels.hostname }} . Ensure NTP is configured correctly on this host.'
+          description: 'Clock skew detected on hostname {{ $labels.hostname }} . Ensure NTP is configured correctly on this host.'
+
+      - alert: clock-is-not-in-synch
+        expr: node_timex_sync_status == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Clock not in synch detected on hostname {{ $labels.hostname }} . Ensure NTP is configured correctly on this host.
+          description: Clock not in synch detected on hostname {{ $labels.hostname }} . Ensure NTP is configured correctly on this host.
+
+      - alert: prometheus-config-reload-failed
+        expr: prometheus_config_last_reload_successful == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Reloading Prometheus' configuration failed
+          description: Reloading Prometheus' configuration failed
+
+      - alert: prometheus-notification-q-running-full
+        expr: predict_linear(prometheus_notifications_queue_length[5m], 60 * 30) > prometheus_notifications_queue_capacity
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus' alert notification queue is running full
+          description: Prometheus' alert notification queue is running full
+
+      - alert: prometheus-error-sending-alerts
+        expr: rate(prometheus_notifications_errors_total[5m]) / rate(prometheus_notifications_sent_total[5m]) > 0.01
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Errors while sending alert from Prometheus
+          description: Errors while sending alerts from Prometheus {{$labels.namespace}}/{{ $labels.pod}} to Alertmanager {{$labels.Alertmanager}}
+
+      - alert: prometheus-error-sending-alerts-2
+        expr: rate(prometheus_notifications_errors_total[5m]) / rate(prometheus_notifications_sent_total[5m]) > 0.03
+        labels:
+          severity: warning
+        annotations:
+          summary: Errors while sending alerts from Prometheus
+          description: Errors while sending alerts from Prometheus {{$labels.namespace}}/{{ $labels.pod}} to Alertmanager {{$labels.Alertmanager}}
+
+      - alert: prometheus-not-connected-to-alertmanagers
+        expr:  prometheus_notifications_alertmanagers_discovered < 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus {{ $labels.namespace }}/{{ $labels.pod}} is not connected to any Alertmanagers
+          description: Prometheus {{ $labels.namespace }}/{{ $labels.pod}} is not connected to any Alertmanagers
+
+      - alert: prometheus-tsdb-reloads-failing
+        expr: increase(prometheus_tsdb_reloads_failures_total[2h]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus has issues reloading data blocks from disk
+          description: '{{$labels.job}} at {{$labels.instance}} had {{$value | humanize}} reload failures over the last four hours.'
+
+      - alert:  prometheus-tsdb-compactions-failing
+        expr: increase(prometheus_tsdb_compactions_failed_total[2h]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus has issues compacting sample blocks
+          description: '{{$labels.job}} at {{$labels.instance}} had {{$value | humanize}} compaction failures over the last four hours.'
+
+      - alert: prometheus-tsdb-wal-corruptions
+        expr: prometheus_tsdb_wal_corruptions_total > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus write-ahead log is corrupted
+          description: '{{$labels.job}} at {{$labels.instance}} has a corrupted write-ahead log (WAL).'
+
+      - alert: prometheus-not-ingesting-samples
+        expr: rate(prometheus_tsdb_head_samples_appended_total[5m]) <= 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus isn't ingesting samples
+          description: Prometheus {{ $labels.namespace }}/{{ $labels.pod}} isn't ingesting samples.
+
+      - alert: prometheus-target-scrapes-duplicate
+        expr: increase(prometheus_target_scrapes_sample_duplicate_timestamp_total[5m]) > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus has many samples rejected
+          description: '{{$labels.namespace}}/{{$labels.pod}} has many samples rejected due to duplicate timestamps but different values'
+
+      - alert: ssl-earliest-cert-expiry
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 30
+        labels:
+          severity: warning
+        annotations:
+          summary: SSL cerificate expires in 30 days
+          description: '{{$labels.namespace}}/{{$labels.pod}} ssl certificate expires in 30 days'
+
+      - alert: ssl-earliest-cert-expiry-2
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 7
+        labels:
+          severity: warning
+        annotations:
+          summary: SSL cerificate expires in 7 days
+          description: '{{$labels.namespace}}/{{$labels.pod}} ssl certificate expires in 7 days'
+
+      - alert: helm-deploy-failure
+        expr: helm_chart_deploy_success < 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Helm chart failed to deploy for 5 minutes'
+          description: 'Helm chart {{$labels.chart}}/{{$labels.namespace}} deployment failed'
+
+
+#      - alert:
+#        expr:
+#        for:
+#        labels:
+#          severity: warning
+#        annotations:
+#          summary:
+#          description:
+
