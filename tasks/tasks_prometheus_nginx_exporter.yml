@@ -36,6 +36,7 @@
       state: directory
       owner: "{{ nginx_exporter_user }}"
       group: root
+      mode: "u=rw,g=r,o="
     become: yes
     when: not nginx_exporter_version_exists.stat.exists
     tags:

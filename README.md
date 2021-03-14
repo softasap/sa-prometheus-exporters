@@ -508,7 +508,7 @@ You would need also activate
 location /stub_status {
  	stub_status;
  	allow 127.0.0.1;	#only allow requests from localhost
- 	deny all;		#deny all other hosts	
+ 	deny all;		#deny all other hosts
  }
 ```
 

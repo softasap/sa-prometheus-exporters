@@ -20,7 +20,7 @@ rules:
   indentation: disable
   key-duplicates: enable
   line-length:
-    max: 210
+    max: 290
     level: warning
   new-line-at-end-of-file: disable
   new-lines: {type: unix}

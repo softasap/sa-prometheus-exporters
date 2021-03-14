@@ -2,8 +2,7 @@
 
 git config -f .projmodules --get-regexp '^submodule\..*\.path$' > tempfile
 
-while read -u 3 path_key path
-do
+while read -u 3 path_key path; do
     url_key=$(echo $path_key | sed 's/\.path/.url/')
     url=$(git config -f .projmodules --get "$url_key")
 

@@ -33,7 +33,7 @@
             monit_user: "admin",
             monit_password: "xeR5hSdSQcCnFVLV8PLy",
             listen_address: "0.0.0.0:9388"
-          }          
+          }
         - {
             name: redis
           }

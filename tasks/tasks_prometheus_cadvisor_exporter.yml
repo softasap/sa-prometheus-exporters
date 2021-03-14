@@ -51,7 +51,12 @@
       - prometheus
 
   - name: CAdvisor | Template startup script
-    template: src="{{ role_dir }}/templates/cadvisor.systemd.j2" dest="/etc/systemd/system/cadvisor.service"
+    template:
+      src: "{{ role_dir }}/templates/cadvisor.systemd.j2"
+      dest: "/etc/systemd/system/cadvisor.service"
+      owner: root
+      group: root
+      mode: "u=rw,g=r,o=r"
     when: ansible_service_mgr == "systemd"
     become: yes
     tags:
@@ -68,13 +73,23 @@
         - skip_ansible_lint
 
     - name: CAdvisor | Template startup script
-      template: src="{{ role_dir }}/templates/cadvisor.amzn.j2" dest="/etc/init/cadvisor.conf"
+      template:
+        src: "{{ role_dir }}/templates/cadvisor.amzn.j2"
+        dest: "/etc/init/cadvisor.conf"
+        mode: "u=rw,g=r,o=r"
+        owner: root
+        group: root
       become: yes
       tags:
         - prometheus
 
     - name: CAdvisor | Template startup script
-      template: src="{{ role_dir }}/templates/cadvisor.upstart.j2" dest="/etc/init/cadvisor.conf"
+      template:
+        src: "{{ role_dir }}/templates/cadvisor.upstart.j2"
+        dest: "/etc/init/cadvisor.conf"
+        mode: "u=rw,g=r,o=r"
+        owner: root
+        group: root
       when: startstop_exists is failed
       become: yes
       tags:

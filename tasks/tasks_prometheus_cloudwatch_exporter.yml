@@ -56,6 +56,7 @@
       dest: "/etc/prometheus/exporters/cloudwatch_exporter_config.yml"
       owner: "root"
       group: "{{ cloudwatch_exporter_group }}"
+      mode: "u=rw,g=r,o="
     become: yes
     tags:
       - prometheus
