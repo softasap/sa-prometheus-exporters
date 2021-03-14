@@ -23,6 +23,7 @@
           - gnupg-agent
           - apt-transport-https
         state: present
+      ignore_errors: true
       when: ansible_os_family == "Debian"
 
 #  roles:
