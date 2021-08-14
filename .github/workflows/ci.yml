@@ -31,7 +31,10 @@ jobs:
           python-version: '3.6'
 
       - name: Install test dependencies.
-        run: pip3 install yamllint ansible-lint ansible==2.9.6
+        run: pip3 install yamllint ansible-lint ansible==2.9.20
+
+      - name: Install ansible-galaxy dependencies
+        run: ansible-galaxy collection install community.docker
 
       - name: Lint code.
         run: |
@@ -44,11 +47,11 @@ jobs:
     strategy:
       matrix:
         distro:
-          - name: fedora33
-          - name: centos7
-          - name: ubuntu1604
-          - name: ubuntu1804
-          - name: ubuntu2004
+          - fedora33
+          - centos7
+          - ubuntu1604
+          - ubuntu1804
+          - ubuntu2004
 
     steps:
       - name: Check out the codebase.
@@ -78,10 +81,13 @@ jobs:
 #      - name: Install test dependencies.
 #        run: pip3 install ansible==2.9.6 molecule[docker] docker
 
-      - name: Run simplified molecule tests.
-        run: pipenv run molecule converge -s docker
+      - name: Install ansible-galaxy dependencies
+        run: pipenv run ansible-galaxy collection install community.docker
+
+      - name: Run Molecule tests.
+        run: pipenv run molecule test -s docker
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro.name }}
+          MOLECULE_DISTRO: ${{ matrix.distro }}
           MOLECULE_TEST_ROLE: role_under_test

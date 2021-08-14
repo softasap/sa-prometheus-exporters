@@ -1,6 +1,6 @@
 repos:
   - repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v3.1.0
     hooks:
       - id: check-merge-conflict
       - id: trailing-whitespace
@@ -8,18 +8,18 @@ repos:
       - id: check-added-large-files
       - id: detect-private-key
   - repo: https://github.com/PyCQA/flake8.git
-    rev: 3.8.4
+    rev: 3.7.9
     hooks:
       - id: flake8
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.25.0
+    rev: v1.20.0
     hooks:
       - id: yamllint
         files: \.(yaml|yml)$
         types: [file, yaml]
         entry: yamllint --strict -f parsable
   - repo: https://github.com/ansible/ansible-lint
-    rev: v5.0.3
+    rev: 9da220ae3a11c10c10ee43284ad6cad6d8ba52b7
     hooks:
       - id: ansible-lint
         always_run: true
@@ -27,14 +27,13 @@ repos:
         # do not add file filters here as ansible-lint does not give reliable
         # results when called with individual files.
         # https://github.com/ansible/ansible-lint/issues/611
-        # https://ansible-lint.readthedocs.io/en/latest/default_rules.html
         verbose: true
         # plugins is the standard collection dir for modules
         entry: env ANSIBLE_LIBRARY=plugins ansible-lint --force-color -p -v -c ./.ansible-lint
         additional_dependencies:
           - 'ansible<2.10'
   - repo: https://github.com/openstack-dev/bashate.git
-    rev: 2.0.0
+    rev: 0.6.0
     hooks:
       - id: bashate
         # Run bashate check for all bash scripts
