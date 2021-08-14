@@ -21,3 +21,4 @@ roles/**/.ansible-lint
 *.tar.gz
 *.tgz
 .venv
+.cache

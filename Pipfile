@@ -6,13 +6,15 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-ansible = "==2.9.6"
-molecule = "==3.0.2"
+ansible = "==2.9.20"
+molecule = "==3.4.0"
 molecule-vagrant = "*"
+molecule-docker = "*"
 molecule-digitalocean = "*"
 pytest-molecule = "*"
 molecule-ec2 = "*"
 flake8 = "*"
+python-vagrant = "*"
 
 [requires]
 python_version = "3.6"

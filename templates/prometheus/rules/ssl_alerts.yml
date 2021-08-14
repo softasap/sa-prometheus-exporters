@@ -28,4 +28,3 @@ groups:
       description: |
         Consider checking soon {{ $labels.instance }} portal {{ $labels.dnsnames }}
     for: 15m
-

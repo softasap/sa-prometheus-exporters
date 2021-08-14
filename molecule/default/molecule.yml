@@ -10,7 +10,7 @@ lint: |
        set -e
        yamllint .
        ansible-lint
-       flake8  
+       flake8
 
 molecule:
   raw_ssh_args:

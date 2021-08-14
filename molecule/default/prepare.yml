@@ -10,5 +10,3 @@
 
     - name: gather facts
       setup:
-
-

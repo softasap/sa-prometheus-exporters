@@ -1,0 +1,93 @@
+---
+name: CI
+'on':
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+      - '!release/*'
+  schedule:
+    - cron: "10 5 * * 2"
+
+defaults:
+  run:
+    working-directory: 'role_under_test'
+
+jobs:
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+        with:
+          path: 'role_under_test'
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+
+      - name: Install test dependencies.
+        run: pip3 install yamllint ansible-lint ansible==2.9.20
+
+      - name: Install ansible-galaxy dependencies
+        run: ansible-galaxy collection install community.docker
+
+      - name: Lint code.
+        run: |
+          yamllint .
+          ansible-lint
+
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - fedora33
+          - centos7
+          - ubuntu1604
+          - ubuntu1804
+          - ubuntu2004
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+        with:
+          path: 'role_under_test'
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pipenv wheel
+      - id: cache-pipenv
+        uses: actions/cache@v1
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --deploy --dev
+
+#      - name: Install test dependencies.
+#        run: pip3 install ansible==2.9.6 molecule[docker] docker
+
+      - name: Install ansible-galaxy dependencies
+        run: pipenv run ansible-galaxy collection install community.docker
+
+      - name: Run Molecule tests.
+        run: pipenv run molecule test -s docker
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
+          MOLECULE_TEST_ROLE: role_under_test

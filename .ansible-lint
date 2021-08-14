@@ -1,10 +1,14 @@
+# Ansible-lint rules https://ansible-lint.readthedocs.io/en/latest/default_rules.html
 exclude_paths:
   - ./box-example
+  - ./molecule
+  - ./tests
 parseable: true
 quiet: true
 skip_list:
   - skip_linting
-  - '602'
+  - '106'
   - '204'
+  - '602'
 use_default_rules: true
 verbosity: 1

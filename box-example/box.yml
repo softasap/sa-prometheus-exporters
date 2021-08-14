@@ -1,5 +1,5 @@
 ---
-- hosts: www
+- hosts: prometheus_exporters
   gather_facts: False
 
   vars:
@@ -8,48 +8,51 @@
     - box_prometheus_exporters:
 
         - {
-            name: cloudwatch
+            name: node
           }
-        - {
-            name: phpfpm
-          }
-        - {
-            name: blackbox
-          }
-        - {
-            name: elasticsearch
-          }
-        - {
-            name: postgres
-          }
-        - {
-            name: cadvisor
-          }
-        - {
-            name: mongodb
-          }
-        - {
-            name: monit,
-            monit_user: "admin",
-            monit_password: "xeR5hSdSQcCnFVLV8PLy",
-            listen_address: "0.0.0.0:9388"
-          }          
-        - {
-            name: redis
-          }
-        - {
-            name: sql
-          }
-        - {
-            name: memcached
-          }
-        - {
-            name: mysqld
-          }
-        - {
-            name: ecs,
-            parameters: "--aws.region='us-east-1'"
-          }
+#        - {
+#            name: cloudwatch
+#          }
+#        - {
+#            name: phpfpm
+#          }
+#        - {
+#            name: blackbox
+#          }
+#        - {
+#            name: elasticsearch
+#          }
+#        - {
+#            name: postgres
+#          }
+#        - {
+#            name: cadvisor
+#          }
+#        - {
+#            name: mongodb
+#          }
+#        - {
+#            name: monit,
+#            monit_user: "admin",
+#            monit_password: "xeR5hSdSQcCnFVLV8PLy",
+#            listen_address: "0.0.0.0:9388"
+#          }
+#        - {
+#            name: redis
+#          }
+#        - {
+#            name: sql
+#          }
+#        - {
+#            name: memcached
+#          }
+#        - {
+#            name: mysqld
+#          }
+#        - {
+#            name: ecs,
+#            parameters: "--aws.region='us-east-1'"
+#          }
 
 
 
@@ -57,7 +60,7 @@
     - debug: msg="Pre tasks section"
 
     - name: ANSIBLE PYTHON | install python 2
-      raw: test -e /usr/bin/python || (apt -qqy update && apt install -qy python-minimal)
+      raw: test -e /usr/bin/python || test -e /usr/bin/python3 || (apt -qqy update && apt install -qy python-minimal)
       become: yes
 
     - name:  UNPRIVILEGED USERS | Get acl dependency (ansible unprivileged user operations magic)

@@ -43,6 +43,7 @@
       dest: /etc/prometheus/exporters/monit_exporter_config.toml
       owner: "root"
       group: "{{ monit_exporter_group }}"
+      mode: "u=rw,g=r,o="
     become: yes
     tags:
       - prometheus

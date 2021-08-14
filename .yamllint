@@ -5,6 +5,7 @@ ignore: |
   .venv
   molecule
   .travis.yml
+  .github
 
 rules:
   braces: {max-spaces-inside: 1, level: error}
@@ -19,7 +20,7 @@ rules:
   indentation: disable
   key-duplicates: enable
   line-length:
-    max: 140
+    max: 300
     level: warning
   new-line-at-end-of-file: disable
   new-lines: {type: unix}

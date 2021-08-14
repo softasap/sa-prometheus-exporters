@@ -19,4 +19,3 @@ groups:
           description: The softasap.com site is returning status codes other than 200,
             this usually means that the site down
           title: softasap.com is returning errors for 2m
-
