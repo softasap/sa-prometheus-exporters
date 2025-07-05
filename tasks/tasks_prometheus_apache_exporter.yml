@@ -2,49 +2,52 @@
 # https://github.com/Lusitaniae/apache_exporter
 # https://github.com/Lusitaniae/apache_exporter/releases/download/v0.5.0/apache_exporter-0.5.0.linux-amd64.tar.gz
   - name: Set exporter facts
-    set_fact:
+    ansible.builtin.set_fact:
       apache_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('apache_exporter') }}"
       apache_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       apache_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus apache exporter | check if this exporter version exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ prometheus_exporters_dir }}/apache_exporter-{{ prometheus_apache_exporter_version }}.linux-amd64"
     register: apache_exporter_version_exists
-    become: yes
+    become: true
 
   - name: Prometheus apache Exporter | Download distribution
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/Lusitaniae/apache_exporter/releases/download/v{{ prometheus_apache_exporter_version }}/apache_exporter-{{ prometheus_apache_exporter_version }}.linux-amd64.tar.gz"
       dest: "/tmp/apache_exporter-{{ prometheus_apache_exporter_version }}.linux-amd64.tar.gz"
-    become: yes
-    become_user: "{{ apache_exporter_user }}"
+      owner: "{{ apache_exporter_user }}"
+      group: "{{ apache_exporter_group }}"
+      mode: "0644"
+    become: true
     when: not apache_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus apache Exporter | unpack distribution
-    unarchive:
+    ansible.builtin.unarchive:
       src: "/tmp/apache_exporter-{{ prometheus_apache_exporter_version }}.linux-amd64.tar.gz"
       dest: "{{ prometheus_exporters_dir }}"
       remote_src: yes
-    become: yes
+    become: true
     become_user: "{{ apache_exporter_user }}"
     when: not apache_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus apache Exporter | link apache exporter dir
-    file:
+    ansible.builtin.file:
       src: "{{ prometheus_exporters_dir }}/apache_exporter-{{ prometheus_apache_exporter_version }}.linux-amd64/"
       dest: "{{ prometheus_exporters_dir }}/{{ apache_exporter_sub_dir }}"
       owner: "root"
       group: "{{ apache_exporter_group }}"
       state: link
-    become: yes
+    become: true
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml"
+  - name: Prometheus apache Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"

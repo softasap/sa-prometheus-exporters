@@ -1,62 +1,70 @@
 ---
 # https://github.com/commercetools/monit_exporter/releases/download/v0.0.2/monit_exporter
   - name: Set exporter facts
-    set_fact:
+    ansible.builtin.set_fact:
       monit_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('monit_exporter') }}"
       monit_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       monit_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus monit exporter | check if this exporter version exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ prometheus_exporters_dir }}/{{ monit_exporter_sub_dir }}/monit_exporter"
     register: monit_exporter_version_exists
-    become: yes
+    become: true
     become_user: "{{ monit_exporter_user }}"
 
-  - name: Prometheus | Create dirs
-    file: path="{{ item }}"  state=directory  owner="root"  group="{{ monit_exporter_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
+  - name: Prometheus Monit Exporter | Create directories
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ monit_exporter_user }}"
+      group: "{{ monit_exporter_group }}"
+      mode: "u=rwx,g=rwx,o="
+    become: true
     when: not monit_exporter_version_exists.stat.exists
     with_items:
       - "{{ prometheus_exporters_dir }}/{{ monit_exporter_sub_dir }}"
     tags:
       - prometheus
 
-  - name: Prometheus monit Exporter | Download distribution
-    get_url:
+  - name: Prometheus Monit Exporter | Download distribution
+    ansible.builtin.get_url:
       url: "https://github.com/commercetools/monit_exporter/releases/download/v{{ prometheus_monit_exporter_version | default('0.0.2') }}/monit_exporter"
       dest: "{{ prometheus_exporters_dir }}/{{ monit_exporter_sub_dir }}/monit_exporter"
+      owner: "{{ monit_exporter_user }}"
+      group: "{{ monit_exporter_group }}"
       mode: "u=rwx,g=rx,o=rx"
-    become: yes
+    become: true
     become_user: "{{ monit_exporter_user }}"
     when: not monit_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml"
+  - name: Prometheus monit Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"
 
-  - name: Prometheus monit Exporter | Configuration file
-    template:
+  - name: Prometheus Monit Exporter | Configuration file
+    ansible.builtin.template:
       src: "{{ role_dir }}/templates/monit_exporter_config.toml.j2"
       dest: /etc/prometheus/exporters/monit_exporter_config.toml
-      owner: "root"
+      owner: "{{ monit_exporter_user }}"
       group: "{{ monit_exporter_group }}"
       mode: "u=rw,g=r,o="
-    become: yes
+    become: true
     tags:
       - prometheus
 
-  - name: Prometheus monit Exporter | Configuration file link to config.toml
-    file:
+  - name: Prometheus Monit Exporter | Configuration file link to config.toml
+    ansible.builtin.file:
       src: "/etc/prometheus/exporters/monit_exporter_config.toml"
       dest: "{{ prometheus_exporters_dir }}/{{ monit_exporter_sub_dir }}/config.toml"
       state: link
-      owner: "root"
+      owner: "{{ monit_exporter_user }}"
       group: "{{ monit_exporter_group }}"
     with_items: "{{ monit_presets | default([]) }}"
-    become: yes
+    become: true
     tags:
       - monit
       - update

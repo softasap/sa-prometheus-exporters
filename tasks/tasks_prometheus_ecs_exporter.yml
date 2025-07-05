@@ -1,21 +1,26 @@
 ---
 # https://github.com/ProjectLighthouse/ecs-exporter/releases/tag/v1.1.1
   - name: Set exporter facts
-    set_fact:
+    ansible.builtin.set_fact:
       ecs_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('ecs_exporter') }}"
       ecs_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       ecs_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus ecs exporter | check if this exporter version exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}/ecs-exporter"
     register: ecs_exporter_version_exists
-    become: yes
+    become: true
     become_user: "{{ ecs_exporter_user }}"
 
   - name: Prometheus | Create dirs
-    file: path="{{ item }}"  state=directory  owner="root"  group="{{ ecs_exporter_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      owner: "root"
+      group: "{{ ecs_exporter_group }}"
+      mode: "u=rwx,g=rwx,o="
+    become: true
     with_items:
       - "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}"
     when: not ecs_exporter_version_exists.stat.exists
@@ -23,16 +28,17 @@
       - prometheus
 
   - name: Prometheus ecs Exporter | Download distribution
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/ProjectLighthouse/ecs-exporter/releases/download/v{{ prometheus_ecs_exporter_version | default('1.1.1') }}/ecs-exporter"
       dest: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}/ecs-exporter"
       mode: "u=rwx,g=rx,o=rx"
-    become: yes
+    become: true
     become_user: "{{ ecs_exporter_user }}"
     when: not ecs_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml"
+  - name: Prometheus ecs Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"

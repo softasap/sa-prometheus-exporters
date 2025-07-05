@@ -1,73 +1,79 @@
 ---
 # https://github.com/ivx/yet-another-cloudwatch-exporter
-  - name: Set exporter facts
-    set_fact:
-      cloudwatch_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cloudwatch_exporter') }}"
-      cloudwatch_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
-      cloudwatch_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+- name: Set exporter facts
+  ansible.builtin.set_fact:
+    cloudwatch_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cloudwatch_exporter') }}"
+    cloudwatch_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+    cloudwatch_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus cloudwatch exporter | check if this exporter version exists
-    stat:
-      path: "{{ prometheus_exporters_dir }}/{{ cloudwatch_exporter_sub_dir }}/cloudwatch_exporter"
-    register: cloudwatch_exporter_version_exists
-    become: yes
-    become_user: "{{ cloudwatch_exporter_user }}"
+- name: Prometheus cloudwatch exporter | check if this exporter version exists
+  ansible.builtin.stat:
+    path: "{{ prometheus_exporters_dir }}/{{ cloudwatch_exporter_sub_dir }}/cloudwatch_exporter"
+  register: cloudwatch_exporter_version_exists
+  become: true
+  become_user: "{{ cloudwatch_exporter_user }}"
 
-  - name: Prometheus cloudwatch Exporter | Create dirs
-    file: path="{{ item }}"  state=directory  owner="root"  group="{{ cloudwatch_exporter_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
-    when: not cloudwatch_exporter_version_exists.stat.exists
-    with_items:
-      - "{{ prometheus_exporters_dir }}/{{ cloudwatch_exporter_sub_dir }}"
-    tags:
-      - prometheus
+- name: Prometheus cloudwatch Exporter | Create dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+    group: "{{ cloudwatch_exporter_group }}"
+    mode: "u=rwx,g=rwx,o="
+  become: true
+  when: not cloudwatch_exporter_version_exists.stat.exists
+  with_items:
+    - "{{ prometheus_exporters_dir }}/{{ cloudwatch_exporter_sub_dir }}"
+  tags:
+    - prometheus
 
-  - name: Prometheus cloudwatch Exporter | Download distribution
-    get_url:
-          # https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v0.13.3/yet-another-cloudwatch-exporter_0.13.3_Linux_x86_64.tar.gz
-      url: "https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
-      dest: "/tmp/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
-      mode: "u=rwx,g=rx,o=rx"
-    become: yes
-    become_user: "{{ cloudwatch_exporter_user }}"
-    when: not cloudwatch_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus cloudwatch Exporter | Download distribution
+  ansible.builtin.get_url:
+        # https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v0.13.3/yet-another-cloudwatch-exporter_0.13.3_Linux_x86_64.tar.gz
+    url: "https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
+    dest: "/tmp/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+  become_user: "{{ cloudwatch_exporter_user }}"
+  when: not cloudwatch_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus cloudwatch Exporter | unpack distribution
-    unarchive:
-      src: "/tmp/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
-      dest: "{{ prometheus_exporters_dir }}"
-      remote_src: yes
-    become: yes
-    become_user: "{{ cloudwatch_exporter_user }}"
-    when: not cloudwatch_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus cloudwatch Exporter | unpack distribution
+  ansible.builtin.unarchive:
+    src: "/tmp/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
+    dest: "{{ prometheus_exporters_dir }}"
+    remote_src: yes
+  become: true
+  become_user: "{{ cloudwatch_exporter_user }}"
+  when: not cloudwatch_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - include_tasks: "tasks_startup.yml"
-    vars:
-      exporter_startup_config: "{{ exporter_config }}"
-      exporter_startup_template: "cloudwatch"
+- name: Prometheus cloudwatch Exporter | apply tasks_startup
+  ansible.builtin.include_tasks: "tasks_startup.yml"
+  vars:
+    exporter_startup_config: "{{ exporter_config }}"
+    exporter_startup_template: "cloudwatch"
 
-  - name: Prometheus cloudwatch Exporter | Configuration file
-    template:
-      src: "{{ role_dir }}/templates/cloudwatch_exporter_config.yml.j2"
-      dest: "/etc/prometheus/exporters/cloudwatch_exporter_config.yml"
-      owner: "root"
-      group: "{{ cloudwatch_exporter_group }}"
-      mode: "u=rw,g=r,o="
-    become: yes
-    tags:
-      - prometheus
+- name: Prometheus cloudwatch Exporter | Configuration file
+  ansible.builtin.template:
+    src: "{{ role_dir }}/templates/cloudwatch_exporter_config.yml.j2"
+    dest: "/etc/prometheus/exporters/cloudwatch_exporter_config.yml"
+    owner: "root"
+    group: "{{ cloudwatch_exporter_group }}"
+    mode: "u=rw,g=r,o="
+  become: true
+  tags:
+    - prometheus
 
-  - name: Prometheus cloudwatch Exporter | Configuration file link to config.xml
-    file:
-      src: "/etc/prometheus/exporters/cloudwatch_exporter_config.yml"
-      dest: "{{ prometheus_exporters_dir }}/{{ cloudwatch_exporter_sub_dir }}/config.yml"
-      state: link
-      owner: "root"
-      group: "{{ cloudwatch_exporter_group }}"
-    become: yes
-    tags:
-      - prometheus
+- name: Prometheus cloudwatch Exporter | Configuration file link to config.xml
+  ansible.builtin.file:
+    src: "/etc/prometheus/exporters/cloudwatch_exporter_config.yml"
+    dest: "{{ prometheus_exporters_dir }}/{{ cloudwatch_exporter_sub_dir }}/config.yml"
+    state: link
+    owner: "root"
+    group: "{{ cloudwatch_exporter_group }}"
+  become: true
+  tags:
+    - prometheus

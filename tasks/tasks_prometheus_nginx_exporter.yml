@@ -2,87 +2,90 @@
 # https://github.com/nginxinc/nginx-prometheus-exporter
 
   - name: Set exporter facts
-    set_fact:
+    ansible.builtin.set_fact:
       nginx_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('nginx_exporter') }}"
       nginx_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       nginx_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
       default_nginx_exporter_config:
-         parameters: "-nginx.scrape-uri http://localhost:8113/stub_status"
+          parameters: "-nginx.scrape-uri http://localhost:8113/stub_status"
 
 
   - name: Calculate final config
-    set_fact:
-      final_exporter_config: "{{ default_nginx_exporter_config | combine (exporter_config) }}"
+    ansible.builtin.set_fact:
+      final_exporter_config: "{{ default_nginx_exporter_config | combine(exporter_config) }}"
 
   - name: Prometheus nginx exporter | check if this exporter version exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
     register: nginx_exporter_version_exists
-    become: yes
+    become: true
 
   - name: Prometheus nginx Exporter | Download distribution
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v{{ prometheus_nginx_exporter_version }}/nginx-prometheus-exporter-{{ prometheus_nginx_exporter_version }}-linux-amd64.tar.gz"
       dest: "/tmp/nginx-prometheus-exporter-{{ prometheus_nginx_exporter_version }}-linux-amd64.tar.gz"
-    become: yes
+      mode: "0640"
+    become: true
     become_user: "{{ nginx_exporter_user }}"
     when: not nginx_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus nginx Exporter | create versioned directory
-    file:
+    ansible.builtin.file:
       path: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
       state: directory
       owner: "{{ nginx_exporter_user }}"
       group: root
       mode: "u=rw,g=r,o="
-    become: yes
+    become: true
     when: not nginx_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus nginx Exporter | unpack distribution
-    unarchive:
+    ansible.builtin.unarchive:
       src: "/tmp/nginx-prometheus-exporter-{{ prometheus_nginx_exporter_version }}-linux-amd64.tar.gz"
       dest: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
       remote_src: yes
-    become: yes
+    become: true
     when: not nginx_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus nginx Exporter | adapt expected exporter name
-    command: "mv nginx-prometheus-exporter nginx_exporter"
+    ansible.builtin.command: "mv nginx-prometheus-exporter nginx_exporter"
     args:
       chdir: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
-    become: yes
+    become: true
     when: not nginx_exporter_version_exists.stat.exists
+    changed_when: true
     tags:
       - prometheus
 
   - name: Prometheus nginx Exporter | Fix permissions
-    file:
+    ansible.builtin.file:
       path: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64/nginx_exporter"
       owner: "{{ nginx_exporter_user }}"
       group: "root"
       mode: "u=rx,g=rwx,o=rx"
-    become: yes
+    become: true
     when: not nginx_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus nginx Exporter | link nginx exporter dir
-    file:
+    ansible.builtin.file:
       src: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64/"
       dest: "{{ prometheus_exporters_dir }}/{{ nginx_exporter_sub_dir }}"
       owner: "root"
       group: "{{ nginx_exporter_group }}"
       state: link
-    become: yes
+    become: true
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml"
+  - name: Include startup tasks for nginx exporter
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ final_exporter_config }}"

@@ -42,7 +42,7 @@ route:
   # This routes performs a regular expression match on alert labels to
   # catch alerts that are related to a list of services.
   - match_re:
-      service: ^(foo1|foo2|baz)$
+      ansible.builtin.service: ^(foo1|foo2|baz)$
     receiver: slack-channel
     # The service has a sub-route for critical alerts, any alerts
     # that do not match, i.e. severity != critical, fall-back to the
@@ -52,7 +52,7 @@ route:
         severity: critical
       receiver: slack-channel
   - match:
-      service: files
+      ansible.builtin.service: files
     receiver: slack-channel
 
     routes:
@@ -63,7 +63,7 @@ route:
   # This route handles all alerts coming from a database service. If there's
   # no team to handle it, it defaults to the DB team.
   - match:
-      service: database
+      ansible.builtin.service: database
     receiver: slack-channel
     # Also group alerts by affected database.
     group_by: [alertname, cluster, database]

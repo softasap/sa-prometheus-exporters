@@ -2,51 +2,55 @@
 # https://github.com/justwatchcom/sql_exporter
 # https://github.com/justwatchcom/sql_exporter/releases/download/v0.2.0/sql_exporter-0.2.0.linux-amd64.tar.gz
   - name: Set exporter facts
-    set_fact:
+    ansible.builtin.set_fact:
       sql_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('sql_exporter') }}"
       sql_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       sql_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus sql exporter | check if this exporter version exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ prometheus_exporters_dir }}/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64/"
     register: sql_exporter_version_exists
-    become: yes
+    become: true
     become_user: "{{ sql_exporter_user }}"
 
   - name: Prometheus sql Exporter | Download distribution
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/justwatchcom/sql_exporter/releases/download/v{{ prometheus_sql_exporter_version }}/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64.tar.gz"
       dest: "/tmp/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64.tar.gz"
-    become: yes
+      owner: "{{ sql_exporter_user }}"
+      group: "{{ sql_exporter_group }}"
+      mode: '0644'
+    become: true
     become_user: "{{ sql_exporter_user }}"
     when: not sql_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus sql Exporter | unpack distribution
-    unarchive:
+    ansible.builtin.unarchive:
       src: "/tmp/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64.tar.gz"
       dest: "{{ prometheus_exporters_dir }}"
       remote_src: yes
-    become: yes
+    become: true
     become_user: "{{ sql_exporter_user }}"
     when: not sql_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus sql Exporter | link sql exporter dir
-    file:
+    ansible.builtin.file:
       src: "{{ prometheus_exporters_dir }}/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64/"
       dest: "{{ prometheus_exporters_dir }}/{{ sql_exporter_sub_dir }}"
+      state: link
       owner: "root"
       group: "{{ sql_exporter_group }}"
-      state: link
-    become: yes
+    become: true
     when: not sql_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml"
+  - name: Prometheus SQL Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"

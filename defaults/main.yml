@@ -1,7 +1,7 @@
 ---
 # defaults file for sa-prometheus-exporters
 
-role_dir: "{{role_path}}"
+role_dir: "{{ role_path }}"
 
 option_install_go: false
 go_version: 1.6
@@ -41,7 +41,7 @@ prometheus_exporters:
       name: mysqld
     }
   - {
-    name: proxysql
+      name: proxysql
     }
   - {
       name: node
@@ -63,26 +63,26 @@ prometheus_exporters:
     }
 
 
-prometheus_user:   prometheus
-prometheus_group:  prometheus
+prometheus_user: prometheus
+prometheus_group: prometheus
 
 prometheus_base_dir: /opt/prometheus
-prometheus_exporters_dir: "{{prometheus_base_dir}}/exporters"
-prometheus_data_dir: "{{prometheus_base_dir}}/data"
+prometheus_exporters_dir: "{{ prometheus_base_dir }}/exporters"
+prometheus_data_dir: "{{ prometheus_base_dir }}/data"
 prometheus_exporters_config_dir: /etc/prometheus/exporters
 
 prometheus_apache_exporter_version: "0.5.0"
 prometheus_nginx_exporter_version: "0.4.2"
-prometheus_node_exporter_version:   "1.0.1"
-prometheus_blackbox_exporter_version:   "0.18.0"
-prometheus_elasticsearch_exporter_version:   "1.0.2"
-prometheus_postgres_exporter_version:   "0.4.1"
-prometheus_cadvisor_exporter_version:   "0.27.4"
-prometheus_mongodb_exporter_version:   "0.3.1"
-prometheus_redis_exporter_version:   "1.43.0"
+prometheus_node_exporter_version: "1.0.1"
+prometheus_blackbox_exporter_version: "0.18.0"
+prometheus_elasticsearch_exporter_version: "1.0.2"
+prometheus_postgres_exporter_version: "0.4.1"
+prometheus_cadvisor_exporter_version: "0.27.4"
+prometheus_mongodb_exporter_version: "0.3.1"
+prometheus_redis_exporter_version: "1.43.0"
 prometheus_sql_exporter_version: "0.2.0"
-prometheus_memcached_exporter_version:   "0.7.0"
-prometheus_mysqld_exporter_version:   "0.12.1"
+prometheus_memcached_exporter_version: "0.7.0"
+prometheus_mysqld_exporter_version: "0.12.1"
 prometheus_proxysql_exporter_version: "1.1.0"
 prometheus_phpfpm_exporter_version: "0.2.0"
 prometheus_ecs_exporter_version: "1.1.1"

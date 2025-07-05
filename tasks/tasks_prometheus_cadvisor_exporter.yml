@@ -2,111 +2,134 @@
 # https://github.com/google/cadvisor/releases
 # https://github.com/google/cadvisor/releases/download/v0.27.4/cadvisor
   - name: Set exporter facts
-    set_fact:
+    ansible.builtin.set_fact:
       cadvisor_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cadvisor_exporter') }}"
       cadvisor_exporter_user: "{{ exporter_config.exporter_user | default('root') }}"
       cadvisor_exporter_group: "{{ exporter_config.exporter_group | default('root') }}"
 
   - name: Prometheus cadvisor exporter | check if this exporter version exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}/cadvisor_exporter"
     register: cadvisor_exporter_version_exists
-    become: yes
+    become: true
     become_user: "{{ cadvisor_exporter_user }}"
 
   - name: CAdvisor | Create dirs
-    file: path="{{ current }}"  state=directory  owner="root"  group="{{ cadvisor_exporter_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
+    ansible.builtin.file:
+      path: "{{ current }}"
+      state: directory
+      owner: "root"
+      group: "{{ cadvisor_exporter_group }}"
+      mode: "0770"
     with_items:
       - "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}"
     loop_control:
-        loop_var: current
+      loop_var: current
     when: not cadvisor_exporter_version_exists.stat.exists
+    become: true
     tags:
       - prometheus
 
+
   - name: CAdvisor | Download distribution
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/google/cadvisor/releases/download/v{{ prometheus_cadvisor_exporter_version }}/cadvisor"
       dest: "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}/cadvisor_exporter"
-      mode: "u=rwx,g=rx,o=rx"
-    become: yes
+      mode: "0755"
+    become: true
     become_user: "{{ cadvisor_exporter_user }}"
     when: not cadvisor_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
-  - name: CAdvisor | eliminate prometheus-exporter-cadvisor service, if any (1/2)
-    service: name="prometheus-exporter-cadvisor" state="stopped"
-    become: yes
-    ignore_errors: true
+  - name: CAdvisor | Check if prometheus-exporter-cadvisor service exists
+    ansible.builtin.stat:
+      path: "/etc/systemd/system/prometheus-exporter-cadvisor.service"
+    register: cadvisor_service_exists
+    become: true
     tags:
       - prometheus
 
-  - name: CAdvisor | eliminate prometheus-exporter-cadvisor service, if any (2/2)
-    file: path="/etc/systemd/system/prometheus-exporter-cadvisor service.service" state="absent"
-    become: yes
-    ignore_errors: true
+  - name: CAdvisor | Stop and remove legacy prometheus-exporter-cadvisor service
+    when: cadvisor_service_exists.stat.exists
     tags:
       - prometheus
+    block:
+
+      - name: Stop legacy service
+        ansible.builtin.service:
+          name: "prometheus-exporter-cadvisor"
+          state: "stopped"
+        become: true
+
+      - name: Remove legacy service file
+        ansible.builtin.file:
+          path: "/etc/systemd/system/prometheus-exporter-cadvisor.service"
+          state: "absent"
+        become: true
 
   - name: CAdvisor | Template startup script
-    template:
+    ansible.builtin.template:
       src: "{{ role_dir }}/templates/cadvisor.systemd.j2"
       dest: "/etc/systemd/system/cadvisor.service"
       owner: root
       group: root
-      mode: "u=rw,g=r,o=r"
+      mode: "0644"
     when: ansible_service_mgr == "systemd"
-    become: yes
+    become: true
     tags:
       - prometheus
 
-  - block:
-
-    - name: Detect start-stop-daemon
-      shell: type start-stop-daemon
-      register: startstop_exists
-      changed_when: False
-      ignore_errors: true
-      tags:
-        - skip_ansible_lint
-
-    - name: CAdvisor | Template startup script
-      template:
-        src: "{{ role_dir }}/templates/cadvisor.amzn.j2"
-        dest: "/etc/init/cadvisor.conf"
-        mode: "u=rw,g=r,o=r"
-        owner: root
-        group: root
-      become: yes
-      tags:
-        - prometheus
-
-    - name: CAdvisor | Template startup script
-      template:
-        src: "{{ role_dir }}/templates/cadvisor.upstart.j2"
-        dest: "/etc/init/cadvisor.conf"
-        mode: "u=rw,g=r,o=r"
-        owner: root
-        group: root
-      when: startstop_exists is failed
-      become: yes
-      tags:
-        - prometheus
-
+  - name: CAdvisor | Configure upstart service
     when: ansible_service_mgr == "upstart" and cadvisor_exists is failed
+    block:
+      - name: Detect start-stop-daemon
+        ansible.builtin.command: type start-stop-daemon
+        register: startstop_exists
+        changed_when: false
+        tags:
+          - skip_ansible_lint
+
+      - name: CAdvisor | Template startup script
+        ansible.builtin.template:
+          src: "{{ role_dir }}/templates/cadvisor.amzn.j2"
+          dest: "/etc/init/cadvisor.conf"
+          mode: "0644"
+          owner: root
+          group: root
+        become: true
+        tags:
+          - prometheus
+
+      - name: CAdvisor | Template startup script
+        ansible.builtin.template:
+          src: "{{ role_dir }}/templates/cadvisor.upstart.j2"
+          dest: "/etc/init/cadvisor.conf"
+          mode: "0644"
+          owner: root
+          group: root
+        when: startstop_exists is failed
+        become: true
+        tags:
+          - prometheus
 
   - name: CAdvisor | Ensure service started
-    service: name="cadvisor" state="started" enabled="yes"
+    ansible.builtin.service:
+      name: "cadvisor"
+      state: "started"
+      enabled: "yes"
     when: docker_test is not defined and ansible_service_mgr == "upstart"
-    become: yes
+    become: true
     tags:
       - prometheus
 
   - name: CAdvisor | Ensure service started
-    systemd: name="cadvisor" state="started" enabled="yes" daemon-reload="yes"
+    ansible.builtin.systemd:
+      name: "cadvisor"
+      state: "started"
+      enabled: "yes"
+      daemon_reload: "yes"
     when: docker_test is not defined and ansible_service_mgr == "systemd"
-    become: yes
+    become: true
     tags:
       - prometheus
