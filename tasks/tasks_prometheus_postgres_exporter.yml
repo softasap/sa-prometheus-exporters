@@ -1,57 +1,58 @@
 ---
 # https://github.com/wrouesnel/postgres_exporter/releases
 # https://github.com/wrouesnel/postgres_exporter/releases/download/v0.4.1/postgres_exporter_v0.4.1_linux-amd64.tar.gz
-  - name: Set exporter facts
-    ansible.builtin.set_fact:
-      postgres_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('postgres_exporter') }}"
-      postgres_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
-      postgres_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus postgres exporter | check if this exporter version exists
-    ansible.builtin.stat:
-      path: "{{ prometheus_exporters_dir }}/postgres_exporter_v{{ prometheus_postgres_exporter_version }}_linux-amd64/"
-    register: postgres_exporter_version_exists
-    become: true
+- name: Set exporter facts
+  ansible.builtin.set_fact:
+    postgres_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('postgres_exporter') }}"
+    postgres_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+    postgres_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus postgres Exporter | Download distribution
-    ansible.builtin.get_url:
-      url: "https://github.com/wrouesnel/postgres_exporter/releases/download/v{{ prometheus_postgres_exporter_version }}/postgres_exporter_v{{ prometheus_postgres_exporter_version }}_linux-amd64.tar.gz"
-      dest: "/tmp/postgres_exporter-{{ prometheus_postgres_exporter_version }}.linux-amd64.tar.gz"
-      owner: "{{ postgres_exporter_user }}"
-      group: "{{ postgres_exporter_group }}"
-      mode: '0644'
-    become: true
-    become_user: "{{ postgres_exporter_user }}"
-    when: not postgres_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus postgres exporter | check if this exporter version exists
+  ansible.builtin.stat:
+    path: "{{ prometheus_exporters_dir }}/postgres_exporter_v{{ prometheus_postgres_exporter_version }}_linux-amd64/"
+  register: postgres_exporter_version_exists
+  become: true
 
-  - name: Prometheus postgres Exporter | unpack distribution
-    ansible.builtin.unarchive:
-      src: "/tmp/postgres_exporter-{{ prometheus_postgres_exporter_version }}.linux-amd64.tar.gz"
-      dest: "{{ prometheus_exporters_dir }}"
-      remote_src: yes
-      owner: "{{ postgres_exporter_user }}"
-      group: "{{ postgres_exporter_group }}"
-    become: true
-    become_user: "{{ postgres_exporter_user }}"
-    when: not postgres_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus postgres Exporter | Download distribution
+  ansible.builtin.get_url:
+    url: "https://github.com/wrouesnel/postgres_exporter/releases/download/v{{ prometheus_postgres_exporter_version }}/postgres_exporter_v{{ prometheus_postgres_exporter_version }}_linux-amd64.tar.gz"
+    dest: "/tmp/postgres_exporter-{{ prometheus_postgres_exporter_version }}.linux-amd64.tar.gz"
+    owner: "{{ postgres_exporter_user }}"
+    group: "{{ postgres_exporter_group }}"
+    mode: '0644'
+  become: true
+  become_user: "{{ postgres_exporter_user }}"
+  when: not postgres_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus postgres Exporter | link postgres exporter dir
-    ansible.builtin.file:
-      src: "{{ prometheus_exporters_dir }}/postgres_exporter_v{{ prometheus_postgres_exporter_version }}_linux-amd64/"
-      dest: "{{ prometheus_exporters_dir }}/{{ postgres_exporter_sub_dir }}"
-      owner: "root"
-      group: "{{ postgres_exporter_group }}"
-      state: link
-    become: true
-    when: not postgres_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus postgres Exporter | unpack distribution
+  ansible.builtin.unarchive:
+    src: "/tmp/postgres_exporter-{{ prometheus_postgres_exporter_version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_exporters_dir }}"
+    remote_src: yes
+    owner: "{{ postgres_exporter_user }}"
+    group: "{{ postgres_exporter_group }}"
+  become: true
+  become_user: "{{ postgres_exporter_user }}"
+  when: not postgres_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus Postgres Exporter | Include startup tasks
-    ansible.builtin.include_tasks: "tasks_startup.yml"
-    vars:
-      exporter_startup_config: "{{ exporter_config }}"
+- name: Prometheus postgres Exporter | link postgres exporter dir
+  ansible.builtin.file:
+    src: "{{ prometheus_exporters_dir }}/postgres_exporter_v{{ prometheus_postgres_exporter_version }}_linux-amd64/"
+    dest: "{{ prometheus_exporters_dir }}/{{ postgres_exporter_sub_dir }}"
+    owner: "root"
+    group: "{{ postgres_exporter_group }}"
+    state: link
+  become: true
+  when: not postgres_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
+
+- name: Prometheus Postgres Exporter | Include startup tasks
+  ansible.builtin.include_tasks: "tasks_startup.yml"
+  vars:
+    exporter_startup_config: "{{ exporter_config }}"

@@ -1,57 +1,57 @@
 ---
 # https://github.com/percona/proxysql_exporter/releases/download/v1.1.0/proxysql_exporter-1.1.0.linux-amd64.tar.gz
-  - name: Set exporter facts
-    ansible.builtin.set_fact:
-      proxysql_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('proxysql_exporter') }}"
-      proxysql_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
-      proxysql_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+- name: Set exporter facts
+  ansible.builtin.set_fact:
+    proxysql_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('proxysql_exporter') }}"
+    proxysql_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+    proxysql_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus proxysql exporter | check if this exporter version exists
-    ansible.builtin.stat:
-      path: "{{ prometheus_exporters_dir }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64/"
-    register: proxysql_exporter_version_exists
-    become: true
-    become_user: "{{ proxysql_exporter_user }}"
+- name: Prometheus proxysql exporter | check if this exporter version exists
+  ansible.builtin.stat:
+    path: "{{ prometheus_exporters_dir }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64/"
+  register: proxysql_exporter_version_exists
+  become: true
+  become_user: "{{ proxysql_exporter_user }}"
 
-  - name: Prometheus proxysql Exporter | Download distribution
-    ansible.builtin.get_url:
-      url: "https://github.com/percona/proxysql_exporter/releases/download/v{{ prometheus_proxysql_exporter_version }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
-      dest: "/tmp/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
-      owner: "{{ proxysql_exporter_user }}"
-      group: "{{ proxysql_exporter_group }}"
-      mode: '0644'
-    become: true
-    become_user: "{{ proxysql_exporter_user }}"
-    when: not proxysql_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus proxysql Exporter | Download distribution
+  ansible.builtin.get_url:
+    url: "https://github.com/percona/proxysql_exporter/releases/download/v{{ prometheus_proxysql_exporter_version }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
+    owner: "{{ proxysql_exporter_user }}"
+    group: "{{ proxysql_exporter_group }}"
+    mode: '0644'
+  become: true
+  become_user: "{{ proxysql_exporter_user }}"
+  when: not proxysql_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus proxysql Exporter | unpack distribution
-    ansible.builtin.unarchive:
-      src: "/tmp/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
-      dest: "{{ prometheus_exporters_dir }}"
-      remote_src: yes
-      owner: "{{ proxysql_exporter_user }}"
-      group: "{{ proxysql_exporter_group }}"
-    become: true
-    become_user: "{{ proxysql_exporter_user }}"
-    when: not proxysql_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus proxysql Exporter | unpack distribution
+  ansible.builtin.unarchive:
+    src: "/tmp/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_exporters_dir }}"
+    remote_src: yes
+    owner: "{{ proxysql_exporter_user }}"
+    group: "{{ proxysql_exporter_group }}"
+  become: true
+  become_user: "{{ proxysql_exporter_user }}"
+  when: not proxysql_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus proxysql Exporter | link proxysql exporter dir
-    ansible.builtin.file:
-      src: "{{ prometheus_exporters_dir }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64/"
-      dest: "{{ prometheus_exporters_dir }}/{{ proxysql_exporter_sub_dir }}"
-      owner: "root"
-      group: "{{ proxysql_exporter_group }}"
-      state: link
-    become: true
-    when: not proxysql_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus proxysql Exporter | link proxysql exporter dir
+  ansible.builtin.file:
+    src: "{{ prometheus_exporters_dir }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64/"
+    dest: "{{ prometheus_exporters_dir }}/{{ proxysql_exporter_sub_dir }}"
+    owner: "root"
+    group: "{{ proxysql_exporter_group }}"
+    state: link
+  become: true
+  when: not proxysql_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus ProxySQL Exporter | Include startup tasks
-    ansible.builtin.include_tasks: "tasks_startup.yml"
-    vars:
-      exporter_startup_config: "{{ exporter_config }}"
+- name: Prometheus ProxySQL Exporter | Include startup tasks
+  ansible.builtin.include_tasks: "tasks_startup.yml"
+  vars:
+    exporter_startup_config: "{{ exporter_config }}"

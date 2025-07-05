@@ -1,72 +1,72 @@
 ---
 # https://github.com/oliver006/redis_exporter/releases
 # https://github.com/oliver006/redis_exporter/releases/download/v0.14/redis_exporter-v0.14.linux-amd64.tar.gz
-  - name: Set exporter facts
-    ansible.builtin.set_fact:
-      redis_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('redis_exporter') }}"
-      redis_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
-      redis_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+- name: Set exporter facts
+  ansible.builtin.set_fact:
+    redis_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('redis_exporter') }}"
+    redis_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+    redis_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus redis exporter | check if this exporter version exists
-    ansible.builtin.stat:
-      path: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
-    register: redis_exporter_version_exists
-    become: true
-    become_user: "{{ redis_exporter_user }}"
+- name: Prometheus redis exporter | check if this exporter version exists
+  ansible.builtin.stat:
+    path: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
+  register: redis_exporter_version_exists
+  become: true
+  become_user: "{{ redis_exporter_user }}"
 
-  - name: Prometheus | Create directories for redis exporter
-    ansible.builtin.file:
-      path: "{{ item }}"
-      state: directory
-      owner: "root"
-      group: "{{ redis_exporter_group }}"
-      mode: "0770"
-    become: true
-    with_items:
-      - "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
-    when: not redis_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus | Create directories for redis exporter
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+    group: "{{ redis_exporter_group }}"
+    mode: "0770"
+  become: true
+  with_items:
+    - "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
+  when: not redis_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus redis Exporter | Download distribution
-    ansible.builtin.get_url:
-      url: "https://github.com/oliver006/redis_exporter/releases/download/v{{ prometheus_redis_exporter_version }}/redis_exporter-v{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
-      dest: "/tmp/redis_exporter-{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
-      owner: "{{ redis_exporter_user }}"
-      group: "{{ redis_exporter_group }}"
-      mode: "0640"
-    become: true
-    become_user: "{{ redis_exporter_user }}"
-    when: not redis_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus redis Exporter | Download distribution
+  ansible.builtin.get_url:
+    url: "https://github.com/oliver006/redis_exporter/releases/download/v{{ prometheus_redis_exporter_version }}/redis_exporter-v{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/redis_exporter-{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
+    owner: "{{ redis_exporter_user }}"
+    group: "{{ redis_exporter_group }}"
+    mode: "0640"
+  become: true
+  become_user: "{{ redis_exporter_user }}"
+  when: not redis_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus redis Exporter | unpack distribution
-    ansible.builtin.unarchive:
-      src: "/tmp/redis_exporter-{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
-      dest: "/tmp/"
-      remote_src: yes
-    become: true
-    become_user: "{{ redis_exporter_user }}"
-    when: not redis_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus redis Exporter | unpack distribution
+  ansible.builtin.unarchive:
+    src: "/tmp/redis_exporter-{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+  become: true
+  become_user: "{{ redis_exporter_user }}"
+  when: not redis_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus redis Exporter | Install distribution
-    ansible.builtin.copy:
-      remote_src: true
-      src: "/tmp/redis_exporter-v{{ prometheus_redis_exporter_version }}.linux-amd64/redis_exporter"
-      dest: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
-      owner: "{{ redis_exporter_user }}"
-      group: "{{ redis_exporter_group }}"
-      mode: "u=rwx,g=rx,o=rx"
-    become: true
-    become_user: "{{ redis_exporter_user }}"
-    when: not redis_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus redis Exporter | Install distribution
+  ansible.builtin.copy:
+    remote_src: true
+    src: "/tmp/redis_exporter-v{{ prometheus_redis_exporter_version }}.linux-amd64/redis_exporter"
+    dest: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
+    owner: "{{ redis_exporter_user }}"
+    group: "{{ redis_exporter_group }}"
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+  become_user: "{{ redis_exporter_user }}"
+  when: not redis_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus Redis Exporter | Include startup tasks
-    ansible.builtin.include_tasks: "tasks_startup.yml"
-    vars:
-      exporter_startup_config: "{{ exporter_config }}"
+- name: Prometheus Redis Exporter | Include startup tasks
+  ansible.builtin.include_tasks: "tasks_startup.yml"
+  vars:
+    exporter_startup_config: "{{ exporter_config }}"
