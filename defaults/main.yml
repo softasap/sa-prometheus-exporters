@@ -7,61 +7,24 @@ option_install_go: false
 go_version: 1.6
 
 prometheus_exporters:
-  - {
-      name: apache
-    }
-  - {
-      name: nginx
-    }
-  - {
-      name: blackbox
-    }
-  - {
-      name: cadvisor
-    }
-  - {
-      name: cloudwatch
-    }
-  - {
-      name: ecs
-    }
-  - {
-      name: elasticsearch
-    }
-  - {
-      name: memcached
-    }
-  - {
-      name: mongodb
-    }
-  - {
-      name: monit
-    }
-  - {
-      name: mysqld
-    }
-  - {
-      name: proxysql
-    }
-  - {
-      name: node
-    }
-  - {
-      name: phpfpm
-    }
-  - {
-      name: postgres
-    }
-  - {
-      name: redis
-    }
-  - {
-      name: sql
-    }
-  - {
-      name: ssl
-    }
-
+  - name: apache
+  - name: nginx
+  - name: blackbox
+  - name: cadvisor
+  - name: cloudwatch
+  - name: ecs
+  - name: elasticsearch
+  - name: memcached
+  - name: mongodb
+  - name: monit
+  - name: mysqld
+  - name: proxysql
+  - name: node
+  - name: phpfpm
+  - name: postgres
+  - name: redis
+  - name: sql
+  - name: ssl
 
 prometheus_user: prometheus
 prometheus_group: prometheus

@@ -1,59 +1,57 @@
 ---
-
-#
 # https://github.com/percona/mongodb_exporter/releases/download/v0.3.1/mongodb_exporter-0.3.1.linux-amd64.tar.gz
 
-  - name: Set exporter facts
-    ansible.builtin.set_fact:
-      mongodb_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('mongodb_exporter') }}"
-      mongodb_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
-      mongodb_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+- name: Set exporter facts
+  ansible.builtin.set_fact:
+    mongodb_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('mongodb_exporter') }}"
+    mongodb_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+    mongodb_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus mongodb exporter | check if this exporter version exists
-    ansible.builtin.stat:
-      path: "{{ prometheus_exporters_dir }}/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64"
-    register: mongodb_exporter_version_exists
-    become: true
-    become_user: "{{ mongodb_exporter_user }}"
+- name: Prometheus MongoDB Exporter | check if this exporter version exists
+  ansible.builtin.stat:
+    path: "{{ prometheus_exporters_dir }}/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64"
+  register: mongodb_exporter_version_exists
+  become: true
+  become_user: "{{ mongodb_exporter_user }}"
 
-  - name: Prometheus mongodb Exporter | Download distribution
-    ansible.builtin.get_url:
-      url: "https://github.com/percona/mongodb_exporter/releases/download/v{{ prometheus_mongodb_exporter_version }}/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64.tar.gz"
-      dest: "/tmp/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64.tar.gz"
-      owner: "{{ mongodb_exporter_user }}"
-      group: "{{ mongodb_exporter_group }}"
-      mode: "0644"
-    become: true
-    become_user: "{{ mongodb_exporter_user }}"
-    when: not mongodb_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus MongoDB Exporter | Download distribution
+  ansible.builtin.get_url:
+    url: "https://github.com/percona/mongodb_exporter/releases/download/v{{ prometheus_mongodb_exporter_version }}/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64.tar.gz"
+    owner: "{{ mongodb_exporter_user }}"
+    group: "{{ mongodb_exporter_group }}"
+    mode: "0644"
+  become: true
+  become_user: "{{ mongodb_exporter_user }}"
+  when: not mongodb_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus MongoDB Exporter | unpack distribution
-    ansible.builtin.unarchive:
-      src: "/tmp/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64.tar.gz"
-      dest: "{{ prometheus_exporters_dir }}"
-      remote_src: yes
-      owner: "{{ mongodb_exporter_user }}"
-      group: "{{ mongodb_exporter_group }}"
-    become: true
-    become_user: "{{ mongodb_exporter_user }}"
-    when: not mongodb_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus MongoDB Exporter | unpack distribution
+  ansible.builtin.unarchive:
+    src: "/tmp/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_exporters_dir }}"
+    remote_src: yes
+    owner: "{{ mongodb_exporter_user }}"
+    group: "{{ mongodb_exporter_group }}"
+  become: true
+  become_user: "{{ mongodb_exporter_user }}"
+  when: not mongodb_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus MongoDB Exporter | link mongodb exporter dir
-    ansible.builtin.file:
-      src: "{{ prometheus_exporters_dir }}/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64/"
-      dest: "{{ prometheus_exporters_dir }}/{{ mongodb_exporter_sub_dir }}"
-      owner: "{{ mongodb_exporter_user }}"
-      group: "{{ mongodb_exporter_group }}"
-      state: link
-    become: true
-    tags:
-      - prometheus
+- name: Prometheus MongoDB Exporter | link mongodb exporter dir
+  ansible.builtin.file:
+    src: "{{ prometheus_exporters_dir }}/mongodb_exporter-{{ prometheus_mongodb_exporter_version }}.linux-amd64/"
+    dest: "{{ prometheus_exporters_dir }}/{{ mongodb_exporter_sub_dir }}"
+    owner: "{{ mongodb_exporter_user }}"
+    group: "{{ mongodb_exporter_group }}"
+    state: link
+  become: true
+  tags:
+    - prometheus
 
-  - name: Prometheus mongodb Exporter | Include startup tasks
-    ansible.builtin.include_tasks: "tasks_startup.yml"
-    vars:
-      exporter_startup_config: "{{ exporter_config }}"
+- name: Prometheus MongoDB Exporter | Include startup tasks
+  ansible.builtin.include_tasks: "tasks_startup.yml"
+  vars:
+    exporter_startup_config: "{{ exporter_config }}"

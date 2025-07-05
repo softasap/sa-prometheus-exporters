@@ -29,7 +29,7 @@
 
 - name: Prometheus cloudwatch Exporter | Download distribution
   ansible.builtin.get_url:
-        # https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v0.13.3/yet-another-cloudwatch-exporter_0.13.3_Linux_x86_64.tar.gz
+    # https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v0.13.3/yet-another-cloudwatch-exporter_0.13.3_Linux_x86_64.tar.gz
     url: "https://github.com/ivx/yet-another-cloudwatch-exporter/releases/download/v{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
     dest: "/tmp/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
     mode: "u=rwx,g=rx,o=rx"

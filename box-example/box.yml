@@ -1,61 +1,30 @@
 ---
 - name: Install prometheus exporters
   hosts: prometheus_exporters
-  gather_facts: False
+  gather_facts: false
 
   vars:
     root_dir: ..
 
     box_prometheus_exporters:
-
-        - {
-            name: node
-          }
-#        - {
-#            name: cloudwatch
-#          }
-#        - {
-#            name: phpfpm
-#          }
-#        - {
-#            name: blackbox
-#          }
-#        - {
-#            name: elasticsearch
-#          }
-#        - {
-#            name: postgres
-#          }
-#        - {
-#            name: cadvisor
-#          }
-#        - {
-#            name: mongodb
-#          }
-#        - {
-#            name: monit,
-#            monit_user: "admin",
-#            monit_password: "xeR5hSdSQcCnFVLV8PLy",
-#            listen_address: "0.0.0.0:9388"
-#          }
-#        - {
-#            name: redis
-#          }
-#        - {
-#            name: sql
-#          }
-#        - {
-#            name: memcached
-#          }
-#        - {
-#            name: mysqld
-#          }
-#        - {
-#            name: ecs,
-#            parameters: "--aws.region='us-east-1'"
-#          }
-
-
+      - name: node
+      # - name: cloudwatch
+      # - name: phpfpm
+      # - name: blackbox
+      # - name: elasticsearch
+      # - name: postgres
+      # - name: cadvisor
+      # - name: mongodb
+      # - name: monit
+      #   monit_user: "admin"
+      #   monit_password: "xeR5hSdSQcCnFVLV8PLy"
+      #   listen_address: "0.0.0.0:9388"
+      # - name: redis
+      # - name: sql
+      # - name: memcached
+      # - name: mysqld
+      # - name: ecs
+      #   parameters: "--aws.region='us-east-1'"
 
   pre_tasks:
     - name: Debug pre tasks
@@ -68,7 +37,7 @@
         state: present
       become: true
 
-    - name:  UNPRIVILEGED USERS | Get acl dependency (ansible unprivileged user operations magic)
+    - name: UNPRIVILEGED USERS | Get acl dependency
       ansible.builtin.apt:
         pkg: "acl"
       become: true
@@ -77,21 +46,15 @@
       ansible.builtin.setup:
       tags: always
 
-
   roles:
-    #  - {
-    #      role: "sa-monit",
-    #      tags: ["create"],
-    #    }
+    # - role: "sa-monit"
+    #   tags: ["create"]
 
-      - {
-          role: "sa-prometheus-exporters",
-          tags: ["create"],
-          prometheus_exporters: "{{box_prometheus_exporters}}"
-        }
+    - role: "sa-prometheus-exporters"
+      tags: ["create"]
+      prometheus_exporters: "{{box_prometheus_exporters}}"
 
   tasks:
-
     - name: Debug tasks section
       ansible.builtin.debug:
         msg: "Tasks section"

@@ -1,57 +1,58 @@
 ---
 # https://github.com/prometheus/mysqld_exporter/releases/download/v0.10.0/mysqld_exporter-0.10.0.linux-amd64.tar.gz
-  - name: Set exporter facts
-    ansible.builtin.set_fact:
-      mysqld_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('mysqld_exporter') }}"
-      mysqld_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
-      mysqld_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus mysqld exporter | check if this exporter version exists
-    ansible.builtin.stat:
-      path: "{{ prometheus_exporters_dir }}/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64/"
-    register: mysqld_exporter_version_exists
-    become: true
-    become_user: "{{ mysqld_exporter_user }}"
+- name: Set exporter facts
+  ansible.builtin.set_fact:
+    mysqld_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('mysqld_exporter') }}"
+    mysqld_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+    mysqld_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus MySQL Exporter | Download distribution
-    ansible.builtin.get_url:
-      url: "https://github.com/prometheus/mysqld_exporter/releases/download/v{{ prometheus_mysqld_exporter_version }}/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64.tar.gz"
-      dest: "/tmp/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64.tar.gz"
-      owner: "{{ mysqld_exporter_user }}"
-      group: "{{ mysqld_exporter_group }}"
-      mode: "0644"
-    become: true
-    become_user: "{{ mysqld_exporter_user }}"
-    when: not mysqld_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus MySQL Exporter | check if this exporter version exists
+  ansible.builtin.stat:
+    path: "{{ prometheus_exporters_dir }}/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64/"
+  register: mysqld_exporter_version_exists
+  become: true
+  become_user: "{{ mysqld_exporter_user }}"
 
-  - name: Prometheus MySQL Exporter | unpack distribution
-    ansible.builtin.unarchive:
-      src: "/tmp/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64.tar.gz"
-      dest: "{{ prometheus_exporters_dir }}"
-      remote_src: yes
-      owner: "{{ mysqld_exporter_user }}"
-      group: "{{ mysqld_exporter_group }}"
-    become: true
-    become_user: "{{ mysqld_exporter_user }}"
-    when: not mysqld_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus MySQL Exporter | Download distribution
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/mysqld_exporter/releases/download/v{{ prometheus_mysqld_exporter_version }}/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64.tar.gz"
+    owner: "{{ mysqld_exporter_user }}"
+    group: "{{ mysqld_exporter_group }}"
+    mode: "0644"
+  become: true
+  become_user: "{{ mysqld_exporter_user }}"
+  when: not mysqld_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus MySQL Exporter | link mysqld exporter dir
-    ansible.builtin.file:
-      src: "{{ prometheus_exporters_dir }}/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64/"
-      dest: "{{ prometheus_exporters_dir }}/{{ mysqld_exporter_sub_dir }}"
-      owner: "{{ mysqld_exporter_user }}"
-      group: "{{ mysqld_exporter_group }}"
-      state: link
-    become: true
-    when: not mysqld_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus MySQL Exporter | unpack distribution
+  ansible.builtin.unarchive:
+    src: "/tmp/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_exporters_dir }}"
+    remote_src: yes
+    owner: "{{ mysqld_exporter_user }}"
+    group: "{{ mysqld_exporter_group }}"
+  become: true
+  become_user: "{{ mysqld_exporter_user }}"
+  when: not mysqld_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus MySQL Exporter | Include startup tasks
-    ansible.builtin.include_tasks: "tasks_startup.yml"
-    vars:
-      exporter_startup_config: "{{ exporter_config }}"
+- name: Prometheus MySQL Exporter | link mysqld exporter dir
+  ansible.builtin.file:
+    src: "{{ prometheus_exporters_dir }}/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64/"
+    dest: "{{ prometheus_exporters_dir }}/{{ mysqld_exporter_sub_dir }}"
+    owner: "{{ mysqld_exporter_user }}"
+    group: "{{ mysqld_exporter_group }}"
+    state: link
+  become: true
+  when: not mysqld_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
+
+- name: Prometheus MySQL Exporter | Include startup tasks
+  ansible.builtin.include_tasks: "tasks_startup.yml"
+  vars:
+    exporter_startup_config: "{{ exporter_config }}"
