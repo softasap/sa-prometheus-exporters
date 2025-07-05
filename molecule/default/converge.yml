@@ -16,7 +16,7 @@
         file: "vars/molecule_vars.yml"
 
   roles:
-    - role: sa-prometheus-exporters
+    - sa-prometheus-exporters
 
   # - name: Apply box play
   #   ansible.builtin.import_playbook: ../../playbook.yml

@@ -17,6 +17,9 @@
     ansible.builtin.get_url:
       url: "https://github.com/justwatchcom/elasticsearch_exporter/releases/download/v{{ prometheus_elasticsearch_exporter_version }}/elasticsearch_exporter-{{ prometheus_elasticsearch_exporter_version }}.linux-amd64.tar.gz"
       dest: "/tmp/elasticsearch_exporter-{{ prometheus_elasticsearch_exporter_version }}.linux-amd64.tar.gz"
+      owner: "{{ elasticsearch_exporter_user }}"
+      group: "{{ elasticsearch_exporter_group }}"
+      mode: "0640"
     become: true
     become_user: "{{ elasticsearch_exporter_user }}"
     when: not elasticsearch_exporter_version_exists.stat.exists
@@ -45,6 +48,7 @@
     tags:
       - prometheus
 
-  - ansible.builtin.include_tasks: "tasks_startup.yml"
+  - name: Prometheus apache Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"

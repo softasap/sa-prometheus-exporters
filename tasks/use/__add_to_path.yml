@@ -9,5 +9,5 @@
     state: present
     backrefs: yes
     regexp: 'PATH=(["]*)((?!.*?{{ extra_path }}).*?)(["]*)$'
-    line: "PATH=\1\2:{{ extra_path }}\3"
+    line: "PATH=\\1\\2:{{ extra_path }}\\3"
   become: true

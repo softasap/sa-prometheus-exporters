@@ -14,14 +14,17 @@
     ansible.builtin.template:
       src: "{{ role_dir }}/templates/{{ exporter_startup_template | default('systemd') }}.service.j2"
       dest: "/etc/systemd/system/prometheus-exporter-{{ exporter_startup_config.name }}.service"
-      mode: 0644
+      mode: "0644"
     when: docker_test is not defined
     become: true
     tags:
       - prometheus
 
   - name: Exporter | Configuring startup for exporter {{ exporter_startup_config.name }}
-    ansible.builtin.service: name="prometheus-exporter-{{ exporter_startup_config.name }}" state="started" enabled="yes"
+    ansible.builtin.service:
+      name: "prometheus-exporter-{{ exporter_startup_config.name }}"
+      state: "started"
+      enabled: "yes"
     when: docker_test is not defined
     become: true
     tags:

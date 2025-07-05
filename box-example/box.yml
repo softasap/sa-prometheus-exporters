@@ -1,11 +1,12 @@
 ---
-- hosts: prometheus_exporters
+- name: Install prometheus exporters
+  hosts: prometheus_exporters
   gather_facts: False
 
   vars:
-    - root_dir: ..
+    root_dir: ..
 
-    - box_prometheus_exporters:
+    box_prometheus_exporters:
 
         - {
             name: node
@@ -57,18 +58,23 @@
 
 
   pre_tasks:
-    - ansible.builtin.debug: msg="Pre tasks section"
+    - name: Debug pre tasks
+      ansible.builtin.debug:
+        msg: "Pre tasks section"
 
-    - name: ANSIBLE PYTHON | install python 2
-      raw: test -e /usr/bin/python || test -e /usr/bin/python3 || (apt -qqy update && apt install -qy python-minimal)
+    - name: Ensure Python is installed
+      ansible.builtin.package:
+        name: python-minimal
+        state: present
       become: true
 
     - name:  UNPRIVILEGED USERS | Get acl dependency (ansible unprivileged user operations magic)
-      ansible.builtin.apt: pkg="acl"
+      ansible.builtin.apt:
+        pkg: "acl"
       become: true
 
-    - name: gather facts
-      setup:
+    - name: Gather facts
+      ansible.builtin.setup:
       tags: always
 
 
@@ -78,12 +84,14 @@
     #      tags: ["create"],
     #    }
 
-     - {
-         role: "sa-prometheus-exporters",
-         tags: ["create"],
-         prometheus_exporters: "{{box_prometheus_exporters}}"
-       }
+      - {
+          role: "sa-prometheus-exporters",
+          tags: ["create"],
+          prometheus_exporters: "{{box_prometheus_exporters}}"
+        }
 
   tasks:
 
-    - ansible.builtin.debug: msg="Tasks section"
+    - name: Debug tasks section
+      ansible.builtin.debug:
+        msg: "Tasks section"

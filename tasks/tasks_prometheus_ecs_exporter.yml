@@ -14,7 +14,12 @@
     become_user: "{{ ecs_exporter_user }}"
 
   - name: Prometheus | Create dirs
-    ansible.builtin.file: path="{{ item }}"  state=directory  owner="root"  group="{{ ecs_exporter_group }}"   mode="u=rwx,g=rwx,o="
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      owner: "root"
+      group: "{{ ecs_exporter_group }}"
+      mode: "u=rwx,g=rwx,o="
     become: true
     with_items:
       - "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}"
@@ -33,6 +38,7 @@
     tags:
       - prometheus
 
-  - ansible.builtin.include_tasks: "tasks_startup.yml"
+  - name: Prometheus ecs Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"

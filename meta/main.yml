@@ -7,10 +7,7 @@ galaxy_info:
 #  alternate_role_name:
 #    - sa-prometheus-exporters
 #  standalone: true
-  namespace: softasap
   author: vyacheslav voronenko
-  description: Installs postgresql, app user, optionally patches listen address and trusted networks
-  company: http://www.voronenko.info/
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
   # issue_tracker_url: http://example.com/issue/tracker

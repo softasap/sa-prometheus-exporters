@@ -16,20 +16,23 @@
   - name: Prometheus Node Exporter | Download distribution
     ansible.builtin.get_url:
       url: "https://github.com/prometheus/node_exporter/releases/download/v{{ prometheus_node_exporter_version }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
-      dest: "/tmp/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
+      dest: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
+      owner: "{{ node_exporter_user }}"
+      group: "{{ node_exporter_group }}"
+      mode: "0644"
     become: true
-    become_user: "{{ node_exporter_user }}"
     when: not node_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus Node Exporter | unpack distribution
     ansible.builtin.unarchive:
-      src: "/tmp/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
+      src: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
       dest: "{{ prometheus_exporters_dir }}"
       remote_src: yes
+      owner: "{{ node_exporter_user }}"
+      group: "{{ node_exporter_group }}"
     become: true
-    become_user: "{{ node_exporter_user }}"
     when: not node_exporter_version_exists.stat.exists
     tags:
       - prometheus
@@ -47,8 +50,10 @@
       - prometheus
 
   - name: Debug | exporter config
-    ansible.builtin.debug: var="exporter_config"
+    ansible.builtin.debug:
+      var: "exporter_config"
 
-  - ansible.builtin.include_tasks: "tasks_startup.yml"
+  - name: Prometheus apache Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"

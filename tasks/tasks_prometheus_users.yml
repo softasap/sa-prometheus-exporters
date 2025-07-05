@@ -1,6 +1,8 @@
 ---
   - name: Prometheus | Create prometheus group
-    ansible.builtin.group: name="{{ prometheus_group }}" state="present"
+    ansible.builtin.group:
+      name: "{{ prometheus_group }}"
+      state: "present"
     become: true
     tags:
       - prometheus

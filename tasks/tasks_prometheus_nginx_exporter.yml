@@ -7,12 +7,12 @@
       nginx_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       nginx_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
       default_nginx_exporter_config:
-         parameters: "-nginx.scrape-uri http://localhost:8113/stub_status"
+          parameters: "-nginx.scrape-uri http://localhost:8113/stub_status"
 
 
   - name: Calculate final config
     ansible.builtin.set_fact:
-      final_exporter_config: "{{ default_nginx_exporter_config | combine (exporter_config) }}"
+      final_exporter_config: "{{ default_nginx_exporter_config | combine(exporter_config) }}"
 
   - name: Prometheus nginx exporter | check if this exporter version exists
     ansible.builtin.stat:
@@ -24,6 +24,7 @@
     ansible.builtin.get_url:
       url: "https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v{{ prometheus_nginx_exporter_version }}/nginx-prometheus-exporter-{{ prometheus_nginx_exporter_version }}-linux-amd64.tar.gz"
       dest: "/tmp/nginx-prometheus-exporter-{{ prometheus_nginx_exporter_version }}-linux-amd64.tar.gz"
+      mode: "0640"
     become: true
     become_user: "{{ nginx_exporter_user }}"
     when: not nginx_exporter_version_exists.stat.exists
@@ -58,6 +59,7 @@
       chdir: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
     become: true
     when: not nginx_exporter_version_exists.stat.exists
+    changed_when: true
     tags:
       - prometheus
 
@@ -83,6 +85,7 @@
     tags:
       - prometheus
 
-  - ansible.builtin.include_tasks: "tasks_startup.yml"
+  - name: Include startup tasks for nginx exporter
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ final_exporter_config }}"

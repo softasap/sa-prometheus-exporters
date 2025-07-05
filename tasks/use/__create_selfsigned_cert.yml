@@ -1,6 +1,10 @@
 --- # Credits https://github.com/StarterSquad/prudentia/blob/master/prudentia/tasks/ssl-self-certificate.yml
   - name: Self signed | Install last stable
-    ansible.builtin.apt: update-cache=yes force=yes state=present pkg=openssl
+    ansible.builtin.apt:
+      update-cache: yes
+      force: yes
+      state: present
+      pkg: openssl
     become: true
 
   - name: Self signed | Generate self signed passwordless certificate

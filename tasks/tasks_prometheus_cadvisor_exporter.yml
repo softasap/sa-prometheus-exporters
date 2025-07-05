@@ -20,21 +20,22 @@
       state: directory
       owner: "root"
       group: "{{ cadvisor_exporter_group }}"
-      mode: "u=rwx,g=rwx,o="
-    become: true
+      mode: "0770"
     with_items:
       - "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}"
     loop_control:
-        loop_var: current
+      loop_var: current
     when: not cadvisor_exporter_version_exists.stat.exists
+    become: true
     tags:
       - prometheus
+
 
   - name: CAdvisor | Download distribution
     ansible.builtin.get_url:
       url: "https://github.com/google/cadvisor/releases/download/v{{ prometheus_cadvisor_exporter_version }}/cadvisor"
       dest: "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}/cadvisor_exporter"
-      mode: "u=rwx,g=rx,o=rx"
+      mode: "0755"
     become: true
     become_user: "{{ cadvisor_exporter_user }}"
     when: not cadvisor_exporter_version_exists.stat.exists
@@ -50,7 +51,11 @@
       - prometheus
 
   - name: CAdvisor | Stop and remove legacy prometheus-exporter-cadvisor service
+    when: cadvisor_service_exists.stat.exists
+    tags:
+      - prometheus
     block:
+
       - name: Stop legacy service
         ansible.builtin.service:
           name: "prometheus-exporter-cadvisor"
@@ -62,9 +67,6 @@
           path: "/etc/systemd/system/prometheus-exporter-cadvisor.service"
           state: "absent"
         become: true
-    when: cadvisor_service_exists.stat.exists
-    tags:
-      - prometheus
 
   - name: CAdvisor | Template startup script
     ansible.builtin.template:
@@ -72,7 +74,7 @@
       dest: "/etc/systemd/system/cadvisor.service"
       owner: root
       group: root
-      mode: "u=rw,g=r,o=r"
+      mode: "0644"
     when: ansible_service_mgr == "systemd"
     become: true
     tags:
@@ -92,7 +94,7 @@
         ansible.builtin.template:
           src: "{{ role_dir }}/templates/cadvisor.amzn.j2"
           dest: "/etc/init/cadvisor.conf"
-          mode: "u=rw,g=r,o=r"
+          mode: "0644"
           owner: root
           group: root
         become: true
@@ -103,7 +105,7 @@
         ansible.builtin.template:
           src: "{{ role_dir }}/templates/cadvisor.upstart.j2"
           dest: "/etc/init/cadvisor.conf"
-          mode: "u=rw,g=r,o=r"
+          mode: "0644"
           owner: root
           group: root
         when: startstop_exists is failed
