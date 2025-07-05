@@ -31,7 +31,7 @@
   ansible.builtin.unarchive:
     src: "/tmp/mysqld_exporter-{{ prometheus_mysqld_exporter_version }}.linux-amd64.tar.gz"
     dest: "{{ prometheus_exporters_dir }}"
-    remote_src: yes
+    remote_src: true
     owner: "{{ mysqld_exporter_user }}"
     group: "{{ mysqld_exporter_group }}"
   become: true

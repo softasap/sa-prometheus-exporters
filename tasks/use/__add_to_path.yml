@@ -7,7 +7,7 @@
   ansible.builtin.lineinfile:
     dest: /etc/environment
     state: present
-    backrefs: yes
+    backrefs: true
     regexp: 'PATH=(["]*)((?!.*?{{ extra_path }}).*?)(["]*)$'
     line: "PATH=\\1\\2:{{ extra_path }}\\3"
   become: true

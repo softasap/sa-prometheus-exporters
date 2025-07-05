@@ -45,7 +45,7 @@
   ansible.builtin.unarchive:
     src: "/tmp/redis_exporter-{{ prometheus_redis_exporter_version }}.linux-amd64.tar.gz"
     dest: "/tmp/"
-    remote_src: yes
+    remote_src: true
   become: true
   become_user: "{{ redis_exporter_user }}"
   when: not redis_exporter_version_exists.stat.exists

@@ -43,7 +43,7 @@
   ansible.builtin.unarchive:
     src: "/tmp/yet-another-cloudwatch-exporter_{{ prometheus_cloudwatch_exporter_version | default('0.13.3') }}_Linux_x86_64.tar.gz"
     dest: "{{ prometheus_exporters_dir }}"
-    remote_src: yes
+    remote_src: true
   become: true
   become_user: "{{ cloudwatch_exporter_user }}"
   when: not cloudwatch_exporter_version_exists.stat.exists

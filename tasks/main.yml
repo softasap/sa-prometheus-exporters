@@ -1,31 +1,31 @@
 ---
 # tasks file for sa-prometheus-exporters
-  - name: "Prometheus | Detect init system"
-    ansible.builtin.include_tasks: use/__detect_init_system.yml
+- name: "Prometheus | Detect init system"
+  ansible.builtin.include_tasks: use/__detect_init_system.yml
 
-  - name: "Prometheus | Setup users and permissions"
-    ansible.builtin.include_tasks: tasks_prometheus_users.yml
+- name: "Prometheus | Setup users and permissions"
+  ansible.builtin.include_tasks: tasks_prometheus_users.yml
 
-  - name: Prometheus | Create dirs
-    ansible.builtin.file:
-      path: "{{ item }}"
-      state: directory
-      owner: "root"
-      group: "{{ prometheus_group }}"
-      mode: "0770"
-    become: true
-    with_items:
-      - "{{ prometheus_exporters_dir }}"
-      - "{{ prometheus_exporters_config_dir }}"
-    tags:
-      - prometheus
+- name: Prometheus | Create dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+    group: "{{ prometheus_group }}"
+    mode: "0770"
+  become: true
+  with_items:
+    - "{{ prometheus_exporters_dir }}"
+    - "{{ prometheus_exporters_config_dir }}"
+  tags:
+    - prometheus
 
-  - name: "Prometheus | Install Go (when required)"
-    ansible.builtin.include_tasks: tasks_go.yml
-    when: option_install_go
+- name: "Prometheus | Install Go (when required)"
+  ansible.builtin.include_tasks: tasks_go.yml
+  when: option_install_go
 
-  - name: "Prometheus | Setup exporters from prometheus_exporters list"
-    ansible.builtin.include_tasks: "tasks_prometheus_{{ item.name }}_exporter.yml"
-    vars:
-      exporter_config: "{{ item }}"
-    with_items: "{{ prometheus_exporters }}"
+- name: "Prometheus | Setup exporters from prometheus_exporters list"
+  ansible.builtin.include_tasks: "tasks_prometheus_{{ item.name }}_exporter.yml"
+  vars:
+    exporter_config: "{{ item }}"
+  with_items: "{{ prometheus_exporters }}"

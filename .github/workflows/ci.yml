@@ -1,18 +1,18 @@
 ---
 name: CI
-'on':
+"on":
   pull_request:
   push:
     branches:
       - master
       - develop
-      - '!release/*'
+      - "!release/*"
   schedule:
     - cron: "10 5 * * 2"
 
 defaults:
   run:
-    working-directory: 'role_under_test'
+    working-directory: "role_under_test"
 
 jobs:
 
@@ -23,12 +23,12 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'role_under_test'
+          path: "role_under_test"
 
       - name: Set up Python 3.
         uses: actions/setup-python@v2
         with:
-          python-version: '3.6'
+          python-version: "3.6"
 
       - name: Install test dependencies.
         run: pip3 install yamllint ansible-lint ansible==2.9.20
@@ -57,12 +57,12 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'role_under_test'
+          path: "role_under_test"
 
       - name: Set up Python 3.
         uses: actions/setup-python@v2
         with:
-          python-version: '3.6'
+          python-version: "3.6"
 
       - name: Install pipenv
         run: |
@@ -87,7 +87,7 @@ jobs:
       - name: Run Molecule tests.
         run: pipenv run molecule test -s docker
         env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
           MOLECULE_DISTRO: ${{ matrix.distro }}
           MOLECULE_TEST_ROLE: role_under_test
