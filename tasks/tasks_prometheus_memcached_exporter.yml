@@ -2,50 +2,56 @@
 # Memcached https://github.com/prometheus/memcached_exporter/
 # https://github.com/prometheus/memcached_exporter/releases/download/v0.3.0/memcached_exporter-0.3.0.linux-amd64.tar.gz
   - name: Set exporter facts
-    set_fact:
+    ansible.builtin.set_fact:
       memcached_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('memcached_exporter') }}"
       memcached_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       memcached_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus memcached exporter | check if this exporter version exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ prometheus_exporters_dir }}/memcached_exporter-{{ prometheus_memcached_exporter_version }}.linux-amd64"
     register: memcached_exporter_version_exists
-    become: yes
+    become: true
     become_user: "{{ memcached_exporter_user }}"
 
   - name: Prometheus memcached Exporter | Download distribution
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/prometheus/memcached_exporter/releases/download/v{{ prometheus_memcached_exporter_version }}/memcached_exporter-{{ prometheus_memcached_exporter_version }}.linux-amd64.tar.gz"
       dest: "/tmp/memcached_exporter-{{ prometheus_memcached_exporter_version }}.linux-amd64.tar.gz"
-    become: yes
+      owner: "{{ memcached_exporter_user }}"
+      group: "{{ memcached_exporter_group }}"
+      mode: "0644"
+    become: true
     become_user: "{{ memcached_exporter_user }}"
     when: not memcached_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus memcached Exporter | unpack distribution
-    unarchive:
+    ansible.builtin.unarchive:
       src: "/tmp/memcached_exporter-{{ prometheus_memcached_exporter_version }}.linux-amd64.tar.gz"
       dest: "{{ prometheus_exporters_dir }}"
       remote_src: yes
-    become: yes
+      owner: "{{ memcached_exporter_user }}"
+      group: "{{ memcached_exporter_group }}"
+    become: true
     become_user: "{{ memcached_exporter_user }}"
     when: not memcached_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus memcached Exporter | link memcached exporter dir
-    file:
+    ansible.builtin.file:
       src: "{{ prometheus_exporters_dir }}/memcached_exporter-{{ prometheus_memcached_exporter_version }}.linux-amd64/"
       dest: "{{ prometheus_exporters_dir }}/{{ memcached_exporter_sub_dir }}"
-      owner: "root"
+      owner: "{{ memcached_exporter_user }}"
       group: "{{ memcached_exporter_group }}"
       state: link
-    become: yes
+    become: true
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml"
+  - name: Prometheus memcached Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"

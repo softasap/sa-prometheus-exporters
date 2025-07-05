@@ -1,10 +1,16 @@
 ---
 galaxy_info:
-  author: vyacheslav voronenko
   description: helper role that allows to install set of predefined prometheus exporters
   company: http://www.voronenko.info/
   role_name: sa_prometheus_exporters  # if absent directory name hosting role is used instead
   namespace: softasap  # if absent, author is used instead
+#  alternate_role_name:
+#    - sa-prometheus-exporters
+#  standalone: true
+  namespace: softasap
+  author: vyacheslav voronenko
+  description: Installs postgresql, app user, optionally patches listen address and trusted networks
+  company: http://www.voronenko.info/
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
   # issue_tracker_url: http://example.com/issue/tracker
@@ -16,7 +22,7 @@ galaxy_info:
   # - Apache
   # - CC-BY
   license: MIT
-  min_ansible_version: 2.1.0.0
+  min_ansible_version: "2.18"
   #
   # Below are all platforms currently available. Just uncomment
   # the ones that apply to your role. If you don't see your
@@ -25,154 +31,15 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
+        - trusty
         - xenial
         - bionic
+        - focal
+        - jammy
+        - noble
   galaxy_tags:
-    - prometheus
-    - exporter
-    - ubuntu
-  #platforms:
-  #- name: EL
-  #  versions:
-  #  - all
-  #  - 5
-  #  - 6
-  #  - 7
-  #- name: GenericUNIX
-  #  versions:
-  #  - all
-  #  - any
-  #- name: Solaris
-  #  versions:
-  #  - all
-  #  - 10
-  #  - 11.0
-  #  - 11.1
-  #  - 11.2
-  #  - 11.3
-  #- name: Fedora
-  #  versions:
-  #  - all
-  #  - 16
-  #  - 17
-  #  - 18
-  #  - 19
-  #  - 20
-  #  - 21
-  #  - 22
-  #  - 23
-  #- name: opensuse
-  #  versions:
-  #  - all
-  #  - 12.1
-  #  - 12.2
-  #  - 12.3
-  #  - 13.1
-  #  - 13.2
-  #- name: IOS
-  #  versions:
-  #  - all
-  #  - any
-  #- name: SmartOS
-  #  versions:
-  #  - all
-  #  - any
-  #- name: eos
-  #  versions:
-  #  - all
-  #  - Any
-  #- name: Windows
-  #  versions:
-  #  - all
-  #  - 2012R2
-  #- name: Amazon
-  #  versions:
-  #  - all
-  #  - 2013.03
-  #  - 2013.09
-  #- name: GenericBSD
-  #  versions:
-  #  - all
-  #  - any
-  #- name: Junos
-  #  versions:
-  #  - all
-  #  - any
-  #- name: FreeBSD
-  #  versions:
-  #  - all
-  #  - 10.0
-  #  - 10.1
-  #  - 10.2
-  #  - 8.0
-  #  - 8.1
-  #  - 8.2
-  #  - 8.3
-  #  - 8.4
-  #  - 9.0
-  #  - 9.1
-  #  - 9.1
-  #  - 9.2
-  #  - 9.3
-  #- name: Ubuntu
-  #  versions:
-  #  - all
-  #  - lucid
-  #  - maverick
-  #  - natty
-  #  - oneiric
-  #  - precise
-  #  - quantal
-  #  - raring
-  #  - saucy
-  #  - trusty
-  #  - utopic
-  #  - vivid
-  #  - wily
-  #- name: SLES
-  #  versions:
-  #  - all
-  #  - 10SP3
-  #  - 10SP4
-  #  - 11
-  #  - 11SP1
-  #  - 11SP2
-  #  - 11SP3
-  #- name: GenericLinux
-  #  versions:
-  #  - all
-  #  - any
-  #- name: NXOS
-  #  versions:
-  #  - all
-  #  - any
-  #- name: Debian
-  #  versions:
-  #  - all
-  #  - etch
-  #  - jessie
-  #  - lenny
-  #  - squeeze
-  #  - wheezy
-  #
-  # Below are all categories currently available. Just as with
-  # the platforms above, uncomment those that apply to your role.
-  #
-  #categories:
-  #- cloud
-  #- cloud:ec2
-  #- cloud:gce
-  #- cloud:rax
-  #- clustering
-  #- database
-  #- database:nosql
-  #- database:sql
-  #- development
-  #- monitoring
-  #- networking
-  #- packaging
-  #- system
-  #- web
+    - database
+
 dependencies: []
   # List your role dependencies here, one per line.
   # Be sure to remove the '[]' above if you add dependencies

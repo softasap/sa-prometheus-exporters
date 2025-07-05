@@ -1,17 +1,17 @@
 ---
   - name: Prometheus | Create prometheus group
-    group: name="{{ prometheus_group }}" state="present"
-    become: yes
+    ansible.builtin.group: name="{{ prometheus_group }}" state="present"
+    become: true
     tags:
       - prometheus
 
   - name: Prometheus | Create Prometheus exporter user
-    user:
+    ansible.builtin.user:
       name: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       comment: "Prometheus user"
       shell: "/bin/nologin"
       createhome: "false"
-    become: yes
+    become: true
     tags:
       - prometheus

@@ -10,5 +10,6 @@ skip_list:
   - '106'
   - '204'
   - '602'
+#  - 'schema[meta]'
 use_default_rules: true
 verbosity: 1

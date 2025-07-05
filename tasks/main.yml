@@ -1,22 +1,22 @@
 ---
 # tasks file for sa-prometheus-exporters
-  - include_tasks: use/__detect_init_system.yml
+  - ansible.builtin.include_tasks: use/__detect_init_system.yml
 
-  - include_tasks: tasks_prometheus_users.yml
+  - ansible.builtin.include_tasks: tasks_prometheus_users.yml
 
   - name: Prometheus | Create dirs
-    file: path="{{ item }}" state=directory  owner="root"  group="{{ prometheus_group }}"   mode="u=rwx,g=rwx,o="
-    become: yes
+    ansible.builtin.file: path="{{ item }}" state=directory  owner="root"  group="{{ prometheus_group }}"   mode="u=rwx,g=rwx,o="
+    become: true
     with_items:
       - "{{ prometheus_exporters_dir }}"
       - "{{ prometheus_exporters_config_dir }}"
     tags:
       - prometheus
 
-  - include_tasks: tasks_go.yml
+  - ansible.builtin.include_tasks: tasks_go.yml
     when: option_install_go
 
-  - include_tasks: "tasks_prometheus_{{ item.name }}_exporter.yml"
+  - ansible.builtin.include_tasks: "tasks_prometheus_{{ item.name }}_exporter.yml"
     vars:
       exporter_config: "{{ item }}"
     with_items: "{{ prometheus_exporters }}"

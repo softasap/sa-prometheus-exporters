@@ -1,0 +1,25 @@
+[project]
+name = "molecule-env"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Vyacheslav Voronenko"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "python-vagrant (>=1.0.0,<2.0.0)",
+    "testinfra (>=6.0.0,<7.0.0)",
+    "libvirt-python (>=11.2.0,<12.0.0)",
+    "molecule (==25.1.0)",
+    "molecule-vagrant (>=2.0.0,<3.0.0)",
+    "molecule-plugins (==23.7.0)",
+    "ansible (>11,<12)",
+    "ansible-lint (>=25.5.0,<26.0.0)",
+    "docker (>=7.1.0,<8.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

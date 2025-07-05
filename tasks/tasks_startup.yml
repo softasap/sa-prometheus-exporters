@@ -1,28 +1,28 @@
 ---
   - name: Exporter | Configuring settings file for exporter {{ exporter_startup_config.name }}
-    template:
+    ansible.builtin.template:
       src: "{{ exporter_startup_config.exporter_configuration_template | default(role_dir + '/templates/exporter_configuration.j2') }}"
       dest: "{{ prometheus_exporters_config_dir }}/{{ exporter_startup_config.name }}_exporter"
       owner: "root"
       group: "{{ exporter_startup_config.exporter_group | default(prometheus_group) }}"
       mode: "u=rw,g=r,o="
-    become: yes
+    become: true
     tags:
       - prometheus
 
   - name: Exporter | Configuring systemd file for exporter {{ exporter_startup_config.name }}
-    template:
+    ansible.builtin.template:
       src: "{{ role_dir }}/templates/{{ exporter_startup_template | default('systemd') }}.service.j2"
       dest: "/etc/systemd/system/prometheus-exporter-{{ exporter_startup_config.name }}.service"
       mode: 0644
     when: docker_test is not defined
-    become: yes
+    become: true
     tags:
       - prometheus
 
   - name: Exporter | Configuring startup for exporter {{ exporter_startup_config.name }}
-    service: name="prometheus-exporter-{{ exporter_startup_config.name }}" state="started" enabled="yes"
+    ansible.builtin.service: name="prometheus-exporter-{{ exporter_startup_config.name }}" state="started" enabled="yes"
     when: docker_test is not defined
-    become: yes
+    become: true
     tags:
       - prometheus

@@ -6,12 +6,12 @@
       elif [[ -f /etc/init.d/cron && ! -h /etc/init.d/cron ]]; then echo sysv-init;
       else echo UNKNOWN;
       fi
-    become: yes
+    become: true
     changed_when: False
     args:
       executable: /bin/bash
     register: upstart_detect_raw
 
   - name: USE | Detect upstart system and set fact
-    set_fact:
+    ansible.builtin.set_fact:
       upstart_system: "{{ upstart_detect_raw.stdout }}"

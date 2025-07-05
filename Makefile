@@ -1,6 +1,9 @@
 init:
 	pipenv install --python 3
 
+vagrant-login:
+	molecule login -s default
+
 update-from-requirements:
 	pipenv install -r ./molecule/requirements-dev.txt
 

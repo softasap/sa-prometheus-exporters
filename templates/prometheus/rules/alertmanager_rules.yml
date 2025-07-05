@@ -4,7 +4,7 @@ groups:
       - alert: AlertmanagerNotificationsFailing
         expr: rate(alertmanager_notifications_failed_total[1m]) > 0
         labels:
-          service: alertmanager
+          ansible.builtin.service: alertmanager
           severity: critical
         annotations:
           title: Alertmanager is failing sending notications

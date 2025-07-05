@@ -1,7 +1,13 @@
 ---
-  - name: Debug |
-    debug: msg="add {{ extra_path }} to path"
+- name: Debug path addition
+  ansible.builtin.debug:
+    msg: "Adding {{ extra_path }} to PATH"
 
-  - name: add {{ extra_path }} to path
-    lineinfile: dest=/etc/environment state=present  backrefs=yes regexp='PATH=(["]*)((?!.*?{{ extra_path }}).*?)(["]*)$' line="PATH=\1\2:{{ extra_path }}\3"
-    become: yes
+- name: Add path to /etc/environment
+  ansible.builtin.lineinfile:
+    dest: /etc/environment
+    state: present
+    backrefs: yes
+    regexp: 'PATH=(["]*)((?!.*?{{ extra_path }}).*?)(["]*)$'
+    line: "PATH=\1\2:{{ extra_path }}\3"
+  become: true

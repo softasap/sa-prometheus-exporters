@@ -2,48 +2,54 @@
 # https://github.com/Lusitaniae/phpfpm_exporter
 # https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v0.2.0/phpfpm_exporter-0.2.0.linux-amd64.tar.gz
   - name: Set exporter facts
-    set_fact:
+    ansible.builtin.set_fact:
       phpfpm_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('phpfpm_exporter') }}"
       phpfpm_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
       phpfpm_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
   - name: Prometheus phpfpm Exporter | check if this exporter version exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ prometheus_exporters_dir }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64/"
     register: phpfpm_exporter_version_exists
-    become: yes
+    become: true
 
   - name: Prometheus phpfpm Exporter | Download distribution
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v{{ prometheus_phpfpm_exporter_version }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64.tar.gz"
       dest: "/tmp/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64.tar.gz"
-    become: yes
+      owner: "{{ phpfpm_exporter_user }}"
+      group: "{{ phpfpm_exporter_group }}"
+      mode: '0644'
+    become: true
     when: not phpfpm_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus phpfpm Exporter | unpack distribution
-    unarchive:
+    ansible.builtin.unarchive:
       src: "/tmp/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64.tar.gz"
       dest: "{{ prometheus_exporters_dir }}"
       remote_src: yes
-    become: yes
+      owner: "{{ phpfpm_exporter_user }}"
+      group: "{{ phpfpm_exporter_group }}"
+    become: true
     when: not phpfpm_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
   - name: Prometheus phpfpm Exporter | link phpfpm exporter dir
-    file:
+    ansible.builtin.file:
       src: "{{ prometheus_exporters_dir }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64/"
       dest: "{{ prometheus_exporters_dir }}/{{ phpfpm_exporter_sub_dir }}"
       owner: "root"
       group: "{{ phpfpm_exporter_group }}"
       state: link
-    become: yes
+    become: true
     when: not phpfpm_exporter_version_exists.stat.exists
     tags:
       - prometheus
 
-  - include_tasks: "tasks_startup.yml"
+  - name: Prometheus PHP-FPM Exporter | Include startup tasks
+    ansible.builtin.include_tasks: "tasks_startup.yml"
     vars:
       exporter_startup_config: "{{ exporter_config }}"
