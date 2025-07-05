@@ -1,3 +1,4 @@
+---
 # respect historical role name with dash
 role_name_check: 1
 driver:
@@ -16,7 +17,7 @@ driver:
   # If set to false, set VAGRANT_NO_PARALLEL to '1'
   # Defaults to true - but that can cause issues with multiple machines
   parallel: false
-  default_box: 'ubuntu/jammy64'
+  default_box: "ubuntu/jammy64"
 platforms:
   - name: ubuntu2204
     box: ubuntu/jammy64
@@ -27,7 +28,7 @@ platforms:
         type: dhcp
         auto_config: true
     instance_raw_config_args:
-      - "vbguest.auto_update = false"   # yamllint disable-line
+      - "vbguest.auto_update = false" # yamllint disable-line
       - "disksize.size = '50GB'"
     provider_raw_config_args:
       - "customize [ 'modifyvm', :id, '--uartmode1', 'disconnected' ]"
@@ -40,23 +41,23 @@ platforms:
         type: dhcp
         auto_config: true
     instance_raw_config_args:
-      - "vbguest.auto_update = false"   # yamllint disable-line
+      - "vbguest.auto_update = false" # yamllint disable-line
       - "disksize.size = '50GB'"
     provider_raw_config_args:
       - "customize [ 'modifyvm', :id, '--uartmode1', 'disconnected' ]"
-  # - name: alpine
-  #   box:  generic/alpine318
-  #   memory: 4096
-  #   cpus: 2
-  #   interfaces:
-  #     - network_name: private_network
-  #       type: dhcp
-  #       auto_config: true
-  #   instance_raw_config_args:
-  #     - "vbguest.auto_update = false"   # yamllint disable-line
-  #     - "disksize.size = '50GB'"
-  #   provider_raw_config_args:
-  #     - "customize [ 'modifyvm', :id, '--uartmode1', 'disconnected' ]"
+# - name: alpine
+#   box:  generic/alpine318
+#   memory: 4096
+#   cpus: 2
+#   interfaces:
+#     - network_name: private_network
+#       type: dhcp
+#       auto_config: true
+#   instance_raw_config_args:
+#     - "vbguest.auto_update = false"   # yamllint disable-line
+#     - "disksize.size = '50GB'"
+#   provider_raw_config_args:
+#     - "customize [ 'modifyvm', :id, '--uartmode1', 'disconnected' ]"
 provisioner:
   name: ansible
   log: true

@@ -2,11 +2,11 @@
 galaxy_info:
   description: helper role that allows to install set of predefined prometheus exporters
   company: http://www.voronenko.info/
-  role_name: sa_prometheus_exporters  # if absent directory name hosting role is used instead
-  namespace: softasap  # if absent, author is used instead
-#  alternate_role_name:
-#    - sa-prometheus-exporters
-#  standalone: true
+  role_name: sa_prometheus_exporters # if absent directory name hosting role is used instead
+  namespace: softasap # if absent, author is used instead
+  #  alternate_role_name:
+  #    - sa-prometheus-exporters
+  #  standalone: true
   author: vyacheslav voronenko
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value

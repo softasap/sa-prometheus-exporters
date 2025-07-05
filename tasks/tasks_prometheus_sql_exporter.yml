@@ -20,7 +20,7 @@
     dest: "/tmp/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64.tar.gz"
     owner: "{{ sql_exporter_user }}"
     group: "{{ sql_exporter_group }}"
-    mode: '0644'
+    mode: "0644"
   become: true
   become_user: "{{ sql_exporter_user }}"
   when: not sql_exporter_version_exists.stat.exists
@@ -31,7 +31,7 @@
   ansible.builtin.unarchive:
     src: "/tmp/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64.tar.gz"
     dest: "{{ prometheus_exporters_dir }}"
-    remote_src: yes
+    remote_src: true
   become: true
   become_user: "{{ sql_exporter_user }}"
   when: not sql_exporter_version_exists.stat.exists

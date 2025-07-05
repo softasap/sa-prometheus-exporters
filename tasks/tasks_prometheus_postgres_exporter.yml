@@ -20,7 +20,7 @@
     dest: "/tmp/postgres_exporter-{{ prometheus_postgres_exporter_version }}.linux-amd64.tar.gz"
     owner: "{{ postgres_exporter_user }}"
     group: "{{ postgres_exporter_group }}"
-    mode: '0644'
+    mode: "0644"
   become: true
   become_user: "{{ postgres_exporter_user }}"
   when: not postgres_exporter_version_exists.stat.exists
@@ -31,7 +31,7 @@
   ansible.builtin.unarchive:
     src: "/tmp/postgres_exporter-{{ prometheus_postgres_exporter_version }}.linux-amd64.tar.gz"
     dest: "{{ prometheus_exporters_dir }}"
-    remote_src: yes
+    remote_src: true
     owner: "{{ postgres_exporter_user }}"
     group: "{{ postgres_exporter_group }}"
   become: true

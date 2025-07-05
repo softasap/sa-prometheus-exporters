@@ -8,23 +8,23 @@ ignore: |
   .github
 
 rules:
-  braces: {max-spaces-inside: 1, level: error}
-  brackets: {max-spaces-inside: 1, level: error}
-  colons: {max-spaces-after: -1, level: error}
-  commas: {max-spaces-after: -1, level: error}
+  braces: { max-spaces-inside: 1, level: error }
+  brackets: { max-spaces-inside: 1, level: error }
+  colons: { max-spaces-after: -1, level: error }
+  commas: { max-spaces-after: -1, level: error }
   comments-indentation: false
   comments:
     min-spaces-from-content: 1
   document-start: disable
-  empty-lines: {max: 3, level: error}
-  hyphens: {level: error}
+  empty-lines: { max: 3, level: error }
+  hyphens: { level: error }
   indentation: disable
   key-duplicates: enable
   line-length:
     max: 290
     level: warning
   new-line-at-end-of-file: disable
-  new-lines: {type: unix}
+  new-lines: { type: unix }
   octal-values:
     forbid-implicit-octal: true
     forbid-explicit-octal: true

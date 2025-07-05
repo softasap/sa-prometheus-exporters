@@ -6,14 +6,14 @@
 # See: https://github.com/ansible/galaxy/issues/46
 
 name: Release
-'on':
+"on":
   push:
     tags:
-      - '*'
+      - "*"
 
 defaults:
   run:
-    working-directory: 'role_under_test'
+    working-directory: "role_under_test"
 
 jobs:
 
@@ -24,12 +24,12 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'role_under_test'
+          path: "role_under_test"
 
       - name: Set up Python 3.
         uses: actions/setup-python@v2
         with:
-          python-version: '3.6'
+          python-version: "3.6"
 
       - name: Install Ansible.
         run: pip3 install ansible-base

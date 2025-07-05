@@ -1,59 +1,59 @@
 ---
 # https://github.com/prometheus/node_exporter/releases/download/0.12.0/node_exporter-0.12.0.linux-amd64.tar.gz
-  - name: Set exporter facts
-    ansible.builtin.set_fact:
-      node_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('node_exporter') }}"
-      node_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
-      node_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
+- name: Set exporter facts
+  ansible.builtin.set_fact:
+    node_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('node_exporter') }}"
+    node_exporter_user: "{{ exporter_config.exporter_user | default(prometheus_user) }}"
+    node_exporter_group: "{{ exporter_config.exporter_group | default(prometheus_group) }}"
 
-  - name: Prometheus node exporter | check if this exporter version exists
-    ansible.builtin.stat:
-      path: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64/"
-    register: node_exporter_version_exists
-    become: true
-    become_user: "{{ node_exporter_user }}"
+- name: Prometheus node exporter | check if this exporter version exists
+  ansible.builtin.stat:
+    path: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64/"
+  register: node_exporter_version_exists
+  become: true
+  become_user: "{{ node_exporter_user }}"
 
-  - name: Prometheus Node Exporter | Download distribution
-    ansible.builtin.get_url:
-      url: "https://github.com/prometheus/node_exporter/releases/download/v{{ prometheus_node_exporter_version }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
-      dest: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
-      owner: "{{ node_exporter_user }}"
-      group: "{{ node_exporter_group }}"
-      mode: "0644"
-    become: true
-    when: not node_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus Node Exporter | Download distribution
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ prometheus_node_exporter_version }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+    mode: "0644"
+  become: true
+  when: not node_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus Node Exporter | unpack distribution
-    ansible.builtin.unarchive:
-      src: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
-      dest: "{{ prometheus_exporters_dir }}"
-      remote_src: yes
-      owner: "{{ node_exporter_user }}"
-      group: "{{ node_exporter_group }}"
-    become: true
-    when: not node_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus Node Exporter | unpack distribution
+  ansible.builtin.unarchive:
+    src: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_exporters_dir }}"
+    remote_src: true
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+  become: true
+  when: not node_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Prometheus Node Exporter | link node exporter dir
-    ansible.builtin.file:
-      src: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64/"
-      dest: "{{ prometheus_exporters_dir }}/{{ node_exporter_sub_dir }}"
-      owner: "root"
-      group: "{{ node_exporter_group }}"
-      state: link
-    become: true
-    when: not node_exporter_version_exists.stat.exists
-    tags:
-      - prometheus
+- name: Prometheus Node Exporter | link node exporter dir
+  ansible.builtin.file:
+    src: "{{ prometheus_exporters_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64/"
+    dest: "{{ prometheus_exporters_dir }}/{{ node_exporter_sub_dir }}"
+    owner: "root"
+    group: "{{ node_exporter_group }}"
+    state: link
+  become: true
+  when: not node_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
 
-  - name: Debug | exporter config
-    ansible.builtin.debug:
-      var: "exporter_config"
+- name: Debug | exporter config
+  ansible.builtin.debug:
+    var: "exporter_config"
 
-  - name: Prometheus apache Exporter | Include startup tasks
-    ansible.builtin.include_tasks: "tasks_startup.yml"
-    vars:
-      exporter_startup_config: "{{ exporter_config }}"
+- name: Prometheus apache Exporter | Include startup tasks
+  ansible.builtin.include_tasks: "tasks_startup.yml"
+  vars:
+    exporter_startup_config: "{{ exporter_config }}"

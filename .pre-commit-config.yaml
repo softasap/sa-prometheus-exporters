@@ -1,3 +1,4 @@
+---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -32,7 +33,7 @@ repos:
         # plugins is the standard collection dir for modules
         entry: env ANSIBLE_LIBRARY=plugins ansible-lint --force-color -p -v .
         additional_dependencies:
-          - 'ansible>11,<12'
+          - "ansible>11,<12"
   - repo: https://github.com/openstack-dev/bashate.git
     rev: 2.1.1
     hooks:
