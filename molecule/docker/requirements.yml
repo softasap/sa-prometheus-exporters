@@ -1,3 +1,6 @@
----
-- src: softasap.sa-box-bootstrap
-  name: sa_box_bootstrap
+collections:
+  - name: community.general
+    version: 10.5.0
+  - name: ansible.posix
+    version: 1.6.2
+  - name: community.docker

@@ -1,6 +1,5 @@
 ---
-# https://github.com/justwatchcom/sql_exporter
-# https://github.com/justwatchcom/sql_exporter/releases/download/v0.2.0/sql_exporter-0.2.0.linux-amd64.tar.gz
+# https://github.com/burningalchemist/sql_exporter/releases (moved from justwatchcom)
 - name: Set exporter facts
   ansible.builtin.set_fact:
     sql_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('sql_exporter') }}"
@@ -16,7 +15,7 @@
 
 - name: Prometheus sql Exporter | Download distribution
   ansible.builtin.get_url:
-    url: "https://github.com/justwatchcom/sql_exporter/releases/download/v{{ prometheus_sql_exporter_version }}/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64.tar.gz"
+    url: "https://github.com/burningalchemist/sql_exporter/releases/download/{{ prometheus_sql_exporter_version }}/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64.tar.gz"
     dest: "/tmp/sql_exporter-{{ prometheus_sql_exporter_version }}.linux-amd64.tar.gz"
     owner: "{{ sql_exporter_user }}"
     group: "{{ sql_exporter_group }}"

@@ -1,5 +1,5 @@
 ---
-# https://github.com/ProjectLighthouse/ecs-exporter/releases/tag/v1.1.1
+# https://github.com/prometheus-community/ecs_exporter/releases (moved from ProjectLighthouse)
 - name: Set exporter facts
   ansible.builtin.set_fact:
     ecs_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('ecs_exporter') }}"
@@ -29,11 +29,35 @@
 
 - name: Prometheus ecs Exporter | Download distribution
   ansible.builtin.get_url:
-    url: "https://github.com/ProjectLighthouse/ecs-exporter/releases/download/v{{ prometheus_ecs_exporter_version | default('1.1.1') }}/ecs-exporter"
-    dest: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}/ecs-exporter"
-    mode: "u=rwx,g=rx,o=rx"
+    url: "https://github.com/prometheus-community/ecs_exporter/releases/download/v{{ prometheus_ecs_exporter_version | default('0.6.0') }}/ecs_exporter-{{ prometheus_ecs_exporter_version | default('0.6.0') }}.linux-amd64.tar.gz"
+    dest: "/tmp/ecs_exporter-{{ prometheus_ecs_exporter_version | default('0.6.0') }}.linux-amd64.tar.gz"
+    mode: "0644"
   become: true
   become_user: "{{ ecs_exporter_user }}"
+  when: not ecs_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
+
+- name: Prometheus ecs Exporter | unpack distribution
+  ansible.builtin.unarchive:
+    src: "/tmp/ecs_exporter-{{ prometheus_ecs_exporter_version | default('0.6.0') }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}"
+    creates: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}/ecs_exporter"
+    remote_src: true
+  become: true
+  become_user: "{{ ecs_exporter_user }}"
+  when: not ecs_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
+
+- name: Prometheus ecs Exporter | link exporter binary to expected name
+  ansible.builtin.file:
+    src: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}/ecs_exporter"
+    dest: "{{ prometheus_exporters_dir }}/{{ ecs_exporter_sub_dir }}/ecs-exporter"
+    state: link
+    owner: "{{ ecs_exporter_user }}"
+    group: "{{ ecs_exporter_group }}"
+  become: true
   when: not ecs_exporter_version_exists.stat.exists
   tags:
     - prometheus

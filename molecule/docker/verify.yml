@@ -1,0 +1,33 @@
+---
+# Verify playbook for the docker scenario (no service checks — containers
+# typically run this role with docker_test defined, which skips services).
+- name: Verify role under test (docker)
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Verify | Display role under test
+      ansible.builtin.debug:
+        var: role_under_test
+
+    - name: Verify | node_exporter reports its version
+      ansible.builtin.shell: /opt/prometheus/exporters/node_exporter/node_exporter --version 2>&1
+      register: node_version
+      changed_when: false
+
+    - name: Verify | Assert node_exporter version matches pin
+      ansible.builtin.assert:
+        that:
+          - "'1.13.1' in node_version.stdout"
+        fail_msg: "node_exporter version mismatch: {{ node_version.stdout }}"
+
+    - name: Verify | redis_exporter reports its version
+      ansible.builtin.shell: /opt/prometheus/exporters/redis_exporter/redis_exporter --version 2>&1
+      register: redis_version
+      changed_when: false
+
+    - name: Verify | Assert redis_exporter version matches pin
+      ansible.builtin.assert:
+        that:
+          - "'1.99.0' in redis_version.stdout"
+        fail_msg: "redis_exporter version mismatch: {{ redis_version.stdout }}"

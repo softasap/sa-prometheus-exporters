@@ -1,6 +1,5 @@
 ---
-# Memcached https://github.com/prometheus/memcached_exporter/
-# https://github.com/prometheus/memcached_exporter/releases/download/v0.3.0/memcached_exporter-0.3.0.linux-amd64.tar.gz
+# https://github.com/prometheus/memcached_exporter/releases
 
 - name: Set exporter facts
   ansible.builtin.set_fact:
@@ -49,6 +48,7 @@
     group: "{{ memcached_exporter_group }}"
     state: link
   become: true
+  when: not memcached_exporter_version_exists.stat.exists
   tags:
     - prometheus
 

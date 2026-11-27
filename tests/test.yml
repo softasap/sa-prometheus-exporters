@@ -1,6 +1,18 @@
 ---
-- hosts: all
+# Legacy direct-playbook test entry point (not used by molecule).
+# The role name is never hardcoded: pass it via extra vars, e.g.
+#   ansible-playbook -i inventory -e role_under_test=my-role tests/test.yml
+# Molecule scenarios use include_role the same way (see molecule/*/converge.yml).
+- name: Test role under test
+  hosts: all
   vars:
     ansible_python_interpreter: auto
-  roles:
-    - { role: "role_under_test", firewall_used: docker, docker_test: true, preferred_python_version: "3" }
+
+  tasks:
+    - name: Apply role under test
+      ansible.builtin.include_role:
+        name: "{{ role_under_test }}"
+      vars:
+        firewall_used: docker
+        docker_test: true
+        preferred_python_version: "3"

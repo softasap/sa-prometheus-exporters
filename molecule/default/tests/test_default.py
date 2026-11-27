@@ -12,3 +12,17 @@ def test_hosts_file(host):
     assert f.exists
     assert f.user == 'root'
     assert f.group == 'root'
+
+
+def test_node_exporter_binary(host):
+    f = host.file('/opt/prometheus/exporters/node_exporter/node_exporter')
+
+    assert f.exists
+    assert f.user == 'prometheus'
+
+
+def test_redis_exporter_binary(host):
+    path = '/opt/prometheus/exporters/redis_exporter/redis_exporter'
+    binary = host.file(path)
+
+    assert binary.exists

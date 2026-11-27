@@ -1,6 +1,5 @@
 ---
-# https://github.com/Lusitaniae/phpfpm_exporter
-# https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v0.2.0/phpfpm_exporter-0.2.0.linux-amd64.tar.gz
+# https://github.com/hipages/php-fpm_exporter/releases (moved from Lusitaniae)
 
 - name: Set exporter facts
   ansible.builtin.set_fact:
@@ -16,7 +15,7 @@
 
 - name: Prometheus PHP-FPM Exporter | Download distribution
   ansible.builtin.get_url:
-    url: "https://github.com/Lusitaniae/phpfpm_exporter/releases/download/v{{ prometheus_phpfpm_exporter_version }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64.tar.gz"
+    url: "https://github.com/hipages/php-fpm_exporter/releases/download/v{{ prometheus_phpfpm_exporter_version }}/php-fpm_exporter_{{ prometheus_phpfpm_exporter_version }}_linux_amd64.tar.gz"
     dest: "/tmp/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64.tar.gz"
     owner: "{{ phpfpm_exporter_user }}"
     group: "{{ phpfpm_exporter_group }}"
@@ -29,8 +28,19 @@
 - name: Prometheus PHP-FPM Exporter | unpack distribution
   ansible.builtin.unarchive:
     src: "/tmp/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64.tar.gz"
-    dest: "{{ prometheus_exporters_dir }}"
+    dest: "{{ prometheus_exporters_dir }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64"
+    creates: "{{ prometheus_exporters_dir }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64/php-fpm-exporter"
     remote_src: true
+  become: true
+  when: not phpfpm_exporter_version_exists.stat.exists
+  tags:
+    - prometheus
+
+- name: Prometheus PHP-FPM Exporter | link exporter binary to expected name
+  ansible.builtin.file:
+    src: "{{ prometheus_exporters_dir }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64/php-fpm-exporter"
+    dest: "{{ prometheus_exporters_dir }}/phpfpm_exporter-{{ prometheus_phpfpm_exporter_version }}.linux-amd64/phpfpm_exporter"
+    state: link
     owner: "{{ phpfpm_exporter_user }}"
     group: "{{ phpfpm_exporter_group }}"
   become: true

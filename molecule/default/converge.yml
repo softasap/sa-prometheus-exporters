@@ -3,6 +3,10 @@
   hosts: all
 
   pre_tasks:
+    - name: Display role under test
+      ansible.builtin.debug:
+        var: role_under_test
+
     - name: Pre tasks debug
       ansible.builtin.debug:
         msg: "Pre tasks section for {{ ansible_host }}"
@@ -15,8 +19,10 @@
       ansible.builtin.include_vars:
         file: "vars/molecule_vars.yml"
 
-  roles:
-    - sa-prometheus-exporters
+  tasks:
+    - name: Apply role under test
+      ansible.builtin.include_role:
+        name: "{{ role_under_test }}"
 
   # - name: Apply box play
   #   ansible.builtin.import_playbook: ../../playbook.yml

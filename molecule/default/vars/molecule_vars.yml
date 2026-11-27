@@ -1,2 +1,7 @@
 ---
-dummy: true
+# Converge installs a focused subset for fast, reliable acceptance:
+# node_exporter (binary sanity) + redis_exporter (alternate layout).
+# The full 17-exporter default list remains in defaults/main.yml for real use.
+prometheus_exporters:
+  - name: node
+  - name: redis

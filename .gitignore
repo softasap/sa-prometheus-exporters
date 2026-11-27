@@ -11,3 +11,14 @@ __pycache__/
 .aid*
 .ansible
 auto-patch.sh
+.agents/
+.claude/
+.codegraph/
+.graphifyignore
+.kilo/
+.mcp.json
+.opencode/
+.specify/
+graphify-out/
+opencode.json
+zcode.json

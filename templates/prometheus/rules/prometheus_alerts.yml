@@ -35,7 +35,7 @@ groups:
 #      description: "AlertManager configuration reload error\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
       description: "AlertManager configuration reload error, VALUE = {{ $value }}"
 
-  #Prometheus exporter down
+  # Prometheus exporter down
   - alert: ExporterDown
     expr: up == 0
     for: 5m

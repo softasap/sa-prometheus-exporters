@@ -1,0 +1,61 @@
+---
+# Verify playbook. Runs as part of `molecule test` after converge + idempotence.
+- name: Verify role under test
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Verify | Display role under test
+      ansible.builtin.debug:
+        var: role_under_test
+
+    - name: Verify | Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Verify | Assert exporter services are running
+      ansible.builtin.assert:
+        that:
+          - "'prometheus-exporter-node.service' in ansible_facts.services"
+          - ansible_facts.services['prometheus-exporter-node.service'].state == 'running'
+          - "'prometheus-exporter-redis.service' in ansible_facts.services"
+          - ansible_facts.services['prometheus-exporter-redis.service'].state == 'running'
+        fail_msg: "Exporter services are not running"
+
+    - name: Verify | node_exporter reports its version
+      ansible.builtin.shell: /opt/prometheus/exporters/node_exporter/node_exporter --version 2>&1
+      register: node_version
+      changed_when: false
+
+    - name: Verify | Assert node_exporter version matches pin
+      ansible.builtin.assert:
+        that:
+          - "'1.13.1' in node_version.stdout"
+        fail_msg: "node_exporter version mismatch: {{ node_version.stdout }}"
+
+    - name: Verify | redis_exporter reports its version
+      ansible.builtin.shell: /opt/prometheus/exporters/redis_exporter/redis_exporter --version 2>&1
+      register: redis_version
+      changed_when: false
+
+    - name: Verify | Assert redis_exporter version matches pin
+      ansible.builtin.assert:
+        that:
+          - "'1.99.0' in redis_version.stdout"
+        fail_msg: "redis_exporter version mismatch: {{ redis_version.stdout }}"
+
+    - name: Verify | Exporter config files exist
+      ansible.builtin.stat:
+        path: "/etc/prometheus/exporters/{{ item }}_exporter"
+      register: exporter_configs
+      loop:
+        - node
+        - redis
+
+    - name: Verify | Assert config files are present
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+        fail_msg: "{{ item.item }} exporter config missing"
+      loop: "{{ exporter_configs.results }}"
+      loop_control:
+        label: "{{ item.item }}"

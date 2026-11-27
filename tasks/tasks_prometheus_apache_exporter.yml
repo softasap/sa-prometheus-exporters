@@ -1,6 +1,5 @@
 ---
-# https://github.com/Lusitaniae/apache_exporter
-# https://github.com/Lusitaniae/apache_exporter/releases/download/v0.5.0/apache_exporter-0.5.0.linux-amd64.tar.gz
+# https://github.com/Lusitaniae/apache_exporter/releases
 - name: Set exporter facts
   ansible.builtin.set_fact:
     apache_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('apache_exporter') }}"
@@ -44,6 +43,7 @@
     group: "{{ apache_exporter_group }}"
     state: link
   become: true
+  when: not apache_exporter_version_exists.stat.exists
   tags:
     - prometheus
 
