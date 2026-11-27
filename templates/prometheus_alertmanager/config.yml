@@ -93,7 +93,7 @@ receivers:
   email_configs:
   - to: someemail@gmail.com
   slack_configs:
-  - channel: #notifications
+  - channel: "#notifications"
     send_resolved: true
     api_url: https://hooks.slack.com/services/HIHI/HAHA
     icon_url: https://avatars3.githubusercontent.com/u/4029521

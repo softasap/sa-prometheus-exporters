@@ -13,7 +13,7 @@ groups:
 #      description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
       description: "Node memory is filling up (< 10% left),  VALUE = {{ $value }}"
 
-  #Host network interfaces are probably receiving too much data (> 100 MB/s)
+  # Host network interfaces are probably receiving too much data (> 100 MB/s)
   - alert: UnusualNetworkThroughputIn
     expr: sum by (instance) (irate(node_network_receive_bytes_total[2m])) / 1024 / 1024 > 100
     for: 5m

@@ -2,7 +2,7 @@
 groups:
 - name: cadvisor_alerts.rules
   rules:
-  #A container has disappeared
+  # A container has disappeared
   - alert: ContainerKilled
     expr: time() - container_last_seen > 60
     for: 5m
