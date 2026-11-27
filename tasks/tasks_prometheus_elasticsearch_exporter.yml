@@ -1,5 +1,5 @@
 ---
-# https://github.com/justwatchcom/elasticsearch_exporter/releases/download/v1.0.2/elasticsearch_exporter-1.0.2.linux-amd64.tar.gz
+# https://github.com/prometheus-community/elasticsearch_exporter/releases (moved from justwatchcom)
 - name: Set exporter facts
   ansible.builtin.set_fact:
     elasticsearch_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('elasticsearch_exporter') }}"
@@ -15,7 +15,7 @@
 
 - name: Prometheus elasticsearch Exporter | Download distribution
   ansible.builtin.get_url:
-    url: "https://github.com/justwatchcom/elasticsearch_exporter/releases/download/v{{ prometheus_elasticsearch_exporter_version }}/elasticsearch_exporter-{{ prometheus_elasticsearch_exporter_version }}.linux-amd64.tar.gz"
+    url: "https://github.com/prometheus-community/elasticsearch_exporter/releases/download/v{{ prometheus_elasticsearch_exporter_version }}/elasticsearch_exporter-{{ prometheus_elasticsearch_exporter_version }}.linux-amd64.tar.gz"
     dest: "/tmp/elasticsearch_exporter-{{ prometheus_elasticsearch_exporter_version }}.linux-amd64.tar.gz"
     owner: "{{ elasticsearch_exporter_user }}"
     group: "{{ elasticsearch_exporter_group }}"
@@ -45,10 +45,11 @@
     group: "{{ elasticsearch_exporter_group }}"
     state: link
   become: true
+  when: not elasticsearch_exporter_version_exists.stat.exists
   tags:
     - prometheus
 
-- name: Prometheus apache Exporter | Include startup tasks
+- name: Prometheus elasticsearch Exporter | Include startup tasks
   ansible.builtin.include_tasks: "tasks_startup.yml"
   vars:
     exporter_startup_config: "{{ exporter_config }}"

@@ -4,35 +4,32 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: instance
-    image: "softasap/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
-    ansible.builtin.command: ${MOLECULE_DOCKER_COMMAND:-""}
+  - name: ubuntu2404
+    image: "geerlingguy/docker-ubuntu2404-ansible:latest"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+  - name: ubuntu2604
+    image: "geerlingguy/docker-ubuntu2604-ansible:latest"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
     privileged: true
     pre_build_image: true
 provisioner:
   name: ansible
-  playbooks:
-    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
+  log: true
   inventory:
     host_vars:
-      instance:
-        foo: bar
+      ubuntu2404:
         role_under_test: ${MOLECULE_TEST_ROLE:-role_under_test}
+      ubuntu2604:
+        role_under_test: ${MOLECULE_TEST_ROLE:-role_under_test}
+verifier:
+  name: ansible
 scenario:
   name: docker
-  test_sequence:
-    - dependency
-    - lint
-    - cleanup
-    - destroy
-    - syntax
-    - create
-    - prepare
-    - converge
-    #    - idempotence
-    - side_effect
-    - verify
-    - cleanup
-    - destroy

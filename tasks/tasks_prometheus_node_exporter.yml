@@ -1,5 +1,5 @@
 ---
-# https://github.com/prometheus/node_exporter/releases/download/0.12.0/node_exporter-0.12.0.linux-amd64.tar.gz
+# https://github.com/prometheus/node_exporter/releases
 - name: Set exporter facts
   ansible.builtin.set_fact:
     node_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('node_exporter') }}"
@@ -53,7 +53,7 @@
   ansible.builtin.debug:
     var: "exporter_config"
 
-- name: Prometheus apache Exporter | Include startup tasks
+- name: Prometheus node Exporter | Include startup tasks
   ansible.builtin.include_tasks: "tasks_startup.yml"
   vars:
     exporter_startup_config: "{{ exporter_config }}"

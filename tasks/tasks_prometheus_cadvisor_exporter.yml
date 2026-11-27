@@ -1,6 +1,5 @@
 ---
 # https://github.com/google/cadvisor/releases
-# https://github.com/google/cadvisor/releases/download/v0.27.4/cadvisor
 - name: Set exporter facts
   ansible.builtin.set_fact:
     cadvisor_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('cadvisor_exporter') }}"
@@ -32,7 +31,7 @@
 
 - name: CAdvisor | Download distribution
   ansible.builtin.get_url:
-    url: "https://github.com/google/cadvisor/releases/download/v{{ prometheus_cadvisor_exporter_version }}/cadvisor"
+    url: "https://github.com/google/cadvisor/releases/download/v{{ prometheus_cadvisor_exporter_version }}/cadvisor-v{{ prometheus_cadvisor_exporter_version }}-linux-amd64"
     dest: "{{ prometheus_exporters_dir }}/{{ cadvisor_exporter_sub_dir }}/cadvisor_exporter"
     mode: "0755"
   become: true
@@ -78,55 +77,11 @@
   tags:
     - prometheus
 
-- name: CAdvisor | Configure upstart service
-  when: ansible_service_mgr == "upstart" and cadvisor_exists is failed
-  block:
-    - name: Detect start-stop-daemon
-      ansible.builtin.command: type start-stop-daemon
-      register: startstop_exists
-      changed_when: false
-      tags:
-        - skip_ansible_lint
-
-    - name: CAdvisor | Template startup script
-      ansible.builtin.template:
-        src: "{{ role_dir }}/templates/cadvisor.amzn.j2"
-        dest: "/etc/init/cadvisor.conf"
-        mode: "0644"
-        owner: root
-        group: root
-      become: true
-      tags:
-        - prometheus
-
-    - name: CAdvisor | Template startup script
-      ansible.builtin.template:
-        src: "{{ role_dir }}/templates/cadvisor.upstart.j2"
-        dest: "/etc/init/cadvisor.conf"
-        mode: "0644"
-        owner: root
-        group: root
-      when: startstop_exists is failed
-      become: true
-      tags:
-        - prometheus
-
 - name: CAdvisor | Ensure service started
   ansible.builtin.service:
     name: "cadvisor"
     state: "started"
     enabled: "yes"
-  when: docker_test is not defined and ansible_service_mgr == "upstart"
-  become: true
-  tags:
-    - prometheus
-
-- name: CAdvisor | Ensure service started
-  ansible.builtin.systemd:
-    name: "cadvisor"
-    state: "started"
-    enabled: "yes"
-    daemon_reload: "yes"
   when: docker_test is not defined and ansible_service_mgr == "systemd"
   become: true
   tags:

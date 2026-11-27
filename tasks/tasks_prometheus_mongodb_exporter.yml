@@ -1,5 +1,5 @@
 ---
-# https://github.com/percona/mongodb_exporter/releases/download/v0.3.1/mongodb_exporter-0.3.1.linux-amd64.tar.gz
+# https://github.com/percona/mongodb_exporter/releases
 
 - name: Set exporter facts
   ansible.builtin.set_fact:
@@ -48,6 +48,7 @@
     group: "{{ mongodb_exporter_group }}"
     state: link
   become: true
+  when: not mongodb_exporter_version_exists.stat.exists
   tags:
     - prometheus
 

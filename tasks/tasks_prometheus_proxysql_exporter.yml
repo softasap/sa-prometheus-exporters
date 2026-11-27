@@ -1,5 +1,5 @@
 ---
-# https://github.com/percona/proxysql_exporter/releases/download/v1.1.0/proxysql_exporter-1.1.0.linux-amd64.tar.gz
+# https://github.com/percona/proxysql_exporter/releases
 - name: Set exporter facts
   ansible.builtin.set_fact:
     proxysql_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('proxysql_exporter') }}"
@@ -15,7 +15,7 @@
 
 - name: Prometheus proxysql Exporter | Download distribution
   ansible.builtin.get_url:
-    url: "https://github.com/percona/proxysql_exporter/releases/download/v{{ prometheus_proxysql_exporter_version }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
+    url: "https://github.com/percona/proxysql_exporter/releases/download/v{{ prometheus_proxysql_exporter_version }}/proxysql_exporter_linux_amd64.tar.gz"
     dest: "/tmp/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
     owner: "{{ proxysql_exporter_user }}"
     group: "{{ proxysql_exporter_group }}"
@@ -29,7 +29,8 @@
 - name: Prometheus proxysql Exporter | unpack distribution
   ansible.builtin.unarchive:
     src: "/tmp/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64.tar.gz"
-    dest: "{{ prometheus_exporters_dir }}"
+    dest: "{{ prometheus_exporters_dir }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64"
+    creates: "{{ prometheus_exporters_dir }}/proxysql_exporter-{{ prometheus_proxysql_exporter_version }}.linux-amd64/proxysql_exporter"
     remote_src: true
     owner: "{{ proxysql_exporter_user }}"
     group: "{{ proxysql_exporter_group }}"

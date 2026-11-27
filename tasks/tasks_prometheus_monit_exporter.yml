@@ -1,5 +1,6 @@
 ---
-# https://github.com/commercetools/monit_exporter/releases/download/v0.0.2/monit_exporter
+# https://github.com/commercetools/monit_exporter/releases
+# NOTE: upstream is archived (last release v0.0.2, 2020). Pinned intentionally.
 
 - name: Set exporter facts
   ansible.builtin.set_fact:
@@ -64,7 +65,6 @@
     state: link
     owner: "{{ monit_exporter_user }}"
     group: "{{ monit_exporter_group }}"
-  with_items: "{{ monit_presets | default([]) }}"
   become: true
   tags:
     - monit

@@ -1,16 +1,19 @@
----
-# Ansible-lint rules https://ansible-lint.readthedocs.io/en/latest/default_rules.html
+# Ansible-lint rules https://ansible-lint.readthedocs.io/en/latest/configuring/
 exclude_paths:
-  - ./box-example
-  - ./molecule
-  - ./tests
-parseable: true
+  - box-example/
+  - molecule/
+  - tests/
+  - .ai-files/
+  - .agents/
+  - .codegraph/
+  - .commandcode/
+  - .claude/
+  - squashfs-root/
+offline: false
 quiet: true
 skip_list:
   - skip_linting
-  - "106"
-  - "204"
-  - "602"
-#  - 'schema[meta]'
 use_default_rules: true
 verbosity: 1
+warn_list:
+  - experimental

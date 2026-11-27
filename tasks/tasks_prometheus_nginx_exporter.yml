@@ -1,5 +1,5 @@
 ---
-# https://github.com/nginxinc/nginx-prometheus-exporter
+# https://github.com/nginx/nginx-prometheus-exporter/releases (moved from nginxinc)
 
 - name: Set exporter facts
   ansible.builtin.set_fact:
@@ -21,7 +21,7 @@
 
 - name: Prometheus nginx Exporter | Download distribution
   ansible.builtin.get_url:
-    url: "https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v{{ prometheus_nginx_exporter_version }}/nginx-prometheus-exporter-{{ prometheus_nginx_exporter_version }}-linux-amd64.tar.gz"
+    url: "https://github.com/nginx/nginx-prometheus-exporter/releases/download/v{{ prometheus_nginx_exporter_version }}/nginx-prometheus-exporter_{{ prometheus_nginx_exporter_version }}_linux_amd64.tar.gz"
     dest: "/tmp/nginx-prometheus-exporter-{{ prometheus_nginx_exporter_version }}-linux-amd64.tar.gz"
     mode: "0640"
   become: true
@@ -52,22 +52,24 @@
   tags:
     - prometheus
 
-- name: Prometheus nginx Exporter | adapt expected exporter name
-  ansible.builtin.command: "mv nginx-prometheus-exporter nginx_exporter"
-  args:
-    chdir: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64"
+- name: Prometheus nginx Exporter | Fix permissions
+  ansible.builtin.file:
+    path: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64/nginx-prometheus-exporter"
+    owner: "{{ nginx_exporter_user }}"
+    group: "root"
+    mode: "u=rx,g=rx,o=rx"
   become: true
   when: not nginx_exporter_version_exists.stat.exists
-  changed_when: true
   tags:
     - prometheus
 
-- name: Prometheus nginx Exporter | Fix permissions
+- name: Prometheus nginx Exporter | link nginx exporter binary
   ansible.builtin.file:
-    path: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64/nginx_exporter"
+    src: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64/nginx-prometheus-exporter"
+    dest: "{{ prometheus_exporters_dir }}/nginx_exporter-{{ prometheus_nginx_exporter_version }}.linux-amd64/nginx_exporter"
     owner: "{{ nginx_exporter_user }}"
     group: "root"
-    mode: "u=rx,g=rwx,o=rx"
+    state: link
   become: true
   when: not nginx_exporter_version_exists.stat.exists
   tags:
@@ -81,6 +83,7 @@
     group: "{{ nginx_exporter_group }}"
     state: link
   become: true
+  when: not nginx_exporter_version_exists.stat.exists
   tags:
     - prometheus
 

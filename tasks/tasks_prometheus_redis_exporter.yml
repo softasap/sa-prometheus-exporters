@@ -1,6 +1,5 @@
 ---
 # https://github.com/oliver006/redis_exporter/releases
-# https://github.com/oliver006/redis_exporter/releases/download/v0.14/redis_exporter-v0.14.linux-amd64.tar.gz
 - name: Set exporter facts
   ansible.builtin.set_fact:
     redis_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('redis_exporter') }}"
@@ -9,7 +8,7 @@
 
 - name: Prometheus redis exporter | check if this exporter version exists
   ansible.builtin.stat:
-    path: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
+    path: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}/redis_exporter"
   register: redis_exporter_version_exists
   become: true
   become_user: "{{ redis_exporter_user }}"
@@ -56,7 +55,7 @@
   ansible.builtin.copy:
     remote_src: true
     src: "/tmp/redis_exporter-v{{ prometheus_redis_exporter_version }}.linux-amd64/redis_exporter"
-    dest: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}"
+    dest: "{{ prometheus_exporters_dir }}/{{ redis_exporter_sub_dir }}/redis_exporter"
     owner: "{{ redis_exporter_user }}"
     group: "{{ redis_exporter_group }}"
     mode: "u=rwx,g=rx,o=rx"

@@ -1,6 +1,5 @@
 ---
-# https://github.com/ribbybibby/ssl_exporter
-# https://github.com/ribbybibby/ssl_exporter/releases/download/v0.5.0/ssl_exporter-0.5.0.linux-amd64.tar.gz
+# https://github.com/ribbybibby/ssl_exporter/releases
 - name: Set exporter facts
   ansible.builtin.set_fact:
     ssl_exporter_sub_dir: "{{ exporter_config.exporter_dir | default('ssl_exporter') }}"
@@ -16,7 +15,7 @@
 
 - name: Prometheus ssl Exporter | Download distribution
   ansible.builtin.get_url:
-    url: "https://github.com/ribbybibby/ssl_exporter/releases/download/v{{ prometheus_ssl_exporter_version }}/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64.tar.gz"
+    url: "https://github.com/ribbybibby/ssl_exporter/releases/download/v{{ prometheus_ssl_exporter_version }}/ssl_exporter_{{ prometheus_ssl_exporter_version }}_linux_amd64.tar.gz"
     dest: "/tmp/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64.tar.gz"
     owner: "{{ ssl_exporter_user }}"
     group: "{{ ssl_exporter_group }}"
@@ -30,7 +29,8 @@
 - name: Prometheus ssl Exporter | unpack distribution
   ansible.builtin.unarchive:
     src: "/tmp/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64.tar.gz"
-    dest: "{{ prometheus_exporters_dir }}"
+    dest: "{{ prometheus_exporters_dir }}/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64"
+    creates: "{{ prometheus_exporters_dir }}/ssl_exporter-{{ prometheus_ssl_exporter_version }}.linux-amd64/ssl_exporter"
     remote_src: true
   become: true
   become_user: "{{ ssl_exporter_user }}"
